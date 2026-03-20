@@ -1,0 +1,10 @@
+category.list.alls:
+  path: /categories/alls
+  controller: App\Categories\UI\Controller\CategoryController::listAll
+  methods: [GET]
+
+
+category.add:
+  path: /categories/add
+  controller: App\Categories\UI\Controller\CategoryController::add
+  methods: [POST]
