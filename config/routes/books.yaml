@@ -1,0 +1,4 @@
+api.books.post:
+  path: /api/books
+  controller: App\Books\UI\Controller\BookController::record
+  methods: [POST]

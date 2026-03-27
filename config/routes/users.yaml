@@ -1,0 +1,20 @@
+app_verify_email_user:
+  path: /api/verify/email
+  controller: App\Users\UI\Controller\UserController::verifyUserEmail
+  methods: ['GET', 'OPTIONS']
+
+app_add_user:
+  path: /api/register
+  controller: App\Users\UI\Controller\UserController::receiveNewUser
+  methods: ['POST','OPTIONS']
+
+app_user_login:
+  path: /api/user_login
+  controller: App\Users\UI\Controller\LoginController::__invoke
+  methods: ['POST']
+
+api_me:
+  path: /api/me
+  controller: App\Users\UI\Controller\UserController::me
+  methods: ['GET']
+

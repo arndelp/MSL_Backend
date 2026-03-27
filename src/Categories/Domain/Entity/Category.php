@@ -8,9 +8,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Metadata\ApiResource;
-use App\Entity\Book;
-use Doctrine\ORM\EntityManager;
-;
+use App\Books\Domain\Entity\Book;
+
+
+
 
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]

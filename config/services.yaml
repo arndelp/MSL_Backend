@@ -9,11 +9,22 @@
 parameters:
 
 services:
+    App\:
+        resource: '../src/'
 
-    App\EventListener\BookListener:
-        tags:
-            - { name: doctrine.event_listener, event: prePersist }
-            - { name: doctrine.event_listener, event: preUpdate }
+    App\Users\UI\Controller\LoginController:
+        tags: ['controller.service_arguments']
+        
+    #App\src\Users\:
+     #   ressourse: './src/Users/Domain/Entity'
+     #   exclude:
+     #       - '../src/Users/Domain/Entity'
+     #       - '../src/Users/UI/'
+
+    #App\EventListener\BookListener:
+       # tags:
+        #    - { name: doctrine.event_listener, event: prePersist }
+        #    - { name: doctrine.event_listener, event: preUpdate }
 
 
     # default configuration for services in *this* file
@@ -23,8 +34,6 @@ services:
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
-    App\:
-        resource: '../src/'
-
+    
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

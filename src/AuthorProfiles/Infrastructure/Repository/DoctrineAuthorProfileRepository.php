@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Repository;
+namespace App\AuthorProfiles\Infrastructure\Repository;
 
-use App\Entity\AuthorProfile;
+use App\AuthorProfiles\Domain\Entity\AuthorProfile;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<AuthorProfile>
  */
-class AuthorProfileRepository extends ServiceEntityRepository
+class DoctrineAuthorProfileRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

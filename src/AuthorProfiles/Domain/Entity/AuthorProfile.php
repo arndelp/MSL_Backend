@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Entity;
+namespace App\AuthorProfiles\Domain\Entity;
 
-use App\Repository\AuthorProfileRepository;
+use App\AuthorProfiles\Infrastructure\Repository\DoctrineAuthorProfileRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Users\Domain\Entity\User;
 
-#[ORM\Entity(repositoryClass: AuthorProfileRepository::class)]
+#[ORM\Entity(repositoryClass: DoctrineAuthorProfileRepository::class)]
 class AuthorProfile
 {
     #[ORM\Id]
@@ -24,7 +25,7 @@ class AuthorProfile
     private ?string $website = null;
 
     #[ORM\OneToOne(inversedBy: 'authorProfile', targetEntity: User::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn]
     private ?User $user = null;
    
 

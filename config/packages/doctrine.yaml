@@ -24,19 +24,37 @@ doctrine:
         identity_generation_preferences:
             Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
         auto_mapping: true
-        mappings:
-            App:
-                type: attribute
-                is_bundle: false
-                dir: '%kernel.project_dir%/src/Entity'
-                prefix: 'App\Entity'
-                alias: App
+        mappings:            
             Categories:
                 is_bundle: false
                 type: attribute
                 dir: '%kernel.project_dir%/src/Categories/Domain/Entity'
                 prefix: 'App\Categories\Domain\Entity'
                 alias: Categories
+            Books:
+                is_bundle: false
+                type: attribute
+                dir: '%kernel.project_dir%/src/Books/Domain/Entity'
+                prefix: 'App\Books\Domain\Entity'
+                alias: Books
+            Users:
+                is_bundle: false
+                type: attribute
+                dir: '%kernel.project_dir%/src/Users/Domain/Entity'
+                prefix: 'App\Users\Domain\Entity'
+                alias: Users
+            AuthorProfiles:
+                is_bundle: false
+                type: attribute
+                dir: '%kernel.project_dir%/src/AuthorProfiles/Domain/Entity'
+                prefix: 'App\AuthorProfiles\Domain\Entity'
+                alias: AuthorProfiles
+            #App:
+                #type: attribute
+                #is_bundle: false
+                #dir: '%kernel.project_dir%/src/Entity'
+                #prefix: 'App\Entity'
+                #alias: App
         controller_resolver:
             auto_mapping: false
 

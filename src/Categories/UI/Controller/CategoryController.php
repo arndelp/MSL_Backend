@@ -5,7 +5,7 @@ namespace App\Categories\UI\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use App\Categories\Application\UseCase\GetCategory;
-use App\Components\HttpFoundation\JsonResponse;
+
 
 
 final class CategoryController extends AbstractController

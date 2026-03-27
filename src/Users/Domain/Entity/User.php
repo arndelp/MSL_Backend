@@ -1,48 +1,87 @@
 <?php
 
-namespace App\Entity;
+namespace App\Users\Domain\Entity;
 
-use App\Repository\UserRepository;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\ApiResource;
+use App\Users\Infrastructure\Repository\DoctrineUserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use App\Entity\Book;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use App\Books\Domain\Entity\Book;
+use App\AuthorProfiles\Domain\Entity\AuthorProfile;
+use App\Users\UI\Controller\UserController;
+use App\Users\Application\DTO\CreateUserDTO;
+use App\Users\Application\DTO\LoginDTO;
 
-#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Entity(repositoryClass: DoctrineUserRepository::class)]
+#[ApiResource(
+    // Création d'utilisateur
+    input: CreateUserDTO::class, 
+    normalizationContext: ['groups' => ['user:read', 'book:read']],
+    formats: ['json'],
+    operations: [
+        new Post(
+            controller: UserController::class . '::receiveNewUser',
+            input: CreateUserDTO::class,
+            output: false,
+            name: 'custom_create_user',
+            denormalizationContext: ['groups' => ['user']]
+        ),
+        // Login utilisateur
+        new Post(
+            controller: UserController::class . '::login',
+            input: LoginDTO::class,
+            output: false,
+            name: 'login_user',
+            denormalizationContext: ['groups' => ['user']]
+        ),
+        new GetCollection(),
+        new Get(),
+    ]    
+    )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 { 
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+     #[ORM\Column]
     #[Groups(['user:read', 'book:read'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 50, nullable: true)]
+    #[ORM\Column(name: 'firstname',length: 50, nullable: true)]
     #[Groups(['user:read', 'book:read'])]
     private ?string $firstname = null;
 
-    #[ORM\Column(length: 50, nullable: true)]
+    #[ORM\Column(name: 'lastname',length: 50, nullable: true)]
     #[Groups(['user:read', 'book:read'])]
     private ?string $lastname = null;
 
-    #[ORM\Column(length: 150, unique: true)]
+    #[ORM\Column(name: 'email',length: 150, unique: true)]
     #[Groups(['user:read'])]
     private ?string $email = null;
 
-    #[ORM\Column]    
+    #[ORM\Column(name: 'password')]   
     private ?string $password = null;
 
+     #[ORM\Column(name:'type',length: 20, nullable: true)]
+    #[Groups(['user:read'])]
+    private ?string $type = null;
+
     #[ORM\Column(nullable: true)]
+    #[Groups(['user:read'])]
     private ?string $stripeAccount = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['user:read'])]
     private ?bool $stripeOnboarded = null;
 
-    #[ORM\Column(type: 'json')]
+    #[ORM\Column(name:'roles',type: 'json')]
     #[Groups(['user:read'])]
     private array $roles = [];
 
@@ -51,6 +90,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\Column]
+    private bool $isVerified = false;
 
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Book::class)] // un utilisateur peut être l'auteur de plusieurs livres, mais un livre n'a qu'un seul auteur
     private Collection $books;
@@ -79,12 +121,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // rien à effacer
     }
 
-    public function getRoles(): array
-    {
-        $roles = $this->roles;
-        $roles[] = 'ROLE_USER';
-        return array_unique($roles);
-    }
+   
     
 // ---------- GETTERS & SETTERS ----------
 
@@ -93,9 +130,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->books = new ArrayCollection();   //books = livres écrits par cet utilisateur (OneToMany)
 
         // création automatique du profile
-        $profile = new AuthorProfile();
-        $profile->setUser($this);
-        $this->authorProfile = $profile;
+        //$profile = new AuthorProfile();
+        //$profile->setUser($this);
+        //$this->authorProfile = $profile;
     }
     public function getId(): ?int
     {
@@ -126,6 +163,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(?string $type): static
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
     public function getEmail(): ?string
     {
         return $this->email;
@@ -138,11 +188,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    // public function getPassword(): ?string
-    //{
-    //    return $this->password;
-    //}
-
+   
     public function setPassword(string $password): static
     {
         $this->password = $password;
@@ -162,6 +208,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function isIsVerified(): bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
     public function getStripeOnboarded(): ?bool
     {
         return $this->stripeOnboarded;
@@ -174,12 +232,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    // public function getRoles(): array
-    //{
-    //    return $this->roles;
-    //}
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        $roles[] = 'ROLE_USER';
+        return array_unique($roles);
+    }
 
-    public function setRoles(?array $roles): static
+    public function setRoles(array $roles): static
     {
         $this->roles = $roles;
 

@@ -1,21 +1,22 @@
 <?php
 
-namespace App\Entity;
+namespace App\Books\Domain\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use App\Repository\BookRepository;
+use App\Books\Infrastructure\DoctrineBookRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use App\Categories\Domain\Entity\Category;
 use Symfony\Component\Serializer\Annotation\Groups;
-use App\Entity\User;
+use App\Users\Domain\Entity\User;
 use App\Enum\BookFormat;
 
 
 
-#[ORM\Entity(repositoryClass: BookRepository::class)]
+
+#[ORM\Entity(repositoryClass: DoctrineBookRepository::class)]
 #[ApiResource(
     normalizationContext: ['groups' => ['book:read', 'category:read']],
     denormalizationContext: ['groups' => ['book:write', 'category:write']]    
@@ -50,6 +51,9 @@ class Book
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $extract = null;
+
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $isbn = null;
 
@@ -81,6 +85,9 @@ class Book
     #[ORM\JoinColumn(nullable: false)] // la colonne author_id dans la table book ne peut pas être nulle, un livre doit toujours avoir un auteur
     private ?User $author = null; // author = auteur du livre (ManyToOne)
 
+    #[ORM\Column(nullable: true)]
+    private ?string $status = null;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -102,19 +109,15 @@ class Book
     public function getStock(): ?int { return $this->stock; }
     public function setStock(?int $stock): static { $this->stock = $stock; return $this; }
 
-    public function getFormat(): ?BookFormat
-    {
-        return $this->format;
-    }
+    public function getFormat(): ?string  {  return $this->format;   }
 
-    public function setFormat(BookFormat $format): self
-    {
-        $this->format = $format;
-        return $this;
-    }
+    public function setFormat(?string $format): static  {  $this->format = $format;  return $this; }
 
     public function getDescription(): ?string { return $this->description; }
     public function setDescription(?string $description): static { $this->description = $description; return $this; }
+
+    public function getExtract(): ?string { return $this->extract; }
+    public function setExtract(?string $extract): static { $this->extract = $extract; return $this; }
 
     public function getIsbn(): ?string { return $this->isbn; }
     public function setIsbn(?string $isbn): static { $this->isbn = $isbn; return $this; }
@@ -139,6 +142,9 @@ class Book
 
     public function getReviewCount(): ?int { return $this->reviewCount; }
     public function setReviewCount(?int $reviewCount): static { $this->reviewCount = $reviewCount; return $this; }
+
+    public function getStatus(): ?string { return $this->status; }
+    public function setStatus(?string $status): static { $this->status = $status; return $this;}
 
     /**
      * @return Collection<int, Category> // retourne les catégories associées à ce livre (ManyToMany)
