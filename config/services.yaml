@@ -14,6 +14,12 @@ services:
 
     App\Users\UI\Controller\LoginController:
         tags: ['controller.service_arguments']
+
+    
+    App\Books\UI\:
+        resource: '../src/Books/UI/'
+        autowire: true
+        autoconfigure: true
         
     #App\src\Users\:
      #   ressourse: './src/Users/Domain/Entity'
@@ -37,3 +43,5 @@ services:
     
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    

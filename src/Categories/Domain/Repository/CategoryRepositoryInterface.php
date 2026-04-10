@@ -11,6 +11,8 @@ interface CategoryRepositoryInterface
      */
     public function findAll(): array;
     
-
+    
     public function save(Category $entity, bool $flush = false): void;
+
+    public function findByIds(array $ids): array;
 }

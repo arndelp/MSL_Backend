@@ -9,6 +9,14 @@ final class BookDTO
     #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
     #[Assert\Length(max: 100)]
      public ?string $title = null;  
+
+     
+
+    #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
+    #[Assert\Length(max: 100)]
+     public ?string $authorName = null;
+
+     public ?string $author = null;
     
     #[Assert\PositiveOrZero(message: 'Le prix doit être positif ou nul.')]
     #[Assert\Type(type: 'numeric', message: 'Le prix doit être un nombre.')]
@@ -34,12 +42,13 @@ final class BookDTO
      #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
      public ?string $currency = null;
 
-    #[Assert\NotBlank(message: 'Veuillez sélectionner au moins une catégorie.')]
+    #[Assert\Count(min: 1, minMessage: "Sélectionnez au moins une catégorie.")]
      public ?array $categories = [];
 
     public function __construct(
                
-        string $title = null,
+        string $title = null,      
+        string $authorName = null,
         float $price = null,
         int $stock = null,
         string $format = null,
@@ -51,7 +60,8 @@ final class BookDTO
 
     ) {
 
-        $this->title = $title;
+        $this->title = $title;        
+        $this->author = $authorName;
         $this->price = $price;
         $this->stock = $stock;
         $this->format = $format;
@@ -62,6 +72,6 @@ final class BookDTO
         $this->categories = $categories;
         
     }
-
+   
     
 }

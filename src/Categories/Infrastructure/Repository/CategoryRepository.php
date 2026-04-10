@@ -25,8 +25,6 @@ class CategoryRepository extends ServiceEntityRepository implements CategoryRepo
             ->getQuery()
             ->getResult();
     }   
-
-
  
 
     public function save(Category $entity, bool $flush = false): void
@@ -37,6 +35,18 @@ class CategoryRepository extends ServiceEntityRepository implements CategoryRepo
             $this->getEntityManager()->flush();
         }
     }
+
+    public function findByIds(array $ids): array 
+{
+    return $this->createQueryBuilder('c')   // 'c' est l'alias pour la table Category
+        ->where('c.id IN (:ids)')           // Filtre les catégories dont l'ID est dans le tableau $ids
+        ->setParameter('ids', $ids)         // Associe le paramètre :ids au tableau $ids
+        ->getQuery()                        // Exécute la requête
+        ->getResult();                      // Retourne un tableau d'objets Category correspondant aux IDs fournis
+}
+
+
+
     //    /**
     //     * @return Category[] Returns an array of Category objects
     //     */

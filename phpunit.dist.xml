@@ -25,6 +25,15 @@
         <env name="JWT_PUBLIC_KEY" value="%kernel.project_dir%/config/jwt/public.pem"/>
         <env name="JWT_PASSPHRASE" value="f5bcaf25fc9b5eabd84f2f502c727a66e1ab3e78774c117ce5611f7089cb6121"/>
         <!-- ###- lexik/jwt-authentication-bundle ### -->
+
+        <!-- ###+ symfony/brevo-mailer ### -->
+        <!-- MAILER_DSN=brevo+api://KEY@default -->
+        <!-- MAILER_DSN=brevo+smtp://USERNAME:PASSWORD@default -->
+        <!-- ###- symfony/brevo-mailer ### -->
+
+        <!-- ###+ stripe/stripe-php ### -->
+        <env name="STRIPE_SECRET_KEY" value="sk_test_***"/>
+        <!-- ###- stripe/stripe-php ### -->
     </php>
 
     <testsuites>

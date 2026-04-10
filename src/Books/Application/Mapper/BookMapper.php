@@ -5,12 +5,18 @@ namespace App\Books\Application\Mapper;
 use App\Books\Application\DTO\BookDTO;
 use App\Books\Domain\Entity\Book;
 
+
+
 class BookMapper
 {
+ 
+
+   
     public function toEntity(BookDTO $bookDTO): Book
     {
         $book = new Book();
-        $book->setTitle($bookDTO->title);
+        $book->setTitle($bookDTO->title);     
+        $book->setAuthorName($bookDTO->authorName);
         $book->setPrice($bookDTO->price);
         $book->setStock($bookDTO->stock);
         $book->setFormat($bookDTO->format);
@@ -26,6 +32,7 @@ class BookMapper
     {
         $bookDTO = new BookDTO();
         $bookDTO->title = $book->getTitle();
+        $bookDTO->authorName = $book->getAuthorName();
         $bookDTO->price = $book->getPrice();
         $bookDTO->stock = $book->getStock();
         $bookDTO->format = $book->getFormat() ;

@@ -2,70 +2,84 @@
 
 namespace App\Books\UI\Controller;
 
+use App\Books\Application\DTO\BookDTO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Books\Domain\Entity\Book;
-use App\Categories\Domain\Entity\Category;
-use App\Users\Domain\Entity\User;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use App\Books\Application\UseCase\RecordBookByApi;
+use Throwable;
+use Symfony\Component\HttpFoundation\Response;
 
 final class BookController extends AbstractController
 {
    
    
 
-    public function record(Request $request, EntityManagerInterface $em): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-
-        // Si title n’est pas défini ou vide → mettre “A définir”
-        $title = $data['title'] ?? '';
-        if (trim($title) === '') {$title = 'A définir';}
-
-        $book = new Book();
-        $book->setTitle($title);
-
-        // Pour le reste, mettre des valeurs par défaut simples
-        $book->setPrice(isset($data['price']) ? (float)$data['price'] : 0);
-        $book->setStock(isset($data['stock']) ? (int)$data['stock'] : 1);
-        $book->setDescription($data['description'] ?? null);
-        // Author : si pas défini, mettre un user par défaut (ex: id=1)
-        // Author temporaire : null ou user existant
-        $user = $em->getRepository(User::class)->find(1);
-        $book->setAuthor($this->getUser());
-
-        $book->setFormat($data['format'] ?? null);
-
-        // Catégories
-        if (!empty($data['categories'])) {
-            foreach ($data['categories'] as $catId) {
-                $category = $em->getRepository(Category::class)->find($catId);
-                if ($category) {
-                    $book->addCategory($category);
-                }
-            }
-        }
-      
-
-        // Listener gère automatiquement : slug + createdAt + updatedAt
-        $em->persist($book);
-        $em->flush();
-
-        return $this->json([
+    public function record(
+        Request $request,        
+        LoggerInterface $logger,
+        ValidatorInterface $validator,
+        RecordBookByApi $recordBookByApi,
+    ): Response {
+        {
+            // Récupération des données JSON
+            $data = json_decode($request->getContent(), true); 
+       
+            $logger->info('Données reçues', ['data' => $data]);
             
-            'title' => $book->getTitle(),            
-            'author' => $book->getAuthor(),
-            'price' => $book->getPrice(),
-            'stock' => $book->getStock(),
-            'description' => $book->getDescription(),
-            'format' => $book->getFormat(),
+            if (empty($data)) {
+            return new JsonResponse(['error' => 'Données reçues vides'], 400);
+            }
 
-            'categories' => array_map(
-                fn($c) => ['id' => $c->getId(), 'name' => $c->getName()],
-                $book->getCategories()->toArray()
-            ),
-        ]);
+            $dto = new BookDTO(
+                title: $data['title'] ?? null,   
+                authorName: $data['authorName'] ?? null,         
+                price: $data['price'] ?? null,
+                stock: $data['stock'] ?? null,
+                format: $data['format'] ?? null,
+                description: $data['description'] ?? null,
+                isbn: $data['isbn'] ?? null,
+                pageCount: $data['pageCount'] ?? null,
+                currency: $data['currency'] ?? null,
+                categories: $data['categories'] ?? []
+            
+            );
+            
+            // Validation
+            $errors = $validator->validate($dto);
+            if (count($errors) > 0) {
+                return new JsonResponse(['errors' => (string) $errors], 400);
+            }
+
+        
+            try {
+                //délègue au use case pour enregistrer le livre
+                $book = $recordBookByApi->execute($dto);
+
+                return new JsonResponse(['success' => 'Livre enregistré avec succès'], 201);
+
+            } catch (\InvalidArgumentException $e) {
+                // Erreurs métier (ex: livre déjà enregistré)
+                return new JsonResponse(['error' => $e->getMessage()], 400);
+
+            } catch (Throwable $e) {
+                //Erreurs serveur
+                $logger->error('Erreur en recevant le nouveau client : ' . $e->getMessage(), [
+                    'exception' => $e,
+                    'trace' => $e->getTraceAsString()
+                ]);
+                return new JsonResponse(['error' => 'Erreur interne serveur.'], 500);
+            }
+        
+
+        
+        
+
+            
+            
+        }
     }
 };
     
