@@ -24,6 +24,8 @@ class BookMapper
         $book->setIsbn($bookDTO->isbn);
         $book->setPageCount($bookDTO->pageCount);
         $book->setCurrency($bookDTO->currency);
+        $book->setExtract($bookDTO->extract);
+       
 
         return $book;
     }

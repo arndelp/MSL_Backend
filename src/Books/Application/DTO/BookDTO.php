@@ -34,6 +34,8 @@ final class BookDTO
     #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
      public ?string $description = null;
 
+     public ?string $extract = null;
+
     
      public ?string $isbn = null;
 
@@ -53,6 +55,7 @@ final class BookDTO
         int $stock = null,
         string $format = null,
         string $description = null,
+        string $extract = null,
         string $isbn = null,
         int $pageCount = null,
         string $currency = null,
@@ -66,6 +69,7 @@ final class BookDTO
         $this->stock = $stock;
         $this->format = $format;
         $this->description = $description;
+        $this->extract = $extract;
         $this->isbn = $isbn;
         $this->pageCount = $pageCount;
         $this->currency = $currency;

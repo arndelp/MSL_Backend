@@ -24,16 +24,13 @@ final class RecordBookByApi
 
     public function execute(BookDTO $dto): Book
 {
+
+
     $user = $this->security->getUser();
     
   if (!$user) {
         throw new \Exception('Utilisateur non authentifié');
-    }
-
-
-  
-
-  
+    }  
 
   
    // D'abord mapper le DTO
@@ -49,11 +46,13 @@ final class RecordBookByApi
     $book->setCreatedAt(new \DateTimeImmutable());
     $book->setUpdatedAt(new \DateTimeImmutable());
 
-    // Ajouter les catégories
-    $categories = $this->categoryRepository->findByIds($dto->categories);
-    foreach ($categories as $category) {
+    foreach ($dto->categories as $categoryId) {
+    $category = $this->categoryRepository->find($categoryId);
+
+    if ($category) {
         $book->addCategory($category);
     }
+}
 
     // Sauvegarder
     $this->bookRepository->save($book);

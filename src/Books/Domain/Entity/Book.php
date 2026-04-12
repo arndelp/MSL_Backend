@@ -18,7 +18,6 @@ use App\Books\UI\ApiPlatform\BookProcessor;
 
 
 
-
 #[ORM\Entity(repositoryClass: DoctrineBookRepository::class)]
 #[ApiResource(
     operations: [
@@ -88,8 +87,7 @@ class Book
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(nullable: true)]
-    
+    #[ORM\Column(nullable: true)]    
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 3, scale: 2, nullable: true)]
@@ -133,7 +131,6 @@ class Book
     public function setStock(?int $stock): static { $this->stock = $stock; return $this; }
 
     public function getFormat(): ?string  {  return $this->format;   }
-
     public function setFormat(?string $format): static  {  $this->format = $format;  return $this; }
 
     public function getDescription(): ?string { return $this->description; }
