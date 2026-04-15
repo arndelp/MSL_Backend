@@ -9,16 +9,13 @@ use App\Books\Domain\Repository\BookRepositoryInterface;
 use App\Categories\Domain\Repository\CategoryRepositoryInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
-
-
 final class RecordBookByApi
 {
     public function __construct(
         private BookMapper $bookMapper,
         private BookRepositoryInterface $bookRepository,
         private CategoryRepositoryInterface $categoryRepository,
-        private Security $security,
-       
+        private Security $security,      
         
     ) {}
 
@@ -54,12 +51,16 @@ final class RecordBookByApi
     }
 }
 
+    $book->setCoverFile($dto->cover);
+
+    if ($dto->cover) {
+        $book->setCoverFile($dto->cover);
+    }
+
+    $book->setImages($dto->images ?? []);
+
     // Sauvegarder
     $this->bookRepository->save($book);
-
-  
-
-
 
     return $book;
 }

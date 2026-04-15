@@ -3,6 +3,7 @@
 namespace App\Books\Application\DTO;
 
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\HttpFoundation\File\File;
 
 final class BookDTO
 {
@@ -47,6 +48,10 @@ final class BookDTO
     #[Assert\Count(min: 1, minMessage: "Sélectionnez au moins une catégorie.")]
      public ?array $categories = [];
 
+     public ?File $cover = null;
+
+     public ?array $images = [];
+
     public function __construct(
                
         string $title = null,      
@@ -59,7 +64,9 @@ final class BookDTO
         string $isbn = null,
         int $pageCount = null,
         string $currency = null,
-        array $categories = []
+        array $categories = [],
+        string $cover = null,
+        array $images = [],
 
     ) {
 
@@ -74,6 +81,8 @@ final class BookDTO
         $this->pageCount = $pageCount;
         $this->currency = $currency;
         $this->categories = $categories;
+        $this->cover = $cover;
+        $this->images = $images;
         
     }
    

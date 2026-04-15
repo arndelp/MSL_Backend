@@ -14,6 +14,8 @@ use App\Users\Domain\Entity\User;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use ApiPlatform\Metadata\Post;
 use App\Books\UI\ApiPlatform\BookProcessor;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\HttpFoundation\File\File;
 
 
 
@@ -22,13 +24,18 @@ use App\Books\UI\ApiPlatform\BookProcessor;
 #[ApiResource(
     operations: [
         new Post(
-            processor: BookProcessor::class
+            processor: BookProcessor::class,
+            inputFormats: [
+                'multipart' => ['multipart/form-data']
+            ],
+            deserialize: false //API Platform ne transforme pas la requête en entité (manuel avec le processor)
         )
     ],
     normalizationContext: ['groups' => ['book:read', 'category:read']],
     denormalizationContext: ['groups' => ['book:write', 'category:write']]    
 )]
 #[ORM\HasLifecycleCallbacks]
+#[Vich\Uploadable]
 class Book
 {
     #[ORM\Id]
@@ -106,6 +113,23 @@ class Book
     #[ORM\Column(nullable: true)]
     private ?string $status = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?string $cover = null;
+
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $images = [];
+
+    #[Vich\UploadableField(mapping: 'book_cover', fileNameProperty: 'cover')]
+    private ?File $coverFile = null;
+
+   
+
+
+
+
+
+
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -166,6 +190,25 @@ class Book
     public function getStatus(): ?string { return $this->status; }
     public function setStatus(?string $status): static { $this->status = $status; return $this;}
 
+    public function getCover(): ?string { return $this->cover; }
+    public function setCover(?string $cover): static { $this->cover = $cover; return $this; } 
+
+    public function getCoverFile(): ?File { return $this->coverFile; }
+    public function setCoverFile(?File $coverFile ): static 
+        { 
+            $this->coverFile = $coverFile;
+
+            if ($coverFile) {
+                $this->updatedAt = new \DateTimeImmutable();
+            }
+
+            return $this;
+        }
+
+    public function getImages(): array { return $this->images ?? [];}
+    public function setImages(?array $images): static { $this->images = $images ?? []; return $this;}
+
+
     /**
      * @return Collection<int, Category> // retourne les catégories associées à ce livre (ManyToMany)
      */
@@ -185,6 +228,24 @@ class Book
         if ($this->categories->removeElement($category)) { // si la catégorie a bien été supprimée de ce livre, alors on supprime aussi ce livre de la catégorie (relation bidirectionnelle)
             $category->removeBook($this);
         }
+        return $this;
+    }
+
+    public function addImage(string $image): static
+    {
+        if (!in_array($image, $this->images ?? [])) {
+        $this->images[] = $image;
+        }
+        return $this;
+    }
+
+    public function removeImage(string $image): static
+    {
+        $this->images = array_values(array_filter(
+            $this->images ?? [],
+            fn($img) => $img !== $image
+        ));
+
         return $this;
     }
 

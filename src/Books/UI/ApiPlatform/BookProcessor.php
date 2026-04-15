@@ -17,25 +17,49 @@ class BookProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Book
     {
        
-        $dto = new BookDTO();
-        $dto->title = $data->getTitle();
-        $dto->authorName = $data->getAuthorName();
-        $dto->price = $data->getPrice();
-        $dto->stock = $data->getStock();
-        $dto->format = $data->getFormat();
-        $dto->description = $data->getDescription();
-        $dto->extract = $data->getExtract();
-        $dto->isbn = $data->getIsbn();
-        $dto->pageCount = $data->getPageCount();
-        $dto->currency = $data->getCurrency();
-                
-        // Récupérer les catégories depuis le contexte de la requête, le contexte  est créé dans le DataTransformer, on peut y accéder ici pour récupérer les catégories envoyées dans la requête
-        $request = $context['request'] ?? null; // Récupérer les données brutes de la requête pour les catégories
-        $payload = json_decode($request?->getContent() ?? '[]', true); // Décoder le JSON pour extraire les catégories
-        $dto->categories = $payload['categories'] ?? []; // Assigner les catégories au DTO
-       
+         $request = $context['request'] ?? null;
 
-        // 👉 on appelle TON usecase
-        return $this->useCase->execute($dto);
+    if (!$request) {
+        throw new \Exception('Request not found');
+    }
+
+    $dto = new BookDTO();
+
+    // ❌ PLUS $data
+    $dto->title = $request->request->get('title');
+    $dto->authorName = $request->request->get('authorName');
+    $dto->price = (float) $request->request->get('price');
+    $dto->stock = (int) $request->request->get('stock');
+    $dto->format = $request->request->get('format');
+    $dto->description = $request->request->get('description');
+    $dto->extract = $request->request->get('extract');
+    $dto->isbn = $request->request->get('isbn');
+    $dto->pageCount = (int) $request->request->get('pageCount');
+    $dto->currency = $request->request->get('currency');
+
+    // categories
+    $dto->categories = $request->request->all('categories');
+
+    // cover (Vich)
+    $dto->cover = $request->files->get('cover');
+
+    // images
+    $files = $request->files->get('images', []);
+
+    if ($files instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
+        $files = [$files];
+    }
+
+    $filenames = [];
+
+    foreach ($files as $file) {
+        $name = uniqid().'.'.$file->guessExtension();
+        $file->move('uploads/images', $name);
+        $filenames[] = $name;
+    }
+
+    $dto->images = $filenames;
+
+    return $this->useCase->execute($dto);
     }
 }
