@@ -20,48 +20,48 @@ final class RecordBookByApi
     ) {}
 
     public function execute(BookDTO $dto): Book
-{
+        {
 
 
-    $user = $this->security->getUser();
-    
-  if (!$user) {
-        throw new \Exception('Utilisateur non authentifié');
-    }  
+            $user = $this->security->getUser();
+            
+                if (!$user) {
+                        throw new \Exception('Utilisateur non authentifié');
+                    }  
 
-  
-   // D'abord mapper le DTO
-    $book = $this->bookMapper->toEntity($dto);
+        
+        // D'abord mapper le DTO
+            $book = $this->bookMapper->toEntity($dto);
 
-    // Ensuite définir l'auteur
-    $book->setAuthor($user);
+            // Ensuite définir l'auteur
+            $book->setAuthor($user);
 
-    // Définir le nom de l'auteur si nécessaire
-    $book->setAuthorName($dto->authorName ?? $user->getUserIdentifier());
+            // Définir le nom de l'auteur si nécessaire
+            $book->setAuthorName($dto->authorName ?? $user->getUserIdentifier());
 
-    // Dates
-    $book->setCreatedAt(new \DateTimeImmutable());
-    $book->setUpdatedAt(new \DateTimeImmutable());
+            // Dates
+            $book->setCreatedAt(new \DateTimeImmutable());
+            $book->setUpdatedAt(new \DateTimeImmutable());
 
-    foreach ($dto->categories as $categoryId) {
-    $category = $this->categoryRepository->find($categoryId);
+            foreach ($dto->categories as $categoryId) {
+            $category = $this->categoryRepository->find($categoryId);
 
-    if ($category) {
-        $book->addCategory($category);
-    }
-}
+            if ($category) {
+                $book->addCategory($category);
+            }
+        }
 
-    $book->setCoverFile($dto->cover);
+            $book->setCoverFile($dto->cover);
 
-    if ($dto->cover) {
-        $book->setCoverFile($dto->cover);
-    }
+            if ($dto->cover) {
+                $book->setCoverFile($dto->cover);
+            }
 
-    $book->setImages($dto->images ?? []);
+            $book->setImages($dto->images ?? []);
 
-    // Sauvegarder
-    $this->bookRepository->save($book);
+            // Sauvegarder
+            $this->bookRepository->save($book);
 
-    return $book;
-}
+            return $book;
+        }
 }

@@ -65,8 +65,8 @@ final class SaveUser
         $email = (new TemplatedEmail())
            ->from(new Address('admin@monsalondulivre.fr', 'Monsalondulivre.fr'))
            ->to($user->getEmail())
-           ->subject('Veuillez confirmer votre e-mail')
-           ->htmlTemplate('@User/confirmation_email.html.twig');
+           ->subject('Veuillez confirmer votre e-mail')           
+           ->htmlTemplate('emails/email_confirmation_register_user.html.twig');
 
         $this->emailVerifier->sendEmailConfirmation('app_verify_email_user', $user, $email);
 

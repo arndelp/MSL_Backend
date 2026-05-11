@@ -6,7 +6,7 @@
 /.env.local.php
 /.env.*.local
 /config/secrets/prod/prod.decrypt.private.php
-/public/bundles/
+
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
@@ -17,9 +17,11 @@
 ###< phpunit/phpunit ###
 
 ###> symfony/asset-mapper ###
+/public/bundles/
 /public/assets/
 /assets/vendor/
-public/
+/public/uploads/
+/public/logo/
 
 
 ###< symfony/asset-mapper ###

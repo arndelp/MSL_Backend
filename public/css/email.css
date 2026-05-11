@@ -1,0 +1,33 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    padding: 30px;
+}
+
+.container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 600px;
+    margin: auto;
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.title {
+    color: #2c3e50;
+}
+
+.message {
+    margin-top: 20px;
+    line-height: 1.6;
+}
+
+.footer {
+    margin-top: 30px;
+    font-size: 12px;
+    color: gray;
+}

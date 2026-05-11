@@ -16,7 +16,7 @@ use App\Books\Domain\Entity\Book;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => ['category:read', 'book:read']],
+    normalizationContext: ['groups' => ['category:read']],
     denormalizationContext: ['groups' => ['category:write', 'book:write']]    
 )]
 class Category
@@ -44,7 +44,6 @@ class Category
     private Collection $children;
 
     #[ORM\ManyToMany(targetEntity: Book::class, mappedBy: 'categories')] // une catégorie peut être associée à plusieurs livres, et un livre peut être associé à plusieurs catégories. mappedby: 'categories' indique que la relation est définie par la propriété $categories de la classe Book
-    #[Groups(['category:read'])]
     private Collection $books;
 
     public function __construct()

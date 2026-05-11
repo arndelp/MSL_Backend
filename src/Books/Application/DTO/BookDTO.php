@@ -3,7 +3,7 @@
 namespace App\Books\Application\DTO;
 
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 final class BookDTO
 {
@@ -48,7 +48,7 @@ final class BookDTO
     #[Assert\Count(min: 1, minMessage: "Sélectionnez au moins une catégorie.")]
      public ?array $categories = [];
 
-     public ?File $cover = null;
+     public ?UploadedFile $cover = null;
 
      public ?array $images = [];
 

@@ -1,0 +1,4 @@
+api.contacts.post:
+  path: /api/contact
+  controller: App\Contacts\UI\Controller\ContactMessageController::record
+  methods: [POST]

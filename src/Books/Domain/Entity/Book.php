@@ -3,7 +3,7 @@
 namespace App\Books\Domain\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use App\Books\Infrastructure\DoctrineBookRepository;
+use App\Books\Infrastructure\Repository\BookRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -16,13 +16,18 @@ use ApiPlatform\Metadata\Post;
 use App\Books\UI\ApiPlatform\BookProcessor;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\HttpFoundation\File\File;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 
 
 
 
-#[ORM\Entity(repositoryClass: DoctrineBookRepository::class)]
+
+#[ORM\Entity(repositoryClass: BookRepository::class)]
 #[ApiResource(
     operations: [
+        new Get(),
+        new GetCollection(),
         new Post(
             processor: BookProcessor::class,
             inputFormats: [
@@ -31,8 +36,8 @@ use Symfony\Component\HttpFoundation\File\File;
             deserialize: false //API Platform ne transforme pas la requête en entité (manuel avec le processor)
         )
     ],
-    normalizationContext: ['groups' => ['book:read', 'category:read']],
-    denormalizationContext: ['groups' => ['book:write', 'category:write']]    
+    normalizationContext: ['groups' => ['book:read']],
+    denormalizationContext: ['groups' => ['book:write']]    
 )]
 #[ORM\HasLifecycleCallbacks]
 #[Vich\Uploadable]
@@ -41,82 +46,89 @@ class Book
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['book:read', 'category:read'])]
+    #[Groups(['book:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 150)]
-    #[Groups(['book:read','book:write', 'category:read'])]
+    #[Groups(['book:read','book:write'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 100, nullable: true)]
-    #[Groups(['book:read','book:write', 'category:read'])]
+    #[Groups(['book:read','book:write'])]
     private ?string $authorName = null;
 
     #[ORM\Column(length: 255, unique: true)]
+    #[Groups(['book:read'])]
     private ?string $slug = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['book:read','book:write', 'category:read'])]
+    #[Groups(['book:read','book:write'])]
     private ?float $price = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['book:read','book:write', 'category:read'])]
+    #[Groups(['book:read','book:write'])]
     private ?int $stock = null;
 
     #[ORM\Column(type: "string", length: 20, nullable: true)]    
-    #[Groups(['book:read','book:write', 'category:read'])]
+    #[Groups(['book:read','book:write'])]
     private ?string $format = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['book:read','book:write', 'category:read'])]
+    #[Groups(['book:read','book:write'])]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['book:read','book:write', 'category:read'])]
+    #[Groups(['book:read','book:write'])]
     private ?string $extract = null;
 
     #[ORM\Column(length: 20, nullable: true)]
-    #[Groups(['book:read','book:write', 'category:read'])]
+    #[Groups(['book:read','book:write'])]
     private ?string $isbn = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['book:read','book:write', 'category:read'])]
+    #[Groups(['book:read','book:write'])]
     private ?int $pageCount = null;
 
     #[ORM\Column(length: 3, nullable: true)]
-    #[Groups(['book:read','book:write', 'category:read'])]
+    #[Groups(['book:read','book:write'])]
     private ?string $currency = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['book:read','book:write', 'category:read'])]
+    #[Groups(['book:read','book:write'])]
     private ?bool $isPublished = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['book:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]    
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 3, scale: 2, nullable: true)]
+    #[Groups(['book:read'])]
     private ?string $averageRating = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $reviewCount = null;
 
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'books', cascade: ['persist'])]
+    #[Groups(['book:read'])]
     private Collection $categories;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'books')] // un livre a un seul auteur, mais un auteur peut avoir plusieurs livres
     #[ORM\JoinColumn(nullable: false)] // la colonne author_id dans la table book ne peut pas être nulle, un livre doit toujours avoir un auteur
+    #[Groups(['book:read'])]
     private ?User $author = null; // author = auteur du livre (ManyToOne)
 
     #[ORM\Column(nullable: true)]
     private ?string $status = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['book:read'])]
     private ?string $cover = null;
 
     #[ORM\Column(type: 'json', nullable: true)]
+    #[Groups(['book:read'])]
     private ?array $images = [];
 
     #[Vich\UploadableField(mapping: 'book_cover', fileNameProperty: 'cover')]
@@ -212,6 +224,8 @@ class Book
     /**
      * @return Collection<int, Category> // retourne les catégories associées à ce livre (ManyToMany)
      */
+
+    #[Groups(['book:read'])]
     public function getCategories(): Collection { return $this->categories; } // retourne les catégories associées à ce livre (ManyToMany)
 
     public function addCategory(Category $category): static // add() ajoute la catégorie à ce livre, mais ne gère pas la relation inverse (ajout de ce livre à la catégorie), donc on le fait manuellement pour garder la cohérence de la relation bidirectionnelle
@@ -266,4 +280,30 @@ class Book
 
     public function getAuthor(): ?User { return $this->author; } // retourne l'auteur de ce livre (ManyToOne)
     public function setAuthor(?User $author): static { $this->author = $author; return $this;   } // définit l'auteur de ce livre (ManyToOne)
+
+    //envoi de l'url des images
+    #[Groups(['book:read'])]
+    public function getCoverUrl(): ?string
+    {
+        // si aucune couverture n'est définie, on retourne null, sinon on retourne l'url complète en préfixant le chemin d'accès aux couvertures
+        if (!$this->cover) {
+            return null;
+        } else {
+            return 'http://localhost:8000/uploads/covers/' . $this->cover;
+        }
+      
+    }
+
+    #[Groups(['book:read'])]
+    public function getImageUrls(): array
+    {
+        // si aucune image n'est définie, on retourne un tableau vide, sinon on retourne un tableau d'url complètes en préfixant le chemin d'accès aux images
+        $urls = [];
+        foreach ($this->images ?? [] as $image) { 
+            $urls[] = 'http://localhost:8000/uploads/images/' . $image;
+        }
+        return $urls;
+    }
+
+
 }

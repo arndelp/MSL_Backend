@@ -1,6 +1,10 @@
 doctrine:
     dbal:
-       
+    
+        profiling_collect_backtrace: false
+        use_savepoints: true
+        logging: false
+        profiling: false
         user:     '%env(DATABASE_USER)%'
         password: '%env(DATABASE_PASSWORD)%'
         host:     '%env(DATABASE_HOST)%'
@@ -13,8 +17,6 @@ doctrine:
         # either here or in the DATABASE_URL env var (see .env file)
         #server_version: '16'
 
-        profiling_collect_backtrace: '%kernel.debug%'
-        use_savepoints: true
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
@@ -49,6 +51,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/AuthorProfiles/Domain/Entity'
                 prefix: 'App\AuthorProfiles\Domain\Entity'
                 alias: AuthorProfiles
+            Contacts:
+                is_bundle: false
+                type: attribute
+                dir: '%kernel.project_dir%/src/Contacts/Domain/Entity'
+                prefix: 'App\Contacts\Domain\Entity'
+                alias: Contacts
             #App:
                 #type: attribute
                 #is_bundle: false

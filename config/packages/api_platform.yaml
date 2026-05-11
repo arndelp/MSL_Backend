@@ -5,6 +5,7 @@ api_platform:
             - '%kernel.project_dir%/src/Users/Domain/Entity/'
             - '%kernel.project_dir%/src/Categories/Domain/Entity/'
             - '%kernel.project_dir%/src/Books/Domain/Entity/'
+            - '%kernel.project_dir%/src/Contacts/Domain/Entity/'
     formats:        
         json: ['application/json']   
         jsonld: ['application/ld+json']     
@@ -22,12 +23,15 @@ api_platform:
                 - ['user'] 
                 - ['category']
                 - ['book']                
+                - ['contact']
+               
 
         denormalization_context:
             groups: 
                 - ['user']
                 - ['category']
                 - ['book']
+                - ['contact']
                   
     exception_to_status:
         Symfony\Component\Serializer\Exception\ExceptionInterface: 400

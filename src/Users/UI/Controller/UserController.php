@@ -3,29 +3,31 @@
 namespace App\Users\UI\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Psr\Log\LoggerInterface;
 use Throwable;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 use App\Users\Infrastructure\Security\EmailVerifierUser;
 use App\Users\Domain\Repository\UserRepositoryInterface;
 use App\Users\Application\UseCase\SaveUser;
 use App\Users\Application\DTO\CreateUserDTO;
-use App\Users\Domain\Entity\User;
-use Symfony\Component\Security\Core\Security;
+
+
 
 class UserController extends AbstractController
 {
-
+    
     public function me(Security $security): JsonResponse
     {
         $user = $security->getUser();
 
         if (!$user) {
-            return $this->json(['message' => 'Unauthorized'], 401);
+            return $this->json(['error' => 'Unauthorized'], 401);
         }
 
         return $this->json([
@@ -62,7 +64,7 @@ class UserController extends AbstractController
     // Validation du DTO
     $errors = $validator->validate($dto);
     if (count($errors) > 0) {            
-        return new JsonResponse(['errors' => 'Validation échouée'], 400);
+        return new JsonResponse(['error' => 'Validation échouée'], 400);
     }
     try {  
 
@@ -100,7 +102,7 @@ class UserController extends AbstractController
 
 
 
-public function verifyUserEmail(Request $request, EmailVerifierUser $emailVerifier, User $user, UserRepositoryInterface $userRepository): JsonResponse
+public function verifyUserEmail(Request $request, EmailVerifierUser $emailVerifier, UserRepositoryInterface $userRepository): JsonResponse
     {
         $id = $request->query->get('id');
 

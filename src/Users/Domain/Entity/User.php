@@ -23,7 +23,7 @@ use App\Users\Application\DTO\LoginDTO;
 #[ApiResource(
     // Création d'utilisateur
     input: CreateUserDTO::class, 
-    normalizationContext: ['groups' => ['user:read', 'book:read']],
+    normalizationContext: ['groups' => ['user:read', 'book:read', 'contact:read']], // groupes de sérialisation pour la lecture
     formats: ['json'],
     operations: [
         new Post(
@@ -51,38 +51,38 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
      #[ORM\Column]
-    #[Groups(['user:read', 'book:read'])]
+    #[Groups(['user:read', 'book:read', 'contact:read'])]
     private ?int $id = null;
 
     #[ORM\Column(name: 'firstname',length: 50, nullable: true)]
-    #[Groups(['user:read', 'book:read'])]
+    #[Groups(['user:read', 'book:read', 'contact:read'])]
     private ?string $firstname = null;
 
     #[ORM\Column(name: 'lastname',length: 50, nullable: true)]
-    #[Groups(['user:read', 'book:read'])]
+    #[Groups(['user:read', 'book:read', 'contact:read'])]
     private ?string $lastname = null;
 
     #[ORM\Column(name: 'email',length: 150, unique: true)]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'book:read', 'contact:read'])]
     private ?string $email = null;
 
     #[ORM\Column(name: 'password')]   
     private ?string $password = null;
 
      #[ORM\Column(name:'type',length: 20, nullable: true)]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'book:read'])]
     private ?string $type = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'book:read'])]
     private ?string $stripeAccount = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'book:read'])]
     private ?bool $stripeOnboarded = null;
 
     #[ORM\Column(name:'roles',type: 'json')]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'book:read', 'contact:read'])]
     private array $roles = [];
 
     #[ORM\Column(nullable: true)]

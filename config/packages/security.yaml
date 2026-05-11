@@ -54,14 +54,16 @@ security:
 
     access_control:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api, roles: PUBLIC_ACCESS, methods: [OPTIONS] }
-       
+        - { path: ^/api, roles: PUBLIC_ACCESS }       
         - { path: ^/api/register, roles: PUBLIC_ACCESS , methods: [OPTIONS,POST]}
         - { path: ^/api/users, roles: PUBLIC_ACCESS }
         - { path: ^/api/verify/email, roles: PUBLIC_ACCESS }
         - { path: ^/verify, roles: PUBLIC_ACCESS }
         - { path: ^/api/me, roles: IS_AUTHENTICATED_FULLY }
-        - { path: ^/api/books, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/books, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/books/{id}, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/books, roles: IS_AUTHENTICATED_FULLY, methods: [POST, PUT, DELETE] }
+        
 
 when@test:
     security:

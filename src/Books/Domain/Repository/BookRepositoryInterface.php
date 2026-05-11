@@ -7,4 +7,7 @@ use App\Books\Domain\Entity\Book;
 interface BookRepositoryInterface
 {
     public function save(Book $book): void;
+
+    public function findAll(): array;
+    
 }

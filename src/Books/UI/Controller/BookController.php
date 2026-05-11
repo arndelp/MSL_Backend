@@ -11,12 +11,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use App\Books\Application\UseCase\RecordBookByApi;
 use Throwable;
 use Symfony\Component\HttpFoundation\Response;
+use App\Books\Application\UseCase\GetAllBooks;
 
 final class BookController extends AbstractController
 {
-   
-   
-
     public function record(
         Request $request,        
         LoggerInterface $logger,
@@ -71,16 +69,18 @@ final class BookController extends AbstractController
                     'trace' => $e->getTraceAsString()
                 ]);
                 return new JsonResponse(['error' => 'Erreur interne serveur.'], 500);
-            }
-        
-
-        
-        
-
-            
-            
+            }            
         }
     }
+
+    public function Alls(GetAllBooks $getAllBooks): JsonResponse
+    {
+        $books = $getAllBooks->execute();
+        return new JsonResponse($books);
+    }
+
+ 
+    
 };
     
 

@@ -24,12 +24,7 @@ final class CreateUserDTO
 
     #[Assert\NotBlank(message: "Le mot de passe est obligatoire.")]
     #[Assert\Length(max: 50)]
-    public ?string $password = null;
-
-  
-   
-
-    
+    public ?string $password = null;    
 
     public function __construct(
         string $firstname,

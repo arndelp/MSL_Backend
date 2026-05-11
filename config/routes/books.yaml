@@ -2,3 +2,9 @@ api.books.post:
   path: /api/books
   controller: App\Books\UI\Controller\BookController::record
   methods: [POST]
+
+api.books.alls:
+  path: /api/books
+  controller: App\Books\UI\Controller\BookController::Alls
+  methods: [GET]
+

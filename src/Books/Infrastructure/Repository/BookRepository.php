@@ -23,4 +23,9 @@ class BookRepository extends ServiceEntityRepository implements BookRepositoryIn
         $em->flush();
         
     }
+
+    public function findAll(): array
+    {
+        return $this->findBy([], ['title' => 'ASC']);
+    }
 }
