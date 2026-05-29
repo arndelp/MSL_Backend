@@ -51,12 +51,29 @@ final class SaveUser
        
         // Sauvegarde en base de données
         $this->userRepository->save($user);
+    
 
-
+// Créer le AuthorProfile lors de l'ajout d'un livre
         // Créer l’AuthorProfile maintenant que l’User a un ID
-        $profile = new AuthorProfile();
-        $profile->setUser($user);
-        $user->setAuthorProfile($profile);
+        if ($user->getType() == 'author') {
+
+            $profile = new AuthorProfile();
+            $profile->setUser($user);
+            $user->setAuthorProfile($profile);
+            $user->setRoles(['ROLE_AUTHOR']); // Assigner le rôle d'auteur à l'utilisateur
+            $user->setType('author');
+        
+        }
+        else {
+            $user->setRoles(['ROLE_USER']); // Assigner le rôle d'utilisateur standard
+            $user->setType('buyer_only');
+        }
+
+        $user->setIsVerified(false); // Marquer l'utilisateur comme non vérifié
+        $timeZone = new \DateTimeZone('Europe/Paris');
+        $user->setCreatedAt(new \DateTimeImmutable(Null, $timeZone));
+        $user->setUpdatedAt(new \DateTimeImmutable(Null, $timeZone));
+        
         
         // Flush à nouveau pour persister l’AuthorProfile
         $this->userRepository->save($user);

@@ -26,11 +26,14 @@ final class CreateUserDTO
     #[Assert\Length(max: 50)]
     public ?string $password = null;    
 
+    public ?string $type = null; // "buyer_only" ou "author"
+
     public function __construct(
         string $firstname,
         string $lastname,
         string $email,
         string $password,
+        string $type,
        
         
     ) {        
@@ -38,6 +41,7 @@ final class CreateUserDTO
         $this->lastname = $lastname;
         $this->email = $email;
         $this->password = $password;
+        $this->type = $type;
        
         
     }

@@ -61,7 +61,7 @@ security:
         - { path: ^/verify, roles: PUBLIC_ACCESS }
         - { path: ^/api/me, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/books, roles: PUBLIC_ACCESS, methods: [GET] }
-        - { path: ^/api/books/{id}, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/books/id, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api/books, roles: IS_AUTHENTICATED_FULLY, methods: [POST, PUT, DELETE] }
         
 

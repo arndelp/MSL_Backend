@@ -6,6 +6,8 @@ api_platform:
             - '%kernel.project_dir%/src/Categories/Domain/Entity/'
             - '%kernel.project_dir%/src/Books/Domain/Entity/'
             - '%kernel.project_dir%/src/Contacts/Domain/Entity/'
+            - '%kernel.project_dir%/src/Addresses/Domain/Entity/'
+            - '%kernel.project_dir%/src/AuthorProfiles/Domain/Entity/'
     formats:        
         json: ['application/json']   
         jsonld: ['application/ld+json']     
@@ -24,7 +26,8 @@ api_platform:
                 - ['category']
                 - ['book']                
                 - ['contact']
-               
+                - ['address']
+                - ['author_profile']
 
         denormalization_context:
             groups: 
@@ -32,6 +35,9 @@ api_platform:
                 - ['category']
                 - ['book']
                 - ['contact']
+                - ['address']
+                - ['author_profile']
+
                   
     exception_to_status:
         Symfony\Component\Serializer\Exception\ExceptionInterface: 400

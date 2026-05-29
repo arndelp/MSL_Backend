@@ -57,12 +57,13 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Contacts/Domain/Entity'
                 prefix: 'App\Contacts\Domain\Entity'
                 alias: Contacts
-            #App:
-                #type: attribute
-                #is_bundle: false
-                #dir: '%kernel.project_dir%/src/Entity'
-                #prefix: 'App\Entity'
-                #alias: App
+            Addresses:
+                is_bundle: false
+                type: attribute
+                dir: '%kernel.project_dir%/src/Addresses/Domain/Entity'
+                prefix: 'App\Addresses\Domain\Entity'
+                alias: Addresses
+           
         controller_resolver:
             auto_mapping: false
 

@@ -6,8 +6,10 @@ use App\AuthorProfiles\Infrastructure\Repository\DoctrineAuthorProfileRepository
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Users\Domain\Entity\User;
+use ApiPlatform\Metadata\ApiResource;
 
 #[ORM\Entity(repositoryClass: DoctrineAuthorProfileRepository::class)]
+#[ApiResource]
 class AuthorProfile
 {
     #[ORM\Id]

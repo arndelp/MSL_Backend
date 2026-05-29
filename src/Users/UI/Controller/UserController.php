@@ -35,6 +35,7 @@ class UserController extends AbstractController
             'email' => $user->getEmail(),
             'firstname' => $user->getFirstname(),
             'lastname' => $user->getLastname(),
+            'type' => $user->getType(),
             'role' => $user->getRoles(),
         ]);
     }
@@ -57,6 +58,7 @@ class UserController extends AbstractController
         firstname: $data['firstname'] ?? '',
         lastname: $data['lastname'] ?? '',
         email: $data['email'] ?? '',
+        type: $data['type'] ?? '',
         password: $data['password'] ?? '',
        
     );   
@@ -69,13 +71,12 @@ class UserController extends AbstractController
     try {  
 
         // On délègue au UseCase
-        $user = $saveUser->execute($dto);   
-        
-        
+        $user = $saveUser->execute($dto);         
 
         return new JsonResponse([
             'success' => 'User créé avec succès',
-            'id' => $user->getId()
+            'id' => $user->getId(),
+            'type' => $user->getType()
         ], 201);
 
     } catch (\InvalidArgumentException $e) {

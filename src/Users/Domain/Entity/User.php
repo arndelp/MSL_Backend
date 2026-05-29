@@ -18,6 +18,7 @@ use App\AuthorProfiles\Domain\Entity\AuthorProfile;
 use App\Users\UI\Controller\UserController;
 use App\Users\Application\DTO\CreateUserDTO;
 use App\Users\Application\DTO\LoginDTO;
+use App\Addresses\Domain\Entity\Address;
 
 #[ORM\Entity(repositoryClass: DoctrineUserRepository::class)]
 #[ApiResource(
@@ -74,15 +75,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $type = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['user:read', 'book:read'])]
+    #[Groups(['user:private', 'book:private'])]
     private ?string $stripeAccount = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['user:read', 'book:read'])]
+    #[Groups(['user:private', 'book:private'])]
     private ?bool $stripeOnboarded = null;
 
     #[ORM\Column(name:'roles',type: 'json')]
-    #[Groups(['user:read', 'book:read', 'contact:read'])]
+    #[Groups(['user:private', 'book:private', 'contact:private'])]
     private array $roles = [];
 
     #[ORM\Column(nullable: true)]
@@ -95,14 +96,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private bool $isVerified = false;
 
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Book::class)] // un utilisateur peut être l'auteur de plusieurs livres, mais un livre n'a qu'un seul auteur
-    private Collection $books;
-
-   
+    private Collection $books;   
 
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?AuthorProfile $authorProfile = null;
 
-
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Address::class)]
+    private Collection $addresses;   // adresses de livraison de l'utilisateur (OneToMany)
  
 
 // ---------- SECURITY USER INTERFACE METHODS ---------- // méthodes requises par l'interface UserInterface pour la sécurité //
@@ -128,6 +128,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->books = new ArrayCollection();   //books = livres écrits par cet utilisateur (OneToMany)
+        $this->addresses = new ArrayCollection();   //addresses = adresses de livraison de l'utilisateur (OneToMany)
 
         // création automatique du profile
         //$profile = new AuthorProfile();
@@ -323,5 +324,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    
+    public function getAddresses(): Collection
+    {
+        return $this->addresses;
+    }
+
+    public function addAddress(Address $address): static
+    {
+        if (!$this->addresses->contains($address)) {
+            $this->addresses->add($address);
+            $address->setUser($this); // 🔥 IMPORTANT
+        }
+
+        return $this;
+    }
+
+    public function removeAddress(Address $address): static
+    {
+        if ($this->addresses->removeElement($address)) {
+            if ($address->getUser() === $this) {
+                $address->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

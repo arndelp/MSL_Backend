@@ -9,5 +9,9 @@ interface BookRepositoryInterface
     public function save(Book $book): void;
 
     public function findAll(): array;
+
+    public function findPriceById(int $id): ?float;
+
+    public function findTitleById(int $id): ?string;
     
 }

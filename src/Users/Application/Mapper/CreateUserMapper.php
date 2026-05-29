@@ -14,6 +14,7 @@ public function toEntity(CreateUserDTO $dto): User
     $user->setFirstname($dto->firstname);
     $user->setLastname($dto->lastname);
     $user->setEmail($dto->email);  
+    $user->setType($dto->type);
     
   
     
@@ -28,6 +29,7 @@ public function toDTO(User $user): CreateUserDTO
     $dto->lastname = $user->getLastname();
     $dto->email = $user->getEmail();
     $dto->password = $user->getPassword();
+    $dto->type = $user->getType();
    
     
 

@@ -28,4 +28,16 @@ class BookRepository extends ServiceEntityRepository implements BookRepositoryIn
     {
         return $this->findBy([], ['title' => 'ASC']);
     }
+
+    public function findPriceById(int $id): ?float
+    {
+        $book = $this->find($id);
+        return $book ? $book->getPrice() : null;
+    }
+
+    public function findTitleById(int $id): ?string
+    {
+        $book = $this->find($id);
+        return $book ? $book->getTitle() : null;
+    }
 }
