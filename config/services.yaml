@@ -31,6 +31,17 @@ services:
     App\Contacts\Infrastructure\Service\ContactMailerService:
         arguments:
             $receiverEmail: '%contact_receiver_email%'
+
+
+
+   
+
+    App\Orders\Domain\Repository\OrderRepositoryInterface:
+        alias: App\Orders\Infrastructure\Repository\OrderRepository
+
+    App\Orders\Domain\Repository\OrderItemRepositoryInterface:
+        alias: App\Orders\Infrastructure\Repository\OrderItemRepository
+
            
  
 

@@ -59,6 +59,8 @@ final class RecordBookByApi
 
             $book->setImages($dto->images ?? []);
 
+           
+
             // Sauvegarder
             $this->bookRepository->save($book);
 

@@ -62,7 +62,8 @@ security:
         - { path: ^/api/me, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/books, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api/books/id, roles: PUBLIC_ACCESS, methods: [GET] }
-        - { path: ^/api/books, roles: IS_AUTHENTICATED_FULLY, methods: [POST, PUT, DELETE] }
+        - { path: ^/api/books, roles: IS_AUTHENTICATED_FULLY, methods: [POST, PUT] }
+        - { path: ^/api/orders, roles: IS_AUTHENTICATED_FULLY, methods: [GET, POST, PUT] }
         
 
 when@test:

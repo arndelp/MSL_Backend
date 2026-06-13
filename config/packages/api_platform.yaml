@@ -8,6 +8,7 @@ api_platform:
             - '%kernel.project_dir%/src/Contacts/Domain/Entity/'
             - '%kernel.project_dir%/src/Addresses/Domain/Entity/'
             - '%kernel.project_dir%/src/AuthorProfiles/Domain/Entity/'
+            - '%kernel.project_dir%/src/Orders/Domain/Entity/'
     formats:        
         json: ['application/json']   
         jsonld: ['application/ld+json']     
@@ -28,6 +29,7 @@ api_platform:
                 - ['contact']
                 - ['address']
                 - ['author_profile']
+                - ['order']
 
         denormalization_context:
             groups: 
@@ -37,6 +39,7 @@ api_platform:
                 - ['contact']
                 - ['address']
                 - ['author_profile']
+                - ['order']
 
                   
     exception_to_status:

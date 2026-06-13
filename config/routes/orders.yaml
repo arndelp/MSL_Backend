@@ -1,0 +1,7 @@
+api.orders.post:
+  path: /api/recordOrder
+  controller: App\Orders\UI\Controller\OrderController::recordOrder
+  methods: [POST]
+
+
+

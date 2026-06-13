@@ -4,6 +4,8 @@ namespace App\Books\Application\Mapper;
 
 use App\Books\Application\DTO\BookDTO;
 use App\Books\Domain\Entity\Book;
+use App\Enum\BookFormat;
+
 
 
 
@@ -19,7 +21,7 @@ class BookMapper
         $book->setAuthorName($bookDTO->authorName);
         $book->setPrice($bookDTO->price);
         $book->setStock($bookDTO->stock);
-        $book->setFormat($bookDTO->format);
+        $book->setFormat(BookFormat::from($bookDTO->format));
         $book->setDescription($bookDTO->description);
         $book->setIsbn($bookDTO->isbn);
         $book->setPageCount($bookDTO->pageCount);
@@ -37,7 +39,7 @@ class BookMapper
         $bookDTO->authorName = $book->getAuthorName();
         $bookDTO->price = $book->getPrice();
         $bookDTO->stock = $book->getStock();
-        $bookDTO->format = $book->getFormat() ;
+        $bookDTO->format = $book->getFormat()->value ;
         $bookDTO->description = $book->getDescription();
         $bookDTO->isbn = $book->getIsbn();
         $bookDTO->pageCount = $book->getPageCount();

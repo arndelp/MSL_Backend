@@ -63,6 +63,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Addresses/Domain/Entity'
                 prefix: 'App\Addresses\Domain\Entity'
                 alias: Addresses
+            Orders:
+                is_bundle: false
+                type: attribute
+                dir: '%kernel.project_dir%/src/Orders/Domain/Entity'
+                prefix: 'App\Orders\Domain\Entity'
+                alias: Orders
            
         controller_resolver:
             auto_mapping: false

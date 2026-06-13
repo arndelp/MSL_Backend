@@ -6,6 +6,8 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\ApiResource;
+use App\Orders\Domain\Entity\OrderItem;
+use App\Orders\Domain\Entity\Order;
 use App\Users\Infrastructure\Repository\DoctrineUserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -19,6 +21,7 @@ use App\Users\UI\Controller\UserController;
 use App\Users\Application\DTO\CreateUserDTO;
 use App\Users\Application\DTO\LoginDTO;
 use App\Addresses\Domain\Entity\Address;
+use App\Contacts\Domain\Entity\Contact;
 
 #[ORM\Entity(repositoryClass: DoctrineUserRepository::class)]
 #[ApiResource(
@@ -102,7 +105,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?AuthorProfile $authorProfile = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Address::class)]
-    private Collection $addresses;   // adresses de livraison de l'utilisateur (OneToMany)
+    private Collection $addresses;
+
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: Contact::class)]
+    private Collection $contacts;
+
+    /**
+     * @var Collection<int, Order>
+     */
+    #[ORM\OneToMany(targetEntity: Order::class, mappedBy: 'user_id')]
+    private Collection $orders;
+
+    /**
+     * @var Collection<int, OrderItem>
+     */
+    #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'author')]
+    private Collection $orderItems;   // adresses de livraison de l'utilisateur (OneToMany)
  
 
 // ---------- SECURITY USER INTERFACE METHODS ---------- // méthodes requises par l'interface UserInterface pour la sécurité //
@@ -134,6 +152,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         //$profile = new AuthorProfile();
         //$profile->setUser($this);
         //$this->authorProfile = $profile;
+        $this->orders = new ArrayCollection();
+        $this->orderItems = new ArrayCollection();
+        $this->contacts = new ArrayCollection();
     }
     public function getId(): ?int
     {
@@ -344,6 +365,92 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if ($this->addresses->removeElement($address)) {
             if ($address->getUser() === $this) {
                 $address->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Order>
+     */
+    public function getOrders(): Collection
+    {
+        return $this->orders;
+    }
+
+    public function addOrder(Order $order): static
+    {
+        if (!$this->orders->contains($order)) {
+            $this->orders->add($order);
+            $order->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrder(Order $order): static
+    {
+        if ($this->orders->removeElement($order)) {
+            // set the owning side to null (unless already changed)
+            if ($order->getUserId() === $this) {
+                $order->setUserId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, OrderItem>
+     */
+    public function getOrderItems(): Collection
+    {
+        return $this->orderItems;
+    }
+
+    public function addOrderItem(OrderItem $orderItem): static
+    {
+        if (!$this->orderItems->contains($orderItem)) {
+            $this->orderItems->add($orderItem);
+            $orderItem->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrderItem(OrderItem $orderItem): static
+    {
+        if ($this->orderItems->removeElement($orderItem)) {
+            // set the owning side to null (unless already changed)
+            if ($orderItem->getAuthor() === $this) {
+                $orderItem->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getContacts(): Collection
+    {
+        return $this->contacts;
+    }
+
+    public function addContact(Contact $contact): static
+    {
+        if (!$this->contacts->contains($contact)) {
+            $this->contacts->add($contact);
+            $contact->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContact(Contact $contact): static
+    {
+        if ($this->contacts->removeElement($contact)) {
+            if ($contact->getAuthor() === $this) {
+                $contact->setAuthor(null);
             }
         }
 

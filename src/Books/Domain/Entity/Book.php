@@ -4,6 +4,7 @@ namespace App\Books\Domain\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use App\Books\Infrastructure\Repository\BookRepository;
+use App\Orders\Domain\Entity\OrderItem;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,6 +19,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\HttpFoundation\File\File;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use App\Enum\BookFormat;
 
 
 
@@ -69,9 +71,9 @@ class Book
     #[Groups(['book:read','book:write'])]
     private ?int $stock = null;
 
-    #[ORM\Column(type: "string", length: 20, nullable: true)]    
+    #[ORM\Column(enumType: BookFormat::class)]   
     #[Groups(['book:read','book:write'])]
-    private ?string $format = null;
+    private BookFormat $format;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['book:read','book:write'])]
@@ -125,6 +127,22 @@ class Book
 
     #[ORM\Column(nullable: true)]
     #[Groups(['book:read'])]
+    private ?int $weight = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['book:read'])]
+    private ?int $width = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['book:read'])]
+    private ?int $height = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['book:read'])]
+    private ?int $thickness = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['book:read'])]
     private ?string $cover = null;
 
     #[ORM\Column(type: 'json', nullable: true)]
@@ -134,10 +152,11 @@ class Book
     #[Vich\UploadableField(mapping: 'book_cover', fileNameProperty: 'cover')]
     private ?File $coverFile = null;
 
-   
-
-
-
+    /**
+     * @var Collection<int, OrderItem>
+     */
+    #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'book')]
+    private Collection $orderItems;
 
 
 
@@ -145,6 +164,7 @@ class Book
     public function __construct()
     {
         $this->categories = new ArrayCollection();
+        $this->orderItems = new ArrayCollection();
     }
 
     // ---------- GETTERS & SETTERS ----------
@@ -166,8 +186,8 @@ class Book
     public function getStock(): ?int { return $this->stock; }
     public function setStock(?int $stock): static { $this->stock = $stock; return $this; }
 
-    public function getFormat(): ?string  {  return $this->format;   }
-    public function setFormat(?string $format): static  {  $this->format = $format;  return $this; }
+    public function getFormat(): ?BookFormat  {  return $this->format;   }
+    public function setFormat(?BookFormat $format): static  {  $this->format = $format;  return $this; }
 
     public function getDescription(): ?string { return $this->description; }
     public function setDescription(?string $description): static { $this->description = $description; return $this; }
@@ -201,6 +221,22 @@ class Book
 
     public function getStatus(): ?string { return $this->status; }
     public function setStatus(?string $status): static { $this->status = $status; return $this;}
+
+    public function getWeight(): ?int { return $this->weight; }
+
+    public function setWeight(?int $weight): static  { $this->weight = $weight; return $this;}
+
+    public function getWidth(): ?int { return $this->width; }
+
+    public function setWidth(?int $width): static  { $this->width = $width; return $this;}
+
+    public function getHeight(): ?int { return $this->height; }
+
+    public function setHeight(?int $height): static  { $this->height = $height; return $this;}
+
+    public function getThickness(): ?int { return $this->thickness; }
+
+    public function setThickness(?int $thickness): static  { $this->thickness = $thickness; return $this;}
 
     public function getCover(): ?string { return $this->cover; }
     public function setCover(?string $cover): static { $this->cover = $cover; return $this; } 
@@ -303,6 +339,36 @@ class Book
             $urls[] = 'http://localhost:8000/uploads/images/' . $image;
         }
         return $urls;
+    }
+
+    /**
+     * @return Collection<int, OrderItem>
+     */
+    public function getOrderItems(): Collection
+    {
+        return $this->orderItems;
+    }
+
+    public function addOrderItem(OrderItem $orderItem): static
+    {
+        if (!$this->orderItems->contains($orderItem)) {
+            $this->orderItems->add($orderItem);
+            $orderItem->setBook($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrderItem(OrderItem $orderItem): static
+    {
+        if ($this->orderItems->removeElement($orderItem)) {
+            // set the owning side to null (unless already changed)
+            if ($orderItem->getBook() === $this) {
+                $orderItem->setBook(null);
+            }
+        }
+
+        return $this;
     }
 
 

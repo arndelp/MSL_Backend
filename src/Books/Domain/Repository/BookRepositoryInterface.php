@@ -13,5 +13,7 @@ interface BookRepositoryInterface
     public function findPriceById(int $id): ?float;
 
     public function findTitleById(int $id): ?string;
+
+    public function findById(int $id): ?Book;
     
 }

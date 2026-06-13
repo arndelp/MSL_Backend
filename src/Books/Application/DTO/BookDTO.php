@@ -9,82 +9,47 @@ final class BookDTO
 {
     #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
     #[Assert\Length(max: 100)]
-     public ?string $title = null;  
+    #[Assert\Regex(pattern: '/^[a-zA-Z0-9\s\-]+$/', message: 'Le titre ne doit contenir que des lettres, des chiffres, des espaces et des tirets.')]
+    public ?string $title = null;  
 
      
 
     #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
     #[Assert\Length(max: 100)]
-     public ?string $authorName = null;
-
-     public ?string $author = null;
+    public ?string $authorName = null;    
     
     #[Assert\PositiveOrZero(message: 'Le prix doit être positif ou nul.')]
     #[Assert\Type(type: 'numeric', message: 'Le prix doit être un nombre.')]
     #[Assert\Regex(pattern: '/^\d+(\.\d{1,2})?$/', message: 'Le prix doit être un nombre avec au maximum deux décimales.')]
     #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
     #[Assert\Range(min: 0, max: 999999.99, notInRangeMessage: 'Le prix doit être compris entre {{ min }} et {{ max }}.')]
-     public ?float $price = null;
+    public ?float $price = null;
 
     #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
-     public ?int $stock = null;
+    public ?int $stock = null;
 
     #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
-     public ?string $format = null;
+    public ?string $format = null;
 
     #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
-     public ?string $description = null;
+    public ?string $description = null;
 
-     public ?string $extract = null;
+    public ?string $extract = null;
 
     
-     public ?string $isbn = null;
+    public ?string $isbn = null;
 
-     public ?int $pageCount = null;
+    public ?int $pageCount = null;
 
-     #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
-     public ?string $currency = null;
+    #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
+    public ?string $currency = null;
 
     #[Assert\Count(min: 1, minMessage: "Sélectionnez au moins une catégorie.")]
-     public ?array $categories = [];
+    public ?array $categories = [];
 
-     public ?UploadedFile $cover = null;
+    public ?UploadedFile $cover = null;
 
-     public ?array $images = [];
-
-    public function __construct(
-               
-        string $title = null,      
-        string $authorName = null,
-        float $price = null,
-        int $stock = null,
-        string $format = null,
-        string $description = null,
-        string $extract = null,
-        string $isbn = null,
-        int $pageCount = null,
-        string $currency = null,
-        array $categories = [],
-        string $cover = null,
-        array $images = [],
-
-    ) {
-
-        $this->title = $title;        
-        $this->author = $authorName;
-        $this->price = $price;
-        $this->stock = $stock;
-        $this->format = $format;
-        $this->description = $description;
-        $this->extract = $extract;
-        $this->isbn = $isbn;
-        $this->pageCount = $pageCount;
-        $this->currency = $currency;
-        $this->categories = $categories;
-        $this->cover = $cover;
-        $this->images = $images;
-        
-    }
+    public ?array $images = [];  
    
     
 }

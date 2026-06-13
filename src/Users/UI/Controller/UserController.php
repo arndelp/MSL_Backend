@@ -103,7 +103,7 @@ class UserController extends AbstractController
 
 
 
-public function verifyUserEmail(Request $request, EmailVerifierUser $emailVerifier, UserRepositoryInterface $userRepository): JsonResponse
+public function verifyUserEmail(Request $request, EmailVerifierUser $emailVerifier, UserRepositoryInterface $userRepository): Response
     {
         $id = $request->query->get('id');
 

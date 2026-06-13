@@ -1,12 +1,11 @@
 <?php
+
 namespace App\Enum;
-
-
-
 enum BookFormat: string
 {
-    case POCHE = 'poche';
-    case RELIE = 'relie';
-    case BROCHE = 'broche';
+    case POCKET = 'pocket';     //poche
+    case PAPERBACK = 'paperback';   //broché
+    case HARDCOVER = 'hardcover';     //relié
+    case EBOOK = 'ebook';
     
 }
