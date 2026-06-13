@@ -74,7 +74,8 @@ class Order
     private ?\DateTimeImmutable $paid_at = null;
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
-    private ?User $user_id = null;
+    #[ORM\JoinColumn(name: "user_id", referencedColumnName: "id", nullable: true)]
+    private ?User $user = null;
 
     /**
      * @var Collection<int, OrderItem>
@@ -305,12 +306,12 @@ class Order
 
     public function getUserId(): ?User
     {
-        return $this->user_id;
+        return $this->user;
     }
 
-    public function setUserId(?User $user_id): static
+    public function setUserId(?User $user): static
     {
-        $this->user_id = $user_id;
+        $this->user = $user;
 
         return $this;
     }

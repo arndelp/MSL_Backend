@@ -63,9 +63,9 @@ class Book
     #[Groups(['book:read'])]
     private ?string $slug = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: Types::BIGINT,nullable: true)]
     #[Groups(['book:read','book:write'])]
-    private ?float $price = null;
+    private ?string $price = null; // en centimes
 
     #[ORM\Column(nullable: true)]
     #[Groups(['book:read','book:write'])]
