@@ -5,7 +5,7 @@ namespace App\Payments\Application\UseCase;
 
 use App\Payments\Domain\Payment\StripeGatewayInterface;
 
-class CreateStripeSession
+final class CreateStripeSession
 {
     private StripeGatewayInterface $stripeGateway;
 
@@ -14,7 +14,7 @@ class CreateStripeSession
         $this->stripeGateway = $stripeGateway;
     }
 
-    public function execute(array $cart): string
+    public function execute(array $cart): array
     {
         // Ici tu peux faire des règles de calcul, validation, totaux, etc.
         return $this->stripeGateway->createSession($cart);

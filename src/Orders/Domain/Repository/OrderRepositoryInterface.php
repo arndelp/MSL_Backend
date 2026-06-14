@@ -11,4 +11,6 @@ interface OrderRepositoryInterface
     public function findById(int $id): ?Order;
 
     public function remove(Order $order): void;
+
+   
 }

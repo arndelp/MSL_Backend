@@ -33,7 +33,8 @@ services:
             $receiverEmail: '%contact_receiver_email%'
 
 
-
+    App\Books\Domain\Repository\BookRepositoryInterface: 
+        alias: App\Books\Infrastructure\Repository\BookRepository
    
 
     App\Orders\Domain\Repository\OrderRepositoryInterface:
@@ -41,6 +42,11 @@ services:
 
     App\Orders\Domain\Repository\OrderItemRepositoryInterface:
         alias: App\Orders\Infrastructure\Repository\OrderItemRepository
+
+    App\Payments\Application\UseCase\CreateStripeSession:
+        autowire: true
+        autoconfigure: true
+
 
            
  

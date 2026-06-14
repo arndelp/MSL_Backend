@@ -22,6 +22,8 @@ class OrderItemMapper
             throw new \Exception("Livre introuvable");
         }
 
+
+
         $orderItem->setBook($book);
         $orderItem->setQuantity($orderItemDTO->quantity);
 
@@ -41,6 +43,8 @@ class OrderItemMapper
 
         // Statut par défaut
         $orderItem->setStatus(OrderItemStatus::PENDING);
+
+        
 
         return $orderItem;
     }

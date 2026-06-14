@@ -17,58 +17,96 @@ class StripeGateway implements StripeGatewayInterface
         $this->bookRepository = $bookRepository;
     }
 
-    public function createSession(array $data): string
-    {
-        $lineItems = [];
+    public function createSession(array $data): array
+{
+    $lineItems = [];
 
-        $cart = $data['cart'] ?? [];
-       
+    $cart = $data['cart'] ?? [];
 
-        foreach ($cart as $cartEntry) {
-            foreach ($cartEntry['items'] as $item) {
-                $id = intval($item['id'] ?? 0);
-                $quantity = intval($item['quantity'] ?? 0);
-        
-                if (!$id || $quantity <= 0) continue;
+    foreach ($cart as $cartEntry) {
 
+        // CAS 1 : $cartEntry est un OrderItemDTO
+        if ($cartEntry instanceof \App\Orders\Application\DTO\OrderItemDTO) {
+
+            $id = intval($cartEntry->book_id ?? 0);
+            $quantity = intval($cartEntry->quantity ?? 0);
+
+            if ($id && $quantity > 0) {
                 $title = $this->bookRepository->findTitleById($id);
                 $price = $this->bookRepository->findPriceById($id);
 
-                if ($title === null || $price === null) {
-                continue;
+                if ($title !== null && $price !== null) {
+                    $lineItems[] = [
+                        'price_data' => [
+                            'currency' => 'eur',
+                            'product_data' => ['name' => $title],
+                            'unit_amount' => (int)$price * 100,
+                        ],
+                        'quantity' => $quantity,
+                    ];
                 }
-
-            $lineItems[] = [
-                'price_data' => [
-                    'currency' => 'eur',
-                    'product_data' => [
-                        'name' => $title,
-                    ],
-                    'unit_amount' => (int)$price * 100, // ⚡ Stripe attend des centimes
-                ],
-                'quantity' => $quantity,
-            ];
             }
+
+            continue;
         }
 
-    // 🧪 Debug : vérifier si lineItems est rempli
-    if (empty($lineItems)) {
-        throw new \Exception("lineItems vide ! Vérifie cart et books.");
+        // CAS 2 : $cartEntry est un array avec 'items'
+        if (is_array($cartEntry) && isset($cartEntry['items'])) {
+
+            foreach ($cartEntry['items'] as $item) {
+
+                // item = array
+                $id = intval($item['id'] ?? 0);
+                $quantity = intval($item['quantity'] ?? 0);
+
+                if ($id && $quantity > 0) {
+                    $title = $this->bookRepository->findTitleById($id);
+                    $price = $this->bookRepository->findPriceById($id);
+
+                    if ($title !== null && $price !== null) {
+                        $lineItems[] = [
+                            'price_data' => [
+                                'currency' => 'eur',
+                                'product_data' => ['name' => $title],
+                                'unit_amount' => (int)$price * 100,
+                            ],
+                            'quantity' => $quantity,
+                        ];
+                    }
+                }
+            }
+        }
     }
 
-// Créer la session Stripe
+    if (empty($lineItems)) {
+        throw new \Exception("lineItems vide ! Le format de cart ne correspond pas.");
+    }
+
     $session = $this->stripe->checkout->sessions->create([
         'payment_method_types' => ['card'],
         'mode' => 'payment',
         'line_items' => $lineItems,
         'payment_intent_data' => [
-                'capture_method' => 'manual', // autorisation seulement
-            ],
+            'capture_method' => 'manual',
+        ],
         'success_url' => 'http://localhost:5173/successPayment',
         'cancel_url' => 'http://localhost:5173/cancelPayment',
     ]);
 
-    return $session->url;
-    
+    return [
+        'url' => $session->url,
+        'stripe_session_id' => $session->id,
+        'stripe_payment_intent_id' => $session->payment_intent,
+    ];
+}
+
+    public function capturePaymentIntent(string $paymentIntentId): void
+    {
+        $this->stripe->paymentIntents->capture($paymentIntentId);
+    }
+
+    public function cancelPaymentIntent(string $paymentIntentId): void
+    {
+        $this->stripe->paymentIntents->cancel($paymentIntentId);
     }
 }

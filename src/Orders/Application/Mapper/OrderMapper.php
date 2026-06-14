@@ -5,12 +5,19 @@ namespace App\Orders\Application\Mapper;
 use App\Orders\Domain\Entity\Order;
 use App\Orders\Application\DTO\OrderDTO;
 use App\Enum\OrderStatus;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class OrderMapper
 {
+    public function __construct(
+        private Security $security,
+    ){}
+
     public function toEntity(OrderDTO $orderDTO): Order
 {
     $order = new Order();
+
+    
 
     // Adresse
     $order->setShippingFirstname($orderDTO->shipping_firstname);

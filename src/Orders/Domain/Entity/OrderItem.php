@@ -55,6 +55,13 @@ class OrderItem
     #[ORM\Column(type: Types::BIGINT, nullable: true)]
     private ?string $refund_amount = null;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $stripeSessionId = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $stripePaymentIntentId = null;
+
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $stripe_transfer_id = null;
 
@@ -222,6 +229,29 @@ class OrderItem
 
         return $this;
     }
+
+        public function getStripeSessionId(): ?string
+    {
+        return $this->stripeSessionId;
+    }
+
+    public function setStripeSessionId(?string $stripeSessionId): self
+    {
+        $this->stripeSessionId = $stripeSessionId;
+        return $this;
+    }
+
+    public function getStripePaymentIntentId(): ?string
+    {
+        return $this->stripePaymentIntentId;
+    }
+
+    public function setStripePaymentIntentId(?string $stripePaymentIntentId): self
+    {
+        $this->stripePaymentIntentId = $stripePaymentIntentId;
+        return $this;
+    }
+
 
     public function getStripeTransferId(): ?string
     {
