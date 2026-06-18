@@ -4,6 +4,9 @@ namespace App\Orders\Application\DTO;
 
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Orders\Application\DTO\OrderItemDTO;
+use Symfony\Component\Serializer\Annotation\SerializedName;
+
+
 
 final class OrderDTO
 {
@@ -43,7 +46,18 @@ final class OrderDTO
 
     /** @var OrderItemDTO[] */
     #[Assert\Count(min: 1, minMessage: "La commande doit contenir au moins un article.")]
+    #[Assert\Valid] 
     public array $order_items = [];
+
+    public function setOrderItems(array $items): void
+{
+    $this->order_items = array_map(function ($item) {
+        return new OrderItemDTO(
+            $item['book_id'] ?? $item['id'] ?? null,
+            $item['quantity'] ?? null
+        );
+    }, $items);
+}
 
 
     public function __construct(
@@ -67,6 +81,6 @@ final class OrderDTO
         $this->shipping_city = $shipping_city;
         $this->shipping_country = $shipping_country;
         $this->status = $status;
-        $this->order_items = $order_items;
+        $this->setOrderItems($order_items);
     }
 }

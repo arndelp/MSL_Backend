@@ -18,69 +18,47 @@ class StripeGateway implements StripeGatewayInterface
     }
 
     public function createSession(array $data): array
+
+   
+
 {
     $lineItems = [];
 
-    $cart = $data['cart'] ?? [];
+   
+        $cart = $data['cart'] ?? $data;
 
-    foreach ($cart as $cartEntry) {
+foreach ($cart as $cartEntry) {
 
-        // CAS 1 : $cartEntry est un OrderItemDTO
-        if ($cartEntry instanceof \App\Orders\Application\DTO\OrderItemDTO) {
-
-            $id = intval($cartEntry->book_id ?? 0);
-            $quantity = intval($cartEntry->quantity ?? 0);
-
-            if ($id && $quantity > 0) {
-                $title = $this->bookRepository->findTitleById($id);
-                $price = $this->bookRepository->findPriceById($id);
-
-                if ($title !== null && $price !== null) {
-                    $lineItems[] = [
-                        'price_data' => [
-                            'currency' => 'eur',
-                            'product_data' => ['name' => $title],
-                            'unit_amount' => (int)$price * 100,
-                        ],
-                        'quantity' => $quantity,
-                    ];
-                }
-            }
-
-            continue;
-        }
-
-        // CAS 2 : $cartEntry est un array avec 'items'
-        if (is_array($cartEntry) && isset($cartEntry['items'])) {
-
-            foreach ($cartEntry['items'] as $item) {
-
-                // item = array
-                $id = intval($item['id'] ?? 0);
-                $quantity = intval($item['quantity'] ?? 0);
-
-                if ($id && $quantity > 0) {
-                    $title = $this->bookRepository->findTitleById($id);
-                    $price = $this->bookRepository->findPriceById($id);
-
-                    if ($title !== null && $price !== null) {
-                        $lineItems[] = [
-                            'price_data' => [
-                                'currency' => 'eur',
-                                'product_data' => ['name' => $title],
-                                'unit_amount' => (int)$price * 100,
-                            ],
-                            'quantity' => $quantity,
-                        ];
-                    }
-                }
-            }
-        }
+    if (!is_array($cartEntry)) {
+        continue;
     }
 
-    if (empty($lineItems)) {
-        throw new \Exception("lineItems vide ! Le format de cart ne correspond pas.");
+    // Accepte id OU book_id
+    $bookId = $cartEntry['id'] ?? $cartEntry['book_id'] ?? null;
+    $quantity = $cartEntry['quantity'] ?? null;
+
+    if ($bookId && $quantity > 0) {
+
+        $title = $this->bookRepository->findTitleById($bookId);
+        $price = $this->bookRepository->findPriceById($bookId);
+
+        if ($title !== null && $price !== null) {
+            $lineItems[] = [
+                'price_data' => [
+                    'currency' => 'eur',
+                    'product_data' => ['name' => $title],
+                    'unit_amount' => (int)$price * 100,
+                ],
+                'quantity' => $quantity,
+            ];
+        }
     }
+}
+
+if (empty($lineItems)) {
+    throw new \Exception("lineItems vide ! Le format de cart ne correspond pas.");
+}
+
 
     $session = $this->stripe->checkout->sessions->create([
         'payment_method_types' => ['card'],

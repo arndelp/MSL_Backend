@@ -25,7 +25,7 @@ final class RecordContactMessageByApi
                     }  
 
         $contact = $this->contactMessageInputMapper->toEntity($dto);
-        $contact->setAuthor($user);
+        $contact->setUser($user);
         $contact->setCreatedAt(new \DateTimeImmutable());
         $contact->setIsRead(false); // Par défaut, le message est non lu
         

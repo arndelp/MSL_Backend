@@ -43,7 +43,19 @@ services:
     App\Orders\Domain\Repository\OrderItemRepositoryInterface:
         alias: App\Orders\Infrastructure\Repository\OrderItemRepository
 
+    App\Users\Domain\Repository\UserRepositoryInterface:
+        alias: App\Users\Infrastructure\Repository\DoctrineUserRepository
+
+
     App\Payments\Application\UseCase\CreateStripeSession:
+        autowire: true
+        autoconfigure: true
+
+    App\Orders\Application\Mapper\OrderMapper:
+        autowire: true
+        autoconfigure: true
+
+    App\Orders\Application\Mapper\OrderItemMapper:
         autowire: true
         autoconfigure: true
 

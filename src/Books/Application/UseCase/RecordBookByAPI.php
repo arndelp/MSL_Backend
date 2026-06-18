@@ -34,7 +34,7 @@ final class RecordBookByApi
             $book = $this->bookMapper->toEntity($dto);
 
             // Ensuite définir l'auteur
-            $book->setAuthor($user);
+            $book->setUser($user);
 
             // Définir le nom de l'auteur si nécessaire
             $book->setAuthorName($dto->authorName ?? $user->getUserIdentifier());

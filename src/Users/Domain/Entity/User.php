@@ -98,7 +98,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private bool $isVerified = false;
 
-    #[ORM\OneToMany(mappedBy: 'author', targetEntity: Book::class)] // un utilisateur peut être l'auteur de plusieurs livres, mais un livre n'a qu'un seul auteur
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Book::class)] // un utilisateur peut être l'auteur de plusieurs livres, mais un livre n'a qu'un seul auteur
     private Collection $books;   
 
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
@@ -107,7 +107,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Address::class)]
     private Collection $addresses;
 
-    #[ORM\OneToMany(mappedBy: 'author', targetEntity: Contact::class)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Contact::class)]
     private Collection $contacts;
 
     /**
@@ -119,7 +119,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, OrderItem>
      */
-    #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'author')]
+    #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'user')]
     private Collection $orderItems;   // adresses de livraison de l'utilisateur (OneToMany)
  
 
@@ -299,7 +299,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->books->contains($book)) {
             $this->books->add($book);
-            $book->setAuthor($this); // 🔥 IMPORTANT
+            $book->setUser($this); // 🔥 IMPORTANT
         }
 
         return $this;
@@ -308,8 +308,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeBook(Book $book): static
     {
         if ($this->books->removeElement($book)) {
-            if ($book->getAuthor() === $this) {
-                $book->setAuthor(null);
+            if ($book->getUser() === $this) {
+                $book->setUser(null);
             }
         }
 
@@ -413,7 +413,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->orderItems->contains($orderItem)) {
             $this->orderItems->add($orderItem);
-            $orderItem->setAuthor($this);
+            $orderItem->setUser($this);
         }
 
         return $this;
@@ -423,8 +423,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->orderItems->removeElement($orderItem)) {
             // set the owning side to null (unless already changed)
-            if ($orderItem->getAuthor() === $this) {
-                $orderItem->setAuthor(null);
+            if ($orderItem->getUser() === $this) {
+                $orderItem->setUser(null);
             }
         }
 
@@ -440,7 +440,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->contacts->contains($contact)) {
             $this->contacts->add($contact);
-            $contact->setAuthor($this);
+            $contact->setUser($this);
         }
 
         return $this;
@@ -449,8 +449,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeContact(Contact $contact): static
     {
         if ($this->contacts->removeElement($contact)) {
-            if ($contact->getAuthor() === $this) {
-                $contact->setAuthor(null);
+            if ($contact->getUser() === $this) {
+                $contact->setUser(null);
             }
         }
 

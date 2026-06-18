@@ -118,9 +118,9 @@ class Book
     private Collection $categories;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'books')] // un livre a un seul auteur, mais un auteur peut avoir plusieurs livres
-    #[ORM\JoinColumn(nullable: false)] // la colonne author_id dans la table book ne peut pas être nulle, un livre doit toujours avoir un auteur
+    #[ORM\JoinColumn(nullable: false)] // la colonne user_id dans la table book ne peut pas être nulle, un livre doit toujours avoir un auteur
     #[Groups(['book:read'])]
-    private ?User $author = null; // author = auteur du livre (ManyToOne)
+    private ?User $user = null; // user = auteur du livre (ManyToOne)
 
     #[ORM\Column(nullable: true)]
     private ?string $status = null;
@@ -314,8 +314,8 @@ class Book
     }
 
 
-    public function getAuthor(): ?User { return $this->author; } // retourne l'auteur de ce livre (ManyToOne)
-    public function setAuthor(?User $author): static { $this->author = $author; return $this;   } // définit l'auteur de ce livre (ManyToOne)
+    public function getUser(): ?User { return $this->user; } // retourne l'auteur de ce livre (ManyToOne)
+    public function setUser(?User $user): static { $this->user = $user; return $this;   } // définit l'auteur de ce livre (ManyToOne)
 
     //envoi de l'url des images
     #[Groups(['book:read'])]

@@ -14,7 +14,7 @@ use App\Orders\Domain\Entity\OrderItem;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ApiResource]
-#[ORM\Table(name: "orders")]
+#[ORM\Table(name: "orders")] 
 class Order
 {
     #[ORM\Id]

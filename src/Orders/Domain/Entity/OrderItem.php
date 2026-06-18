@@ -29,7 +29,8 @@ class OrderItem
     private ?Book $book = null;
 
     #[ORM\ManyToOne(inversedBy: 'orderItems')]
-    private ?User $author = null;
+    #[ORM\JoinColumn(name: 'seller_id', referencedColumnName: 'id', nullable: false)]
+    private ?User $user = null;
 
     #[ORM\Column(enumType: OrderItemStatus::class)]
     private ?OrderItemStatus $status = null;
@@ -50,7 +51,7 @@ class OrderItem
     private ?string $platform_fee = null;
 
     #[ORM\Column(type: Types::BIGINT, nullable: true)]
-    private ?string $author_amount = null;
+    private ?string $user_amount = null;
 
     #[ORM\Column(type: Types::BIGINT, nullable: true)]
     private ?string $refund_amount = null;
@@ -69,10 +70,10 @@ class OrderItem
     private ?PayoutStatus $payout_status = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $paid_to_author_at = null;
+    private ?\DateTimeImmutable $paid_to_user_at = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $author_confirmed_at = null;
+    private ?\DateTimeImmutable $user_confirmed_at = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $shipped_at = null;
@@ -85,6 +86,22 @@ class OrderItem
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updated_at = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $buyer_user = null;
+
+    public function getBuyerUser(): ?User
+    {
+        return $this->buyer_user;
+    }
+
+    public function setBuyerUser(?User $buyer_user): self
+    {
+        $this->buyer_user = $buyer_user;
+        return $this;
+    }
+   
 
     public function getId(): ?int
     {
@@ -122,14 +139,14 @@ class OrderItem
         return $this;
     }
 
-    public function getAuthor(): ?User
+    public function getUser(): ?User
     {
-        return $this->author;
+        return $this->user;
     }
 
-    public function setAuthor(?User $author): static
+    public function setUser(?User $user): static
     {
-        $this->author = $author;
+        $this->user = $user;
 
         return $this;
     }
@@ -206,14 +223,14 @@ class OrderItem
         return $this;
     }
 
-    public function getAuthorAmount(): ?string
+    public function getUserAmount(): ?string
     {
-        return $this->author_amount;
+        return $this->user_amount;
     }
 
-    public function setAuthorAmount(?string $author_amount): static
+    public function setUserAmount(?string $user_amount): static
     {
-        $this->author_amount = $author_amount;
+        $this->user_amount = $user_amount;
 
         return $this;
     }
@@ -277,26 +294,26 @@ class OrderItem
         return $this;
     }
 
-    public function getPaidToAuthorAt(): ?\DateTimeImmutable
+    public function getPaidToUserAt(): ?\DateTimeImmutable
     {
-        return $this->paid_to_author_at;
+        return $this->paid_to_user_at;
     }
 
-    public function setPaidToAuthorAt(?\DateTimeImmutable $paid_to_author_at): static
+    public function setPaidToUserAt(?\DateTimeImmutable $paid_to_user_at): static
     {
-        $this->paid_to_author_at = $paid_to_author_at;
+        $this->paid_to_user_at = $paid_to_user_at;
 
         return $this;
     }
 
-    public function getAuthorConfirmedAt(): ?\DateTimeImmutable
+    public function getUserConfirmedAt(): ?\DateTimeImmutable
     {
-        return $this->author_confirmed_at;
+        return $this->user_confirmed_at;
     }
 
-    public function setAuthorConfirmedAt(?\DateTimeImmutable $author_confirmed_at): static
+    public function setUserConfirmedAt(?\DateTimeImmutable $user_confirmed_at): static
     {
-        $this->author_confirmed_at = $author_confirmed_at;
+        $this->user_confirmed_at = $user_confirmed_at;
 
         return $this;
     }
@@ -348,4 +365,5 @@ class OrderItem
 
         return $this;
     }
+
 }

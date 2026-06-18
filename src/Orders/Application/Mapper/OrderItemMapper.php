@@ -6,11 +6,13 @@ use App\Orders\Domain\Entity\OrderItem;
 use App\Orders\Application\DTO\OrderItemDTO;
 use App\Books\Domain\Repository\BookRepositoryInterface;
 use App\Enum\OrderItemStatus;
+use App\Users\Domain\Repository\UserRepositoryInterface;
 
 class OrderItemMapper
 {
     public function __construct(
-        private BookRepositoryInterface $bookRepository
+        private BookRepositoryInterface $bookRepository,
+        private UserRepositoryInterface $userRepository
     ) {}
 
     public function toEntity(OrderItemDTO $orderItemDTO): OrderItem
@@ -35,8 +37,8 @@ class OrderItemMapper
         $totalPrice = $unitPrice * $orderItemDTO->quantity;
         $orderItem->setTotalPrice($totalPrice);
 
-        // Auteur du livre
-        $orderItem->setAuthor($book->getAuthor());
+        // Vendeur du livre (seller_id)
+        $orderItem->setUser($book->getUser());
 
         // Titre du livre
         $orderItem->setBookTitle($book->getTitle());
@@ -44,7 +46,15 @@ class OrderItemMapper
         // Statut par défaut
         $orderItem->setStatus(OrderItemStatus::PENDING);
 
+        // Acheteur du livre
         
+
+       
+
+
+        //Dates de suivi
+        $orderItem->setCreatedAt(new \DateTimeImmutable());
+        $orderItem->setUpdatedAt(new \DateTimeImmutable());
 
         return $orderItem;
     }

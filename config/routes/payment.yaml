@@ -1,4 +1,4 @@
 create_checkout_session:
-    path: /create-checkout-session
+    path: /api/create-checkout-session
     controller: App\Payments\UI\Controller\PaymentController::create
     methods: ['POST']

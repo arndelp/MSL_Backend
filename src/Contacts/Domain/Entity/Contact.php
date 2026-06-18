@@ -52,8 +52,8 @@ class Contact
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'contacts')] // un livre a un seul auteur, mais un auteur peut avoir plusieurs livres
-    #[ORM\JoinColumn(nullable: false)] // la colonne author_id dans la table contact ne peut pas être nulle, un livre doit toujours avoir un auteur
-    private ?User $author = null; // author = auteur du livre (ManyToOne)
+    #[ORM\JoinColumn(nullable: false)] // la colonne user_id dans la table contact ne peut pas être nulle, un livre doit toujours avoir un auteur
+    private ?User $user = null; // user = auteur du livre (ManyToOne)
 
 
 
@@ -116,7 +116,7 @@ class Contact
         return $this;
     }
 
-    public function getAuthor(): ?User { return $this->author;}
-    public function setAuthor(?User $author): static { $this->author = $author; return $this;   } // définit l'auteur de ce livre (ManyToOne)
+    public function getUser(): ?User { return $this->user;}
+    public function setUser(?User $user): static { $this->user = $user; return $this;   } // définit l'auteur de ce livre (ManyToOne)
 
     }

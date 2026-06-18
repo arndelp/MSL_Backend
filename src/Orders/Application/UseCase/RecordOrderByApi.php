@@ -3,11 +3,12 @@
 namespace App\Orders\Application\UseCase;
 
 use App\Orders\Application\DTO\OrderDTO;
-use App\Orders\Domain\Repository\OrderRepositoryInterface;
-use App\Orders\Application\Mapper\OrderMapper;
 use App\Orders\Application\Mapper\OrderItemMapper;
+use App\Orders\Application\Mapper\OrderMapper;
+use App\Orders\Domain\Repository\OrderRepositoryInterface;
 use App\Orders\Domain\Repository\OrderItemRepositoryInterface;
 use App\Payments\Application\UseCase\CreateStripeSession;
+use Symfony\Bundle\SecurityBundle\Security;
 
 final class RecordOrderByApi
 {
@@ -16,65 +17,163 @@ final class RecordOrderByApi
         private OrderMapper $orderMapper,
         private OrderItemMapper $orderItemMapper,
         private OrderItemRepositoryInterface $orderItemRepository,
-        private CreateStripeSession $createStripeSession
-    ) {}
+        private CreateStripeSession $createStripeSession,
+        private Security $security,
+    ) {
+    }
+
 
     public function execute(OrderDTO $orderDTO): void
     {
-        // 1) Créer l'Order global
+        /**
+         * 1) Récupération de l'acheteur connecté
+         */
+        $buyer = $this->security->getUser();
+
+        if (!$buyer) {
+            throw new \Exception('Utilisateur non authentifié');
+        }
+
+
+        /**
+         * 2) Création de la commande globale
+         */
         $order = $this->orderMapper->toEntity($orderDTO);
 
-        // 2) Regrouper les items par auteur
-        $itemsByAuthor = [];
+        // utilisateur qui achète
+        $order->setUserId($buyer);
 
+
+
+        /**
+         * 3) Création des OrderItems
+         */
         foreach ($orderDTO->order_items as $itemDTO) {
-            $authorId = $itemDTO->author_id;
 
-            if (!isset($itemsByAuthor[$authorId])) {
-                $itemsByAuthor[$authorId] = [];
+            $orderItem = $this->orderItemMapper->toEntity($itemDTO);
+
+
+            /**
+             * Acheteur
+             */
+            $orderItem->setBuyerUser($buyer);
+
+
+            /**
+             * Vendeur récupéré depuis le livre
+             */
+            $book = $orderItem->getBook();
+
+            if (!$book) {
+                throw new \Exception(
+                    'Livre introuvable pour la commande'
+                );
             }
 
-            $itemsByAuthor[$authorId][] = $itemDTO;
+
+            $seller = $book->getUser();
+
+            if (!$seller) {
+                throw new \Exception(
+                    'Le livre n\'a pas de vendeur'
+                );
+            }
+
+
+            // vendeur
+            $orderItem->setUser($seller);
+
+
+
+            /**
+             * Ajout dans Order
+             */
+            $order->addOrderItem($orderItem);
         }
 
-        // 3) Pour chaque auteur → créer une session Stripe
-        foreach ($itemsByAuthor as $authorId => $itemsDTO) {
 
-            // Construire le panier Stripe pour cet auteur
+
+        /**
+         * 4) Création des sessions Stripe par vendeur
+         */
+        $itemsBySeller = [];
+
+
+        foreach ($order->getOrderItems() as $orderItem) {
+
+            $sellerId = $orderItem
+                ->getUser()
+                ->getId();
+
+
+            if (!isset($itemsBySeller[$sellerId])) {
+                $itemsBySeller[$sellerId] = [];
+            }
+
+
+            $itemsBySeller[$sellerId][] = $orderItem;
+        }
+
+
+
+        foreach ($itemsBySeller as $sellerItems) {
+
+
             $cart = [
-                'cart' => [
-                    [
-                        'items' => array_map(fn($itemDTO) => [
-                            'id' => $itemDTO->book_id,
-                            'quantity' => $itemDTO->quantity,
-                        ], $itemsDTO)
-                    ]
-                ]
+                'cart' => array_map(
+                    fn($orderItem) => [
+                        'id' => $orderItem
+                            ->getBook()
+                            ->getId(),
+
+                        'quantity' => $orderItem
+                            ->getQuantity(),
+                    ],
+                    $sellerItems
+                )
             ];
 
-            // Appel Stripe → 1 PaymentIntent par auteur
-            $session = $this->createStripeSession->execute($cart);
 
-            // 4) Mapper les OrderItems et stocker les IDs Stripe
-            foreach ($itemsDTO as $itemDTO) {
-                $orderItem = $this->orderItemMapper->toEntity($itemDTO);
 
-                $orderItem->setStripeSessionId($session['stripe_session_id']);
-                $orderItem->setStripePaymentIntentId($session['stripe_payment_intent_id']);
+            $session = $this->createStripeSession
+                ->execute($cart);
 
-                $order->addOrderItem($orderItem);
+
+
+            foreach ($sellerItems as $orderItem) {
+
+                $orderItem->setStripeSessionId(
+                    $session['stripe_session_id']
+                );
+
+
+                $orderItem->setStripePaymentIntentId(
+                    $session['stripe_payment_intent_id']
+                );
             }
         }
 
-        // 5) Calcul du total global
+
+
+        /**
+         * 5) Calcul total commande
+         */
         $total = 0;
+
+
         foreach ($order->getOrderItems() as $item) {
+
             $total += $item->getTotalPrice();
         }
 
+
         $order->setTotalAmount($total);
 
-        // 6) Sauvegarde finale
+
+
+        /**
+         * 6) Sauvegarde
+         */
         $this->orderRepository->save($order);
     }
 }
