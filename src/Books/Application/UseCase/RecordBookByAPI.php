@@ -39,6 +39,7 @@ final class RecordBookByApi
             // Définir le nom de l'auteur si nécessaire
             $book->setAuthorName($dto->authorName ?? $user->getUserIdentifier());
 
+          
             // Dates
             $book->setCreatedAt(new \DateTimeImmutable());
             $book->setUpdatedAt(new \DateTimeImmutable());

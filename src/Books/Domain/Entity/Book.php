@@ -59,7 +59,9 @@ class Book
     #[Groups(['book:read','book:write'])]
     private ?string $authorName = null;
 
-    #[ORM\Column(length: 255, unique: true)]
+
+
+    #[ORM\Column(length: 255)]
     #[Groups(['book:read'])]
     private ?string $slug = null;
 
@@ -67,9 +69,14 @@ class Book
     #[Groups(['book:read','book:write'])]
     private ?string $price = null; // en centimes
 
+    
     #[ORM\Column(nullable: true)]
-    #[Groups(['book:read','book:write'])]
-    private ?int $stock = null;
+    #[Groups(['book:read'])]
+    private ?int $quantity = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['book:read'])]
+    private ?int $quantitySold = null;
 
     #[ORM\Column(enumType: BookFormat::class)]   
     #[Groups(['book:read','book:write'])]
@@ -182,9 +189,15 @@ class Book
 
     public function getPrice(): ?float { return $this->price; }
     public function setPrice(?float $price): static { $this->price = $price; return $this; }
+    
 
-    public function getStock(): ?int { return $this->stock; }
-    public function setStock(?int $stock): static { $this->stock = $stock; return $this; }
+    public function getQuantity(): ?int { return $this->quantity; }
+
+    public function setQuantity(?int $quantity): static { $this->quantity = $quantity; return $this; }
+
+    public function getQuantitySold(): ?int { return $this->quantitySold; }
+
+    public function setQuantitySold(?int $quantitySold): static { $this->quantitySold = $quantitySold; return $this; } 
 
     public function getFormat(): ?BookFormat  {  return $this->format;   }
     public function setFormat(?BookFormat $format): static  {  $this->format = $format;  return $this; }

@@ -46,7 +46,10 @@ class OrderItemMapper
         // Statut par défaut
         $orderItem->setStatus(OrderItemStatus::PENDING);
 
-        // Acheteur du livre
+        // PlateForm Fee
+        $orderItem->setPlatformFee(($totalPrice*12)/100);
+
+        
         
 
        

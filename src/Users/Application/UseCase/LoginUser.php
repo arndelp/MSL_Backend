@@ -39,6 +39,8 @@ class LoginUser
                 'email' => $user->getEmail(),
                 'firstname' => $user->getFirstname(),
                 'lastname' => $user->getLastname(),  
+                'role' => $user->getRoles(),
+                'type' => $user->getType()
             ]
         ];
     }

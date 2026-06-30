@@ -26,7 +26,7 @@ final class BookDTO
     public ?float $price = null;
 
     #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
-    public ?int $stock = null;
+    public ?int $quantity = null;
 
     #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
     public ?string $format = null;

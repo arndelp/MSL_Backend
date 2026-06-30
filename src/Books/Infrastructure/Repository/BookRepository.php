@@ -6,6 +6,7 @@ use App\Books\Domain\Entity\Book;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Books\Domain\Repository\BookRepositoryInterface;
+use App\Users\Domain\Entity\User;
 /**
  * @extends ServiceEntityRepository<Book>
  */
@@ -29,6 +30,14 @@ class BookRepository extends ServiceEntityRepository implements BookRepositoryIn
         return $this->findBy([], ['title' => 'ASC']);
     }
 
+    public function findAvailable(): array
+    {
+        return $this->findBy(
+            ['status' => 'available'],
+            ['title' => 'ASC']
+        );
+    }    
+
     public function findPriceById(int $id): ?float
     {
         $book = $this->find($id);
@@ -45,4 +54,27 @@ class BookRepository extends ServiceEntityRepository implements BookRepositoryIn
     {
         return $this->find($id);
     }
+
+    public function findBySeller(User $user): array
+    {
+        return $this->findBy(
+            [
+                'user' => $user,
+                'status' => 'available',
+            ],
+            ['title' => 'ASC'],
+        );
+    }
+
+    public function deleteBook(Book $book): void
+    {
+        
+
+        $em = $this->getEntityManager();
+        $em->remove($book);
+        $em->flush();
+    }
+
+
+
 }

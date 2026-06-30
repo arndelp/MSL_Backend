@@ -31,11 +31,15 @@ security:
     access_control:
         - { path: ^/api/user_login, roles: PUBLIC_ACCESS }
         - { path: ^/api/register, roles: PUBLIC_ACCESS }
-        - { path: ^/api/books, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/allBooks, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/allBooks/id, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api/categories, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api/verify/email, roles: PUBLIC_ACCESS }
+      
 
         - { path: ^/api/me, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/orders, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/books, roles: IS_AUTHENTICATED_FULLY, methods: [POST, PUT] }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/userBooks, roles: IS_AUTHENTICATED_FULLY, methods: [GET]}
+        - { path: ^/api/deleteBook/id, roles: IS_AUTHENTICATED_FULLY, methods: [DELETE]}

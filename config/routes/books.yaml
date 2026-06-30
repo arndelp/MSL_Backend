@@ -4,7 +4,24 @@ api.books.post:
   methods: [POST]
 
 api.books.alls:
-  path: /api/books
+  path: /api/allBooks
   controller: App\Books\UI\Controller\BookController::Alls
   methods: [GET]
+
+api.books.detail:
+  path: /api/allBooks/{id}
+  controller: App\Books\UI\Controller\BookController::detail
+  methods: [GET]
+
+api.books.user:
+  path: /api/userBooks
+  controller: App\Books\UI\Controller\BookController::getPersonnalBooks
+  methods: [GET]
+
+api.books.delete:
+  path: /api/deleteBook/{id}
+  controller: App\Books\UI\Controller\BookController::delete
+  methods: [DELETE]
+
+
 

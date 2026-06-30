@@ -14,7 +14,17 @@ class GetAllBooks
     public function execute(): array
     {
         try {
-            return $this->bookRepository->findAll();
+            $books = $this->bookRepository->findAvailable();
+
+            return array_map(fn ($book) => [
+                'id' => $book->getId(),
+                'title' => $book->getTitle(),
+                'authorName' => $book->getAuthorName(),
+                'price' => $book->getPrice(),
+                'quantity' => $book->getQuantity(),
+                'format' => $book->getFormat()?->value,
+                'coverUrl' => $book->getCoverUrl(),
+            ], $books);
         } catch (Throwable $e) {
             // Log the error or handle it as needed
             throw new \RuntimeException('Aucun livre trouvé: ' . $e->getMessage());   

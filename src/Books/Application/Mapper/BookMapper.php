@@ -9,6 +9,7 @@ use App\Enum\BookFormat;
 
 
 
+
 class BookMapper
 {
  
@@ -20,13 +21,15 @@ class BookMapper
         $book->setTitle($bookDTO->title);     
         $book->setAuthorName($bookDTO->authorName);
         $book->setPrice($bookDTO->price);
-        $book->setStock($bookDTO->stock);
+        $book->setQuantity($bookDTO->quantity);
         $book->setFormat(BookFormat::from($bookDTO->format));
         $book->setDescription($bookDTO->description);
         $book->setIsbn($bookDTO->isbn);
         $book->setPageCount($bookDTO->pageCount);
         $book->setCurrency($bookDTO->currency);
         $book->setExtract($bookDTO->extract);
+        $book->setStatus('available');
+
        
 
         return $book;
@@ -38,7 +41,7 @@ class BookMapper
         $bookDTO->title = $book->getTitle();
         $bookDTO->authorName = $book->getAuthorName();
         $bookDTO->price = $book->getPrice();
-        $bookDTO->stock = $book->getStock();
+        $bookDTO->quantity = $book->getQuantity();
         $bookDTO->format = $book->getFormat()->value ;
         $bookDTO->description = $book->getDescription();
         $bookDTO->isbn = $book->getIsbn();
