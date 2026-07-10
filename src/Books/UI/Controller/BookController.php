@@ -17,6 +17,8 @@ use Symfony\Bundle\SecurityBundle\Security;
 use App\Users\Domain\Entity\User;
 use App\Books\Domain\Repository\BookRepositoryInterface;
 use App\Books\Application\UseCase\DeleteBook;
+use App\Books\Application\UseCase\ToBeUnavailable;
+use App\Books\Application\UseCase\ToChangeStock;
 
 final class BookController extends AbstractController
 {
@@ -131,31 +133,86 @@ final class BookController extends AbstractController
     }
 
     public function detail(int $id): JsonResponse
-{
-    $book = $this->bookRepository->findById($id);
+    {
+        $book = $this->bookRepository->findById($id);
 
-    if (!$book || $book->getStatus() !== 'available') {
-        return new JsonResponse(['error' => 'Livre introuvable'], 404);
+        if (!$book || $book->getStatus() !== 'available') {
+            return new JsonResponse(['error' => 'Livre introuvable'], 404);
+        }
+
+        return new JsonResponse([
+            'id' => $book->getId(),
+            'title' => $book->getTitle(),
+            'authorName' => $book->getAuthorName(),
+            'price' => $book->getPrice(),
+            'quantity' => $book->getQuantity(),
+            'format' => $book->getFormat()?->value,
+            'pageCount' => $book->getPageCount(),
+            'description' => $book->getDescription(),
+            'extract' => $book->getExtract(),
+            'coverUrl' => $book->getCoverUrl(),
+            'imageUrls' => $book->getImageUrls(),
+            'categories' => array_map(fn ($cat) => [
+                'id' => $cat->getId(),
+                'name' => $cat->getName(),
+            ], $book->getCategories()->toArray()),
+        ]);
     }
 
-    return new JsonResponse([
-        'id' => $book->getId(),
-        'title' => $book->getTitle(),
-        'authorName' => $book->getAuthorName(),
-        'price' => $book->getPrice(),
-        'quantity' => $book->getQuantity(),
-        'format' => $book->getFormat()?->value,
-        'pageCount' => $book->getPageCount(),
-        'description' => $book->getDescription(),
-        'extract' => $book->getExtract(),
-        'coverUrl' => $book->getCoverUrl(),
-        'imageUrls' => $book->getImageUrls(),
-        'categories' => array_map(fn ($cat) => [
-            'id' => $cat->getId(),
-            'name' => $cat->getName(),
-        ], $book->getCategories()->toArray()),
-    ]);
-}
+    public function toBeUnavailable(int $id, ToBeUnavailable $toBeUnavailable): JsonResponse
+    {
+         $user = $this->security->getUser();
+
+        if (!$user instanceof User) {
+            return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
+        }
+
+        try {
+            $toBeUnavailable->execute($id);
+
+            return new JsonResponse([
+                'success' => 'Livre mis à jour avec succès'
+            ], 200);
+
+        } catch (\InvalidArgumentException $e) {
+            return new JsonResponse([
+                'error' => $e->getMessage()
+            ], 404);
+
+        } catch (\Throwable $e) {
+            return new JsonResponse([
+                'error' => 'Mise à jour du livre impossible, veuillez nous contacter',
+            ], 500);
+        }
+    }
+
+    public function toUpdateStock(int $id, int $quantity, ToChangeStock $toChangeStock): JsonResponse
+    {
+        $user = $this->security->getUser();
+
+        if (!$user instanceof User) {
+            return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
+        }
+
+        try {
+            
+            $toChangeStock->execute($id, $quantity);
+
+            return new JsonResponse([
+                'success' => 'Quantité du livre mise à jour avec succès'
+            ], 200);
+
+        } catch (\InvalidArgumentException $e) {
+            return new JsonResponse([
+                'error' => $e->getMessage()
+            ], 404);
+
+        } catch (\Throwable $e) {
+            return new JsonResponse([
+                'error' => 'Mise à jour de la quantité du livre impossible, veuillez nous contacter',
+            ], 500);
+        }
+    }
     
     
 };

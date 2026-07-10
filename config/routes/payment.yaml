@@ -1,4 +1,7 @@
-create_checkout_session:
-    path: /api/create-checkout-session
-    controller: App\Payments\UI\Controller\PaymentController::create
-    methods: ['POST']
+
+
+stripe_webhook:
+    path: /api/stripe/webhook
+    controller: App\Payments\UI\Controller\StripeWebhookController
+    methods: POST
+

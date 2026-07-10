@@ -23,11 +23,9 @@ final class RecordOrderByApi
     }
 
 
-    public function execute(OrderDTO $orderDTO): void
+    public function execute(OrderDTO $orderDTO): array
     {
-        /**
-         * 1) Récupération de l'acheteur connecté
-         */
+        /*1) Récupération de l'acheteur connecté         */
         $buyer = $this->security->getUser();
 
         if (!$buyer) {
@@ -35,33 +33,21 @@ final class RecordOrderByApi
         }
 
 
-        /**
-         * 2) Création de la commande globale
-         */
+        /*2) Création de la commande globale         */
         $order = $this->orderMapper->toEntity($orderDTO);
 
-        // utilisateur qui achète
+            //utilisateur qui achète
         $order->setUserId($buyer);
 
-
-
-        /**
-         * 3) Création des OrderItems
-         */
+        /*3) Création des OrderItems */
         foreach ($orderDTO->order_items as $itemDTO) {
 
             $orderItem = $this->orderItemMapper->toEntity($itemDTO);
 
-
-            /**
-             * Acheteur
-             */
+            /*Acheteur*/
             $orderItem->setBuyerUser($buyer);
 
-
-            /**
-             * Vendeur récupéré depuis le livre
-             */
+            /*Vendeur récupéré depuis le livre*/
             $book = $orderItem->getBook();
 
             if (!$book) {
@@ -69,7 +55,6 @@ final class RecordOrderByApi
                     'Livre introuvable pour la commande'
                 );
             }
-
 
             $seller = $book->getUser();
 
@@ -79,23 +64,14 @@ final class RecordOrderByApi
                 );
             }
 
-
             // vendeur
             $orderItem->setUser($seller);
 
-
-
-            /**
-             * Ajout dans Order
-             */
+            /*Ajout dans Order             */
             $order->addOrderItem($orderItem);
         }
 
-
-
-        /**
-         * 4) Création des sessions Stripe par vendeur
-         */
+        /*4) Création des sessions Stripe par vendeur */
         $itemsBySeller = [];
 
 
@@ -105,19 +81,16 @@ final class RecordOrderByApi
                 ->getUser()
                 ->getId();
 
-
             if (!isset($itemsBySeller[$sellerId])) {
                 $itemsBySeller[$sellerId] = [];
             }
 
-
             $itemsBySeller[$sellerId][] = $orderItem;
         }
 
-
+        $stripeUrl = null;
 
         foreach ($itemsBySeller as $sellerItems) {
-
 
             $cart = [
                 'cart' => array_map(
@@ -133,47 +106,37 @@ final class RecordOrderByApi
                 )
             ];
 
-
-
             $session = $this->createStripeSession
-                ->execute($cart);
+                ->execute($cart);             
+         
 
-
-
+            // Récupération du sessionId
             foreach ($sellerItems as $orderItem) {
 
                 $orderItem->setStripeSessionId(
                     $session['stripe_session_id']
-                );
-
-
-                $orderItem->setStripePaymentIntentId(
-                    $session['stripe_payment_intent_id']
-                );
+                );               
             }
+
+            //URL Stripe
+            $stripeUrl = $session['url'];
         }
 
-
-
-        /**
-         * 5) Calcul total commande
-         */
+        /*5) Calcul total commande  */
         $total = 0;
-
 
         foreach ($order->getOrderItems() as $item) {
 
             $total += $item->getTotalPrice();
         }
 
-
         $order->setTotalAmount($total);
 
-
-
-        /**
-         * 6) Sauvegarde
-         */
+        /*6) Sauvegarde */
         $this->orderRepository->save($order);
+
+    return [
+        'url' => $stripeUrl
+    ];
     }
 }

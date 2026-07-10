@@ -35,5 +35,5 @@ interface StripeGatewayInterface
      * @return void
      */
 
-
+    public function retrieveSession(string $sessionId): \Stripe\Checkout\Session;
 }

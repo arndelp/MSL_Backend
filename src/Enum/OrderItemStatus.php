@@ -2,7 +2,8 @@
 namespace App\Enum;
 enum OrderItemStatus: string
 {
-    case PENDING = 'pending_author_confirmation';
+    case PENDING_PAYMENT = 'pending_payment';
+    case PENDING_AUTHOR_CONFIRMATION = 'pending_author_confirmation';
     case CONFIRMED = 'confirmed';
     case SHIPPED = 'shipped';
     case DELIVERED = 'delivered';

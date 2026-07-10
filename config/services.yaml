@@ -8,7 +8,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     contact_receiver_email: '%env(CONTACT_RECEIVER_EMAIL)%'
- 
+    
+    stripe_webhook_secret: '%env(STRIPE_WEBHOOK_SECRET)%'
 
 services:
 
@@ -16,13 +17,18 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
+      
+
     App\:
         resource: '../src/'
 
     App\Users\UI\Controller\LoginController:
         tags: ['controller.service_arguments']
 
-    
+    App\Payments\UI\Controller\:
+        resource: '../src/Payments/UI/Controller'
+        tags: ['controller.service_arguments']
+
     App\Books\UI\:
         resource: '../src/Books/UI/'
         autowire: true
@@ -58,6 +64,14 @@ services:
     App\Orders\Application\Mapper\OrderItemMapper:
         autowire: true
         autoconfigure: true
+
+    App\Payments\UI\Controller\StripeWebhookController:
+        arguments:
+            $stripeWebhookSecret: '%stripe_webhook_secret%'
+  
+
+
+   
 
 
            

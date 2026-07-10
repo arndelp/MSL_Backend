@@ -23,5 +23,12 @@ api.books.delete:
   controller: App\Books\UI\Controller\BookController::delete
   methods: [DELETE]
 
+api.books.unavailable:
+  path: /api/unavailableBook/{id}
+  controller: App\Books\UI\Controller\BookController::toBeUnavailable
+  methods: [PATCH]
 
-
+api.books.changeStock:
+  path: /api/updateStock/{id}/{quantity}
+  controller: App\Books\UI\Controller\BookController::toUpdateStock
+  methods: [PATCH]

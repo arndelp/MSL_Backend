@@ -44,7 +44,7 @@ class OrderItemMapper
         $orderItem->setBookTitle($book->getTitle());
 
         // Statut par défaut
-        $orderItem->setStatus(OrderItemStatus::PENDING);
+        $orderItem->setStatus(OrderItemStatus::PENDING_PAYMENT);
 
         // PlateForm Fee
         $orderItem->setPlatformFee(($totalPrice*12)/100);
@@ -57,7 +57,7 @@ class OrderItemMapper
 
         //Dates de suivi
         $orderItem->setCreatedAt(new \DateTimeImmutable());
-        $orderItem->setUpdatedAt(new \DateTimeImmutable());
+       
 
         return $orderItem;
     }

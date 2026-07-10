@@ -23,4 +23,31 @@ class OrderItemRepository extends ServiceEntityRepository implements OrderItemRe
         $em->persist($orderItem);
         $em->flush();
     }
+
+    public function findByStripeSessionId(string $stripeSessionId): array
+    {
+        return $this->createQueryBuilder('o')
+            ->andWhere('o.stripeSessionId = :stripeSessionId')
+            ->setParameter('stripeSessionId', $stripeSessionId)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function save(OrderItem $orderItem): void
+    {
+        $em = $this->getEntityManager();
+        $em->persist($orderItem);
+        $em->flush();
+    }
+
+   public function saveAll(array $items): void
+    {
+        $em = $this->getEntityManager();
+
+        foreach ($items as $item) {
+            $em->persist($item);
+        }
+
+        $em->flush();
+    }
 }

@@ -33,13 +33,22 @@ security:
         - { path: ^/api/register, roles: PUBLIC_ACCESS }
         - { path: ^/api/allBooks, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api/allBooks/id, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/all_books/id, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api/categories, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api/verify/email, roles: PUBLIC_ACCESS }
+        - { path: ^/api/stripe/webhook, roles: PUBLIC_ACCESS }
+        - { path: ^/api/payment/success, roles: PUBLIC_ACCESS }
       
 
         - { path: ^/api/me, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/orders, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/books, roles: IS_AUTHENTICATED_FULLY, methods: [POST, PUT] }
-        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+       
         - { path: ^/api/userBooks, roles: IS_AUTHENTICATED_FULLY, methods: [GET]}
         - { path: ^/api/deleteBook/id, roles: IS_AUTHENTICATED_FULLY, methods: [DELETE]}
+        - { path: ^/api/unavailableBook/id, roles: IS_AUTHENTICATED_FULLY, methods: [PATCH]}
+        - { path: ^/api/updateStock/\d+/\d+$, roles: IS_AUTHENTICATED_FULLY, methods: [PATCH]}
+
+        
+
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }

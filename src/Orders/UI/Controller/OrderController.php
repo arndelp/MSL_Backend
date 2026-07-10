@@ -65,7 +65,9 @@ $dto = new OrderDTO(
         }
 
         try {
-            $recordOrderByApi->execute($dto);
+
+            $result = $recordOrderByApi->execute($dto);
+            
         } catch (\Exception $e) {
             $logger->error('Erreur lors de l\'enregistrement de la commande', [
                 'message' => $e->getMessage(),
@@ -77,6 +79,9 @@ $dto = new OrderDTO(
             return new Response('Erreur lors de l\'enregistrement de la commande', 500);
         }
 
-        return new Response('Commande enregistrée avec succès', 201);
+       return new JsonResponse([
+            'success' => true,
+            'url' => $result['url']
+        ], 201);
     }
 }

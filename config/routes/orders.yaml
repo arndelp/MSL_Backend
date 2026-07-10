@@ -3,5 +3,11 @@ api.orders.post:
   controller: App\Orders\UI\Controller\OrderController::recordOrder
   methods: [POST]
 
+stripe_webhook:
+  path: /stripe/webhook
+  controller: App\Controller\StripeWebhookController::handle
+  methods: [POST]
+
+
 
 

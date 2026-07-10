@@ -6,6 +6,7 @@ use Stripe\StripeClient;
 use App\Payments\Domain\Payment\StripeGatewayInterface;
 use App\Books\Domain\Repository\BookRepositoryInterface;
 
+
 class StripeGateway implements StripeGatewayInterface
 {
     private StripeClient $stripe;
@@ -18,20 +19,17 @@ class StripeGateway implements StripeGatewayInterface
     }
 
     public function createSession(array $data): array
+        {
+            $lineItems = [];
 
-   
+        
+                $cart = $data['cart'] ?? $data;
 
-{
-    $lineItems = [];
+        foreach ($cart as $cartEntry) {
 
-   
-        $cart = $data['cart'] ?? $data;
-
-foreach ($cart as $cartEntry) {
-
-    if (!is_array($cartEntry)) {
-        continue;
-    }
+            if (!is_array($cartEntry)) {
+                continue;
+            }
 
     // Accepte id OU book_id
     $bookId = $cartEntry['id'] ?? $cartEntry['book_id'] ?? null;
@@ -67,8 +65,8 @@ if (empty($lineItems)) {
         'payment_intent_data' => [
             'capture_method' => 'manual',
         ],
-        'success_url' => 'http://localhost:5173/successPayment',
-        'cancel_url' => 'http://localhost:5173/cancelPayment',
+        'success_url' => 'http://localhost:5173/successPayment?session_id={CHECKOUT_SESSION_ID}', 
+        'cancel_url' => 'http://localhost:5173/cancelPayment?session_id={CHECKOUT_SESSION_ID}',
     ]);
 
     return [
@@ -87,4 +85,11 @@ if (empty($lineItems)) {
     {
         $this->stripe->paymentIntents->cancel($paymentIntentId);
     }
+
+    public function retrieveSession(string $sessionId): \Stripe\Checkout\Session
+    {
+        return $this->stripe->checkout->sessions->retrieve($sessionId);
+    }
+
+
 }

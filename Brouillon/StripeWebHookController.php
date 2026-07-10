@@ -2,67 +2,119 @@
 
 namespace App\Payments\UI\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Stripe\Stripe;
 use Stripe\Webhook;
-use App\Orders\Domain\OrderRepositoryInterface; // ton repository pour créer la commande
+use App\Orders\Domain\Repository\OrderItemRepositoryInterface;
+use App\Orders\Domain\Repository\OrderRepositoryInterface;
 
-class StripeWebhookController extends AbstractController
+class StripeWebhookController
 {
-    private OrderRepositoryInterface $orderRepository;
-    private string $stripeWebhookSecret;
+    public function __construct(
+        private OrderItemRepositoryInterface $orderItemRepository,
+        private OrderRepositoryInterface $orderRepository,
+        private string $stripeWebhookSecret
+    ) {}
 
-    public function __construct(OrderRepositoryInterface $orderRepository, string $stripeWebhookSecret)
-    {
-        $this->orderRepository = $orderRepository;
-        $this->stripeWebhookSecret = $stripeWebhookSecret;
-    }
-
-    #[Route('/stripe/webhook', name: 'stripe_webhook', methods: ['POST'])]
-    public function handle(Request $request): Response
+    public function __invoke(Request $request): Response
     {
         $payload = $request->getContent();
         $sigHeader = $request->headers->get('stripe-signature');
 
         try {
-            // Vérifie que l'événement vient bien de Stripe
             $event = Webhook::constructEvent(
                 $payload,
                 $sigHeader,
                 $this->stripeWebhookSecret
             );
-        } catch (\UnexpectedValueException $e) {
-            // Payload invalide
-            return new Response('Invalid payload', 400);
-        } catch (\Stripe\Exception\SignatureVerificationException $e) {
-            // Signature invalide
-            return new Response('Invalid signature', 400);
+        } catch (\Exception $e) {
+            return new Response('Signature invalide', 400);
         }
 
-        // On ne traite que les paiements réussis
-        if ($event->type === 'checkout.session.completed') {
-            $session = $event->data->object;
+        switch ($event->type) {
 
-            // Récupération du panier depuis le metadata
-            $cart = json_decode($session->metadata->cart, true);
+            // 🔵 Le client a payé → PaymentIntent créé et autorisé
+            case 'checkout.session.completed':
+                $session = $event->data->object;
+                // Optionnel : utile si tu veux marquer l’item comme "paid_pending_validation"
+                break;
 
-            // Ici, tu peux créer ta commande en base
-            foreach ($cart as $item) {
-                $this->orderRepository->addItem(
-                    $item['id'],
-                    $item['title'],
-                    $item['price'],
-                    $item['quantity']
-                );
+            // 🟢 Paiement capturé (après validation vendeur)
+            case 'payment_intent.succeeded':
+                $intent = $event->data->object;
+                $this->handlePaymentIntentSucceeded($intent->id);
+                break;
+
+            // 🔴 Paiement annulé (rejet vendeur)
+            case 'payment_intent.canceled':
+                $intent = $event->data->object;
+                $this->handlePaymentIntentCanceled($intent->id);
+                break;
+
+            // ⚠️ Paiement échoué
+            case 'payment_intent.payment_failed':
+                $intent = $event->data->object;
+                $this->handlePaymentIntentFailed($intent->id);
+                break;
+        }
+
+        return new Response('OK', 200);
+    }
+
+    private function handlePaymentIntentSucceeded(string $paymentIntentId): void
+    {
+        $item = $this->orderItemRepository->findByStripePaymentIntentId($paymentIntentId);
+
+        if (!$item) return;
+
+        $item->setStatus('validated');
+        $this->orderItemRepository->save($item);
+
+        $this->updateOrderStatus($item->getOrder());
+    }
+
+    private function handlePaymentIntentCanceled(string $paymentIntentId): void
+    {
+        $item = $this->orderItemRepository->findByStripePaymentIntentId($paymentIntentId);
+
+        if (!$item) return;
+
+        $item->setStatus('rejected');
+        $this->orderItemRepository->save($item);
+
+        $order = $item->getOrder();
+        $order->setStatus('rejected');
+        $this->orderRepository->save($order);
+    }
+
+    private function handlePaymentIntentFailed(string $paymentIntentId): void
+    {
+        $item = $this->orderItemRepository->findByStripePaymentIntentId($paymentIntentId);
+
+        if (!$item) return;
+
+        $item->setStatus('failed');
+        $this->orderItemRepository->save($item);
+
+        $order = $item->getOrder();
+        $order->setStatus('failed');
+        $this->orderRepository->save($order);
+    }
+
+    private function updateOrderStatus($order): void
+    {
+        $allValidated = true;
+
+        foreach ($order->getOrderItems() as $item) {
+            if ($item->getStatus() !== 'validated') {
+                $allValidated = false;
+                break;
             }
-
-            // Valider / enregistrer la commande finale
-            $this->orderRepository->save();
         }
 
-        return new Response('Webhook handled', 200);
+        if ($allValidated) {
+            $order->setStatus('validated');
+            $this->orderRepository->save($order);
+        }
     }
 }
