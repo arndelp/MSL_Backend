@@ -8,6 +8,13 @@ stripe_webhook:
   controller: App\Controller\StripeWebhookController::handle
   methods: [POST]
 
+api.seller.accept.orderItem:
+  path: /selle/order-item/{id}/accept
+  controller: App\Orders\UI\Controller\SellerOrderItemController::accept
+  methods: [POST]
+
+
+
 
 
 

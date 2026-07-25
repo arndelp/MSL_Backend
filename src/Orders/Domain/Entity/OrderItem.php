@@ -91,6 +91,35 @@ class OrderItem
     #[ORM\JoinColumn(nullable: false)]
     private ?User $buyer_user = null;
 
+    #[ORM\Column(length: 64, nullable: true)]
+    private ?string $confirmation_token = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $confirmation_token_expires_at = null;
+
+    public function getConfirmationToken(): ?string
+    {
+        return $this->confirmation_token;
+    }
+
+    public function setConfirmationToken(?string $confirmation_token): static
+    {
+        $this->confirmation_token = $confirmation_token;
+
+        return $this;
+    }
+
+    public function getConfirmationTokenExpiresAt() : ?\DateTimeImmutable
+    {
+        return $this->confirmation_token_expires_at;
+    }
+
+    public function setConfirmationTokenExpiresAt(?\DateTimeImmutable $confirmation_token_expires_at) : static
+    {
+        $this->confirmation_token_expires_at = $confirmation_token_expires_at;
+        return $this;
+    }
+
     public function getBuyerUser(): ?User
     {
         return $this->buyer_user;

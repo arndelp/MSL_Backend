@@ -1,0 +1,72 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body style="font-family: Arial, sans-serif; background-color:#f7f7f7; padding:20px;">
+
+    <!-- Conteneur principal -->
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px; margin:auto; background:white; padding:30px; border-radius:8px;">
+        <tr>
+            <td align="center" style="padding-bottom:20px;">
+                <img src="{{ logoUrl }}" alt="Mon Salon du Livre" width="160" style="display:block;">
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <h1 style="color:#2c3e50; font-size:24px; margin-bottom:10px; text-align:center;">
+                    Nouvelle commande à confirmer
+                </h1>
+
+                <p style="font-size:16px; color:#333;">
+                    Bonjour {{ orderItem.user.firstname }},
+                    <br><br>
+                    Vous avez vendu : <strong>{{ orderItem.bookTitle }}</strong><br>
+                    Quantité : <strong>{{ orderItem.quantity }}</strong>
+                </p>
+
+                <p style="font-size:16px; color:#333; margin-top:25px;">
+                    <strong>Adresse d'expédition :</strong>
+                </p>
+
+                <p style="font-size:15px; color:#555; line-height:1.5;">
+                    {{ orderItem.buyerUser.firstname }} {{ orderItem.buyerUser.lastname }}<br>
+                    {{ orderItem.order.shippingAddressLine1 }}<br>
+                    {{ orderItem.order.shippingAddressLine2 }}<br>
+                    {{ orderItem.order.shippingPostalCode }} {{ orderItem.order.shippingCity }}<br>
+                    {{ orderItem.order.shippingCountry }}
+                </p>
+            </td>
+        </tr>
+
+        <!-- Boutons -->
+        <tr>
+            <td align="center" style="padding-top:30px;">
+
+                <a href="{{ acceptUrl }}"
+                   style="background-color:#03C755;
+                          color:white;
+                          padding:12px 24px;
+                          border-radius:6px;
+                          text-decoration:none;
+                          font-size:16px;
+                          display:inline-block;
+                          margin-right:70px;">
+                    Confirmer la vente
+                </a>
+
+                <a href="{{ refuseUrl }}"
+                   style="color:#d9534f;
+                          font-size:16px;
+                          text-decoration:none;
+                          display:inline-block;">
+                    Refuser
+                </a>
+
+            </td>
+        </tr>
+
+    </table>
+
+</body>
+</html>

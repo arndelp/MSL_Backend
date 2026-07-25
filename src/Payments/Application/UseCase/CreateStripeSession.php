@@ -16,6 +16,7 @@ final class CreateStripeSession
 
     public function execute(array $cart): array
     {
+       
         // Ici tu peux faire des règles de calcul, validation, totaux, etc.
         return $this->stripeGateway->createSession($cart);
     }
