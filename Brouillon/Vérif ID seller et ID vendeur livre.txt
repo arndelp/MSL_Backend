@@ -1,0 +1,3 @@
+if ($orderItem->getUser()->getId() !== $seller->getId()) {
+    throw new \RuntimeException('Accès interdit');
+}

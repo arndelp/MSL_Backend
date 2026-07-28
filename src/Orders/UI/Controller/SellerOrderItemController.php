@@ -13,14 +13,26 @@ final class SellerOrderItemController
     ) {
     }
 
-    public function accept(
-        int $id,
-        Request $request
-    ): Response {
+    public function accept(int $id, Request $request ): Response {
+
+     
+
+    $data = json_decode($request->getContent(), true);
+
+  
+
+    $confirmationToken = $data['confirmationToken'] ?? null;
+
+        if (!$confirmationToken) {
+            return new Response(
+                'Token de confirmation manquant',
+                400
+            );
+        }
 
         $this->acceptOrder->execute(
             $id,
-            $request->query->get('token')
+            $confirmationToken
         );
 
         return new Response(

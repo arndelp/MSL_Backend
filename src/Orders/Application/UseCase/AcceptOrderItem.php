@@ -12,7 +12,7 @@ final class AcceptOrderItem
     private StripeGatewayInterface $stripeGateway,
 ){}
 
-public function execute(int $id, string $token): void
+public function execute(int $id, string $confirmationToken): void
 {
     //charger l'orderItem
     $orderItem = $this->repository->find($id);
@@ -22,7 +22,7 @@ public function execute(int $id, string $token): void
     }
 
     //Vérifier le token
-    if ($orderItem->getConfirmationToken() !== $token) {
+    if ($orderItem->getConfirmationToken() !== $confirmationToken) {
         throw new \RuntimeException('Token invalide');
     }
 

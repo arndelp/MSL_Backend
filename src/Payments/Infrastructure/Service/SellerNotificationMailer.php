@@ -7,6 +7,7 @@ use App\Payments\Domain\Service\SellerNotificationMailerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use App\Orders\Domain\Entity\OrderItem;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 
 
@@ -15,25 +16,32 @@ use Symfony\Component\Mime\Address;
 final class SellerNotificationMailer implements SellerNotificationMailerInterface
 {
     public function __construct(
-        private MailerInterface $mailer,     
+        private MailerInterface $mailer,   
+        #[Autowire('%env(FRONTEND_URL)%')]
+        private string $frontendUrl,
+        #[Autowire('%env(APP_URL)%')]
+        private string $appUrl,  
     ) {}
 
     public function sendOrderConfirmation(OrderItem $orderItem): void
     {
      
 
-       
+       $logoUrl = sprintf(
+        '%s/logo/Logo.png',
+        $this->appUrl,
+       );
 
         $acceptUrl = sprintf(
-            '%s/seller/order-items/%d/accept?token=%s',
-            $_ENV['FRONTEND_URL'],
+            '%s/seller/orderItems/%d/accept?confirmationToken=%s',
+            $this->frontendUrl,
             $orderItem->getId(),
             $orderItem->getConfirmationToken()
         );
 
         $refuseUrl = sprintf(
-            '%s/seller/order-items/%d/refuse?token=%s',
-            $_ENV['FRONTEND_URL'],
+            '%s/seller/orderItems/%d/refuse?confirmationToken=%s',
+            $this->frontendUrl,
             $orderItem->getId(),
             $orderItem->getConfirmationToken()
         );
@@ -47,7 +55,7 @@ final class SellerNotificationMailer implements SellerNotificationMailerInterfac
                 'orderItem' => $orderItem,
                 'acceptUrl' => $acceptUrl,
                 'refuseUrl' => $refuseUrl,
-                'logoUrl' => $_ENV['APP_URL'].'/logo/Logo.png',
+                'logoUrl' => $logoUrl,
             ]);
             
             

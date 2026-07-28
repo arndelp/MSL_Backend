@@ -29,6 +29,10 @@ services:
         resource: '../src/Payments/UI/Controller'
         tags: ['controller.service_arguments']
 
+    App\Orders\UI\Controller\:
+        resource: '../src/Orders/UI/Controller'
+        tags: ['controller.service_arguments']
+
     App\Books\UI\:
         resource: '../src/Books/UI/'
         autowire: true
