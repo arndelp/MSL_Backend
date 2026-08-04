@@ -19,12 +19,17 @@ use App\Books\Domain\Repository\BookRepositoryInterface;
 use App\Books\Application\UseCase\DeleteBook;
 use App\Books\Application\UseCase\ToBeUnavailable;
 use App\Books\Application\UseCase\ToChangeStock;
+use App\Books\Application\UseCase\GetAuthorNameAvailable;
+use App\Books\Application\UseCase\GetAuthorNamesByUser;
 
 final class BookController extends AbstractController
 {
     public function __construct(
         private Security $security,
         private BookRepositoryInterface $bookRepository,
+        private GetAllBooks $getAllBooks,
+        private GetAuthorNameAvailable $getAuthorNameAvailable,
+        private GetAuthorNamesByUser $getAuthorNameByUser
     ) {}
 
 
@@ -46,7 +51,7 @@ final class BookController extends AbstractController
 
             $dto = new BookDTO(
                 title: $data['title'] ?? null,   
-                authorName: $data['authorName'] ?? null,         
+                authorName: isset($data['authorName']) ? preg_replace('/\s+/', ' ', trim($data['authorName'])) : null,         
                 price: $data['price'] ?? null,
                 quantity: $data['quantity'] ?? null,
                 format: $data['format'] ?? null,
@@ -213,8 +218,28 @@ final class BookController extends AbstractController
             ], 500);
         }
     }
+
+    //Récupérer tout les noms d'auteur de livre disponible dans l'ordre alphabétique (pour le filtre de recherche))
+    public function getAllAuthorNames(GetAuthorNameAvailable $authorNames): JsonResponse
+    {
+       $authorNames= $this->getAuthorNameAvailable->execute();
+
+       return $this->json($authorNames, 200, [], ['groups' => 'authorNames:read']);
+    }
     
-    
-};
-    
+    //Récupérer les noms d'auteur utilisés en fonction de l'user connecté (pour le filtre de recherche))
+    public function getAuthorNamesByUser(GetAuthorNamesByUser  $authorNames): JsonResponse
+    {
+        $user = $this->security->getUser();
+
+        if (!$user instanceof User) {
+            return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
+        }
+
+        $authorNames = $this->getAuthorNameByUser->execute($user);
+       
+
+        return $this->json($authorNames, 200, [], ['groups' => 'authorNames:read']);
+    }
+}
 

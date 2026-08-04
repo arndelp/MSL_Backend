@@ -13,6 +13,8 @@ api.books.detail:
   controller: App\Books\UI\Controller\BookController::detail
   methods: [GET]
 
+
+
 api.books.user:
   path: /api/userBooks
   controller: App\Books\UI\Controller\BookController::getPersonnalBooks
@@ -32,3 +34,13 @@ api.books.changeStock:
   path: /api/updateStock/{id}/{quantity}
   controller: App\Books\UI\Controller\BookController::toUpdateStock
   methods: [PATCH]
+
+api.books.authors:
+  path: /api/authors
+  controller: App\Books\UI\Controller\BookController::getAllAuthorNames
+  methods: [GET]
+
+api.books.author:
+  path: /api/authorNamesByUser
+  controller: App\Books\UI\Controller\BookController::getAuthorNamesByUser
+  methods: [GET]

@@ -16,12 +16,10 @@ final class HandleStripeWebhook
        private LoggerInterface $logger,
     ) {
     }
-
+// Gestion des webhooks Stripe pour les paiements
     public function execute(\Stripe\Event $event): void
     {
-
-     
-       $this->logger->info('Stripe webhook reçu', [
+        $this->logger->info('Stripe webhook reçu', [
            'type' => $event->type,
         ]);
        
@@ -51,7 +49,7 @@ final class HandleStripeWebhook
                     );
 
                     $item->setUpdatedAt(
-                        new \DateTimeImmutable()
+                        new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris'))
                     );    
 
                     if ($item->getConfirmationToken() === null) {

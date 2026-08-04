@@ -76,20 +76,21 @@ if (empty($lineItems)) {
     ];
 }
 
+//Capture du payement intent pour finaliser le paiement
     public function capturePaymentIntent(string $paymentIntentId): void
     {
         $this->stripe->paymentIntents->capture($paymentIntentId);
     }
 
+//Annulation du payement intent pour annuler le paiement
     public function cancelPaymentIntent(string $paymentIntentId): void
     {
         $this->stripe->paymentIntents->cancel($paymentIntentId);
     }
 
+//Récupération de la session de paiement pour vérifier le statut du paiement (non utilisé pour le moment)
     public function retrieveSession(string $sessionId): \Stripe\Checkout\Session
     {
         return $this->stripe->checkout->sessions->retrieve($sessionId);
     }
-
-
 }

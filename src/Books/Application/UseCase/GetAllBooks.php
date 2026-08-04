@@ -24,6 +24,13 @@ class GetAllBooks
                 'quantity' => $book->getQuantity(),
                 'format' => $book->getFormat()?->value,
                 'coverUrl' => $book->getCoverUrl(),
+                'categories' => array_map(
+                    fn ($cat) => [
+                        'id' => $cat->getId(),
+                        'name' => $cat->getName(),
+                    ],
+                    $book->getCategories()->toArray()
+                ),
             ], $books);
         } catch (Throwable $e) {
             // Log the error or handle it as needed

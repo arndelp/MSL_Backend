@@ -10,9 +10,10 @@ use App\Users\Domain\Entity\User;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Enum\OrderItemStatus;
+use App\Enum\CancellationReason;
+
 
 #[ORM\Entity(repositoryClass: OrderItemRepository::class)]
-#[ApiResource]
 class OrderItem
 {
     #[ORM\Id]
@@ -96,6 +97,21 @@ class OrderItem
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $confirmation_token_expires_at = null;
+
+    #[ORM\Column(enumType: CancellationReason::class, nullable: true)]
+    private ?CancellationReason $cancellationReason = null;
+
+    public function getCancellationReason(): ?CancellationReason
+    {
+        return $this->cancellationReason;
+    }
+
+    public function setCancellationReason(?CancellationReason  $cancellationReason): static
+    {
+        $this->cancellationReason = $cancellationReason;
+
+        return $this;
+    }
 
     public function getConfirmationToken(): ?string
     {

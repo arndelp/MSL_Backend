@@ -25,24 +25,24 @@ final class SellerNotificationMailer implements SellerNotificationMailerInterfac
 
     public function sendOrderConfirmation(OrderItem $orderItem): void
     {
-     
-
        $logoUrl = sprintf(
         '%s/logo/Logo.png',
         $this->appUrl,
        );
 
         $acceptUrl = sprintf(
-            '%s/seller/orderItems/%d/accept?confirmationToken=%s',
+            '%s/seller/orderItems/%d/%s/accept?confirmationToken=%s',
             $this->frontendUrl,
             $orderItem->getId(),
+            $orderItem->getBook()->getTitle(),
             $orderItem->getConfirmationToken()
         );
 
         $refuseUrl = sprintf(
-            '%s/seller/orderItems/%d/refuse?confirmationToken=%s',
+            '%s/seller/orderItems/%d/%s/refuse?confirmationToken=%s',
             $this->frontendUrl,
-            $orderItem->getId(),
+            $orderItem->getId(),    
+            $orderItem->getBook()->getTitle(),       
             $orderItem->getConfirmationToken()
         );
        
@@ -56,13 +56,8 @@ final class SellerNotificationMailer implements SellerNotificationMailerInterfac
                 'acceptUrl' => $acceptUrl,
                 'refuseUrl' => $refuseUrl,
                 'logoUrl' => $logoUrl,
-            ]);
-            
-            
-
-       
+            ]);       
      
-        $this->mailer->send($email);
-     
+        $this->mailer->send($email);     
     }
 }

@@ -35,8 +35,8 @@ class OrderMapper
     // Valeurs par défaut
     $order->setCurrency("EUR");
     $order->setTotalAmount(0); // recalculé dans le UseCase
-    $order->setCreatedAt(new \DateTimeImmutable());
-    $order->setModifiedAt(new \DateTimeImmutable());
+    $order->setCreatedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')));
+ 
 
     return $order;
 }

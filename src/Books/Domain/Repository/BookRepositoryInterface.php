@@ -22,5 +22,9 @@ interface BookRepositoryInterface
     public function findBySeller(User $user): array;
 
     public function deleteBook(Book $book): void;
+
+    public function findAllAuthorNames(): array;
+
+    public function findAuthorNamesByUser(User $user): array;
     
 }

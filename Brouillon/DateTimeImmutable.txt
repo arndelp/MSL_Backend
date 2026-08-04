@@ -1,0 +1,6 @@
+$date = new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris'));
+
+ ou 
+
+$tz = new \DateTimeZone('Europe/Paris');
+$date = new \DateTimeImmutable('now', $tz);

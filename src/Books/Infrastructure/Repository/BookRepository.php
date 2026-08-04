@@ -75,6 +75,26 @@ class BookRepository extends ServiceEntityRepository implements BookRepositoryIn
         $em->flush();
     }
 
+    //Récupérer tout les nom d'auteur de livre disponible dans l'ordre alphabétique
+    public function findAllAuthorNames(): array
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->select('DISTINCT b.authorName')
+            ->where('b.status = :status')
+            ->setParameter('status', 'available')
+            ->orderBy('b.authorName', 'ASC');
 
+        return $qb->getQuery()->getResult();
+    }
 
+    public function findAuthorNamesByUser(User $user): array
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->select('DISTINCT b.authorName')
+            ->where('b.user = :user')            
+            ->setParameter('user', $user)
+            ->orderBy('b.authorName', 'ASC');
+
+        return $qb->getQuery()->getResult();
+    }
 }

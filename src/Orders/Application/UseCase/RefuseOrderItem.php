@@ -2,19 +2,22 @@
 
 namespace App\Orders\Application\UseCase;
 
-use App\Enum\PayoutStatus;
+
 use App\Orders\Domain\Repository\OrderItemRepositoryInterface;
 use App\Payments\Domain\Payment\StripeGatewayInterface;
 use App\Enum\OrderItemStatus;
+use App\Orders\Application\DTO\OrderItemCancellationDTO;
+use App\Enum\CancellationReason;
+use App\Enum\PayoutStatus;
 
-final class AcceptOrderItem
+final class RefuseOrderItem
 {
     public function __construct(
-    private OrderItemRepositoryInterface $repository,
-    private StripeGatewayInterface $stripeGateway,
-    ){}
+        private OrderItemRepositoryInterface $repository,
+        private StripeGatewayInterface $stripeGateway,
+    ) {}
 
-    public function execute(int $id, string $confirmationToken): void
+    public function execute(int $id,  OrderItemCancellationDTO $dto): void
     {
         //charger l'orderItem
         $orderItem = $this->repository->find($id);
@@ -24,7 +27,7 @@ final class AcceptOrderItem
         }
 
         //Vérifier le token
-        if ($orderItem->getConfirmationToken() !== $confirmationToken) {
+        if ($orderItem->getConfirmationToken() !== $dto->confirmationToken) {
             throw new \RuntimeException('Token invalide');
         }
 
@@ -44,26 +47,31 @@ final class AcceptOrderItem
             throw new \RuntimeException('Commande déjà traitée');
         }
 
-        //Capturer le paiement (méthode du StripeGateway)
-        $this->stripeGateway->capturePaymentIntent(
+        //Annuler le paiement (méthode du StripeGateway)
+        $this->stripeGateway->cancelPaymentIntent(
             $orderItem->getStripePaymentIntentId()
         );
 
         //Modifier la commande
         $orderItem->setStatus(
-            OrderItemStatus::CONFIRMED
+            OrderItemStatus::CANCELLED
         );
-
-        $orderItem->setUserConfirmedAt(
-            new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris'))
+        //Raison de l'annulation
+        //conversion en ENUM-> Pas de mapper , pour simplifier étant donné qu'il n'y a qu'un champs à traiter.
+        $orderItem->setCancellationReason(
+            CancellationReason::from($dto->reason)
         );
 
         $orderItem->setPayoutStatus(
-            PayoutStatus::PAID
+            PayoutStatus::CANCELLED
+        );
+
+         $orderItem->setCancelledAt(
+            new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris'))
         );
 
         $orderItem->setUpdatedAt(
-            new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris'))
+             new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris'))
         );
 
         //Détruire le token
@@ -73,6 +81,6 @@ final class AcceptOrderItem
 
         //Sauvegarder
         $this->repository->save($orderItem);
-
     }
 }
+

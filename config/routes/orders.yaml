@@ -3,16 +3,52 @@ api.orders.post:
   controller: App\Orders\UI\Controller\OrderController::recordOrder
   methods: [POST]
 
+api.seller.find.seller.checkToken:
+  path: /api/seller/orderItems/{id}/checkConfirmationToken
+  controller: App\Orders\UI\Controller\OrderItemController::CheckConfirmationToken
+  methods: [GET]
+
+api.seller.find.orderItems.pendeingConfirmation:
+  path: /api/seller/findOIPendingConfirmation
+  controller: App\Orders\UI\Controller\OrderItemController::FindOIBySellerPendingConfirmation
+  methods: [GET]
+
+api.seller.find.orderItems.confirmed:
+  path: /api/seller/findOIConfirmed
+  controller: App\Orders\UI\Controller\OrderItemController::FindOIBySellerConfirmed
+  methods: [GET]
+
+api.seller.find.orderItems.shipped:
+  path: /api/seller/findOIShipped
+  controller: App\Orders\UI\Controller\OrderItemController::FindOIBySellerShipped
+  methods: [GET]
+
+
+
+
+
+
+
+
+
+
+  
+
+api.seller.orderItem.toBeShipped:
+  path: /api/seller/orderItems/{id}/toBeShipped
+  controller: App\Orders\UI\Controller\SellerOrderItemController::itemShipped
+  methods: [PATCH]
+
 api.seller.accept.orderItem:
   path: /api/seller/orderItems/{id}/accept
   controller: App\Orders\UI\Controller\SellerOrderItemController::accept
   methods: [POST]
 
+
 api.seller.refuse.orderItem:
   path: /api/seller/orderItems/{id}/refuse
   controller: App\Orders\UI\Controller\SellerOrderItemController::refuse
   methods: [POST]
-
 
 
 

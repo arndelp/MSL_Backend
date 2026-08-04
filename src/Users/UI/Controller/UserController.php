@@ -16,6 +16,7 @@ use App\Users\Infrastructure\Security\EmailVerifierUser;
 use App\Users\Domain\Repository\UserRepositoryInterface;
 use App\Users\Application\UseCase\SaveUser;
 use App\Users\Application\DTO\CreateUserDTO;
+use App\Users\Domain\Entity\User;
 
 
 
@@ -26,7 +27,7 @@ class UserController extends AbstractController
    
     public function me(Security $security): JsonResponse
     {
-        $user = $this->$security->getUser();
+        $user = $security->getUser();
 
         if (!$user) {
             return $this->json(['error' => 'Unauthorized'], 401);
@@ -38,7 +39,7 @@ class UserController extends AbstractController
             'firstname' => $user->getFirstname(),
             'lastname' => $user->getLastname(),
             'type' => $user->getType(),
-            'role' => $user->getRoles(),
+            'roles' => $user->getRoles(),
         ]);
     }
 

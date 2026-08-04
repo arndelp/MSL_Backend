@@ -49,14 +49,8 @@ class OrderItemMapper
         // PlateForm Fee
         $orderItem->setPlatformFee(($totalPrice*12)/100);
 
-        
-        
-
-       
-
-
         //Dates de suivi
-        $orderItem->setCreatedAt(new \DateTimeImmutable());
+        $orderItem->setCreatedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')));
        
 
         return $orderItem;

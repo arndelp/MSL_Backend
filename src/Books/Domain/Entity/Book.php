@@ -38,8 +38,8 @@ use App\Enum\BookFormat;
             deserialize: false //API Platform ne transforme pas la requête en entité (manuel avec le processor)
         )
     ],
-    normalizationContext: ['groups' => ['book:read']],
-    denormalizationContext: ['groups' => ['book:write']]    
+    normalizationContext: ['groups' => ['book:read', 'authorNames:read']], 
+    denormalizationContext: ['groups' => ['book:write', 'authorNames:write']]    
 )]
 #[ORM\HasLifecycleCallbacks]
 #[Vich\Uploadable]
@@ -56,7 +56,7 @@ class Book
     private ?string $title = null;
 
     #[ORM\Column(length: 100, nullable: true)]
-    #[Groups(['book:read','book:write'])]
+    #[Groups(['book:read','book:write', 'authorNames:read'])]
     private ?string $authorName = null;
 
 
@@ -259,9 +259,9 @@ class Book
         { 
             $this->coverFile = $coverFile;
 
-            if ($coverFile) {
-                $this->updatedAt = new \DateTimeImmutable();
-            }
+            //if ($coverFile) {
+             //   $this->updatedAt = new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris'));
+            //}
 
             return $this;
         }
@@ -327,7 +327,7 @@ class Book
     }
 
 
-    public function getUser(): ?User { return $this->user; } // retourne l'auteur de ce livre (ManyToOne)
+    public function getUser(): ?User { return $this->user; } // retourne l'auteur (user) de ce livre (ManyToOne)
     public function setUser(?User $user): static { $this->user = $user; return $this;   } // définit l'auteur de ce livre (ManyToOne)
 
     //envoi de l'url des images

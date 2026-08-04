@@ -23,40 +23,43 @@ final class OrderController extends AbstractController
     {
         
 
-         $user = $this->getUser();
+        $user = $this->getUser();
 
             if (!$user instanceof User) {
                 return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
             }  
-      $data = json_decode($request->getContent(), true);
 
-if (!$data) {
-    return new Response('Données reçues vides', 400);
-}
+        $data = json_decode($request->getContent(), true);
 
-if (empty($data['order_items'])) {
-    return new Response("La commande doit contenir au moins un article.", 400);
-}
+            if (!$data) {
+                return new Response('Données reçues vides', 400);
+            }
 
-// Normalisation des items
-foreach ($data['order_items'] as &$item) {
-    if (isset($item['id']) && !isset($item['book_id'])) {
-        $item['book_id'] = $item['id'];
-    }
-}
+            if (empty($data['order_items'])) {
+                return new Response("La commande doit contenir au moins un article.", 400);
+            }
 
-$dto = new OrderDTO(
-    shipping_firstname: $data['shipping_firstname'] ?? null,
-    shipping_lastname: $data['shipping_lastname'] ?? null,
-    shipping_phone_number: $data['shipping_phone_number'] ?? null,
-    shipping_address_line_1: $data['shipping_address_line_1'] ?? null,
-    shipping_address_line_2: $data['shipping_address_line_2'] ?? null,
-    shipping_postal_code: $data['shipping_postal_code'] ?? null,
-    shipping_city: $data['shipping_city'] ?? null,
-    shipping_country: $data['shipping_country'] ?? "France",
-    status: $data['status'] ?? "pending_payment",
-    order_items: $data['order_items']
-);
+        // Normalisation des items
+        foreach ($data['order_items'] as &$item) {
+
+            if (isset($item['id']) && !isset($item['book_id'])) {
+                $item['book_id'] = $item['id'];
+            }
+            
+        }
+
+        $dto = new OrderDTO(
+            shipping_firstname: $data['shipping_firstname'] ?? null,
+            shipping_lastname: $data['shipping_lastname'] ?? null,
+            shipping_phone_number: $data['shipping_phone_number'] ?? null,
+            shipping_address_line_1: $data['shipping_address_line_1'] ?? null,
+            shipping_address_line_2: $data['shipping_address_line_2'] ?? null,
+            shipping_postal_code: $data['shipping_postal_code'] ?? null,
+            shipping_city: $data['shipping_city'] ?? null,
+            shipping_country: $data['shipping_country'] ?? "France",
+            status: $data['status'] ?? "pending_payment",
+            order_items: $data['order_items']
+        );
 
         // Validation du DTO complet
         $errors = $validator->validate($dto);

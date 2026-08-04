@@ -18,10 +18,7 @@ final class StripeWebhookController extends AbstractController
     }
 
     public function __invoke(Request $request): Response
-    {
- 
-         
-      
+    {      
         $payload = $request->getContent();
         $signature = $request->headers->get('Stripe-Signature');
 
@@ -41,9 +38,7 @@ final class StripeWebhookController extends AbstractController
 
             return new Response('Invalid signature', 400);
 
-        }
-
-       
+        }       
 
         $this->handleStripeWebhook->execute($event);
 

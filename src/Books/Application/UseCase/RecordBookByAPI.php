@@ -41,8 +41,9 @@ final class RecordBookByApi
 
           
             // Dates
-            $book->setCreatedAt(new \DateTimeImmutable());
-            $book->setUpdatedAt(new \DateTimeImmutable());
+            $book->setCreatedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')));
+
+          
 
             foreach ($dto->categories as $categoryId) {
             $category = $this->categoryRepository->find($categoryId);

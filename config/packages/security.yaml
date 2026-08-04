@@ -40,15 +40,26 @@ security:
         - { path: ^/api/payment/success, roles: PUBLIC_ACCESS }
         - { path: ^/api/seller/orderItems/\d+/accept, roles: PUBLIC_ACCESS, methods: [POST] }
         - { path: ^/api/seller/orderItems/\d+/refuse, roles: PUBLIC_ACCESS, methods: [POST] }
+        - { path: ^/api/seller/orderItems/\d+/checkConfirmationToken, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/authors, roles: PUBLIC_ACCESS, methods: [GET] }
+
+
 
         - { path: ^/api/me, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/orders, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/books, roles: IS_AUTHENTICATED_FULLY, methods: [POST, PUT] }
        
         - { path: ^/api/userBooks, roles: IS_AUTHENTICATED_FULLY, methods: [GET]}
+        - { path: ^/api/seller/findOIPendingConfirmation, roles: IS_AUTHENTICATED_FULLY, methods: [GET] }
+        - { path: ^/api/seller/findOIConfirmed, roles: IS_AUTHENTICATED_FULLY, methods: [GET] }
+        - { path: ^/api/seller/findOIShipped, roles: IS_AUTHENTICATED_FULLY, methods: [GET] }
+        - { path: ^/api/authorNamesByUser, roles: IS_AUTHENTICATED_FULLY, methods: [GET] }
+
         - { path: ^/api/deleteBook/\d+$, roles: IS_AUTHENTICATED_FULLY, methods: [DELETE]}
+
         - { path: ^/api/unavailableBook/\d+$, roles: IS_AUTHENTICATED_FULLY, methods: [PATCH]}
         - { path: ^/api/updateStock/\d+/\d+$, roles: IS_AUTHENTICATED_FULLY, methods: [PATCH]}
+        - { path: ^/api/seller/orderItems/\d+/toBeShipped, roles: IS_AUTHENTICATED_FULLY, methods: [PATCH] }
 
         
 

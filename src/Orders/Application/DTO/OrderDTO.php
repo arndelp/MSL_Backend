@@ -4,7 +4,7 @@ namespace App\Orders\Application\DTO;
 
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Orders\Application\DTO\OrderItemDTO;
-use Symfony\Component\Serializer\Annotation\SerializedName;
+
 
 
 
