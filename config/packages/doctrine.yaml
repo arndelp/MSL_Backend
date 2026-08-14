@@ -69,6 +69,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Orders/Domain/Entity'
                 prefix: 'App\Orders\Domain\Entity'
                 alias: Orders
+            SellerPayments:
+                is_bundle: false
+                type: attribute
+                dir: '%kernel.project_dir%/src/SellerPayments/Domain/Entity'
+                prefix: 'App\SellerPayments\Domain\Entity'
+                alias: SellerPayments
            
         controller_resolver:
             auto_mapping: false

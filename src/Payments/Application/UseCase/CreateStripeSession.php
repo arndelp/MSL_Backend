@@ -1,23 +1,19 @@
 <?php
 
-
 namespace App\Payments\Application\UseCase;
 
+use App\Orders\Domain\Entity\Order;
 use App\Payments\Domain\Payment\StripeGatewayInterface;
 
 final class CreateStripeSession
 {
-    private StripeGatewayInterface $stripeGateway;
-
-    public function __construct(StripeGatewayInterface $stripeGateway)
-    {
-        $this->stripeGateway = $stripeGateway;
+    public function __construct(
+        private StripeGatewayInterface $stripeGateway
+    ) {
     }
 
-    public function execute(array $cart): array
+    public function execute(Order $order): array
     {
-       
-        // Ici tu peux faire des règles de calcul, validation, totaux, etc.
-        return $this->stripeGateway->createSession($cart);
+        return $this->stripeGateway->createSession($order);
     }
 }

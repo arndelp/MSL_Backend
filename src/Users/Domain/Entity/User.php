@@ -22,6 +22,7 @@ use App\Users\Application\DTO\CreateUserDTO;
 use App\Users\Application\DTO\LoginDTO;
 use App\Addresses\Domain\Entity\Address;
 use App\Contacts\Domain\Entity\Contact;
+use App\SellerPayments\Domain\Entity\SellerPayment;
 
 #[ORM\Entity(repositoryClass: DoctrineUserRepository::class)]
 #[ApiResource(
@@ -104,6 +105,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?AuthorProfile $authorProfile = null;
 
+    //Collections
+
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Address::class)]
     private Collection $addresses;
 
@@ -116,12 +119,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Order::class, mappedBy: 'user')]
     private Collection $orders;
 
+    
+ 
+    /**
+     * @var Collection<int, SellerPayment>
+     */
+    #[ORM\OneToMany(
+        targetEntity: SellerPayment::class,
+        mappedBy: 'seller'
+    )]
+    private Collection $sellerPayments;
+
     /**
      * @var Collection<int, OrderItem>
      */
-    #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'user')]
+    #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'seller')]
     private Collection $orderItems;   // adresses de livraison de l'utilisateur (OneToMany)
- 
+
+    
+
 
 // ---------- SECURITY USER INTERFACE METHODS ---------- // méthodes requises par l'interface UserInterface pour la sécurité //
     public function getUserIdentifier(): string
@@ -141,21 +157,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
    
     
-// ---------- GETTERS & SETTERS ----------
 
+
+// Constructeur
     public function __construct()
     {
         $this->books = new ArrayCollection();   //books = livres écrits par cet utilisateur (OneToMany)
         $this->addresses = new ArrayCollection();   //addresses = adresses de livraison de l'utilisateur (OneToMany)
-
         // création automatique du profile
         //$profile = new AuthorProfile();
         //$profile->setUser($this);
         //$this->authorProfile = $profile;
-        $this->orders = new ArrayCollection();
-        $this->orderItems = new ArrayCollection();
+        $this->orders = new ArrayCollection();      
         $this->contacts = new ArrayCollection();
+        $this->sellerPayments = new ArrayCollection();
+        $this->orderItems = new ArrayCollection();
     }
+
+
+// ---------- GETTERS & SETTERS ----------
     public function getId(): ?int
     {
         return $this->id;
@@ -401,35 +421,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, OrderItem>
-     */
-    public function getOrderItems(): Collection
-    {
-        return $this->orderItems;
-    }
-
-    public function addOrderItem(OrderItem $orderItem): static
-    {
-        if (!$this->orderItems->contains($orderItem)) {
-            $this->orderItems->add($orderItem);
-            $orderItem->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeOrderItem(OrderItem $orderItem): static
-    {
-        if ($this->orderItems->removeElement($orderItem)) {
-            // set the owning side to null (unless already changed)
-            if ($orderItem->getUser() === $this) {
-                $orderItem->setUser(null);
-            }
-        }
-
-        return $this;
-    }
+   
 
     public function getContacts(): Collection
     {
@@ -451,6 +443,67 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if ($this->contacts->removeElement($contact)) {
             if ($contact->getUser() === $this) {
                 $contact->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * @return Collection<int, SellerPayment>
+     */
+    public function getSellerPayments(): Collection
+    {
+        return $this->sellerPayments;
+    }
+
+    public function addSellerPayment(SellerPayment $sellerPayment): static
+    {
+        if (!$this->sellerPayments->contains($sellerPayment)) {
+            $this->sellerPayments->add($sellerPayment);
+            $sellerPayment->setSeller($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSellerPayment(SellerPayment $sellerPayment): static
+    {
+        if ($this->sellerPayments->removeElement($sellerPayment)) {
+            // set the owning side to null (unless already changed)
+            if ($sellerPayment->getSeller() === $this) {
+                $sellerPayment->setSeller(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, OrderItem>
+     */
+    public function getOrderItems(): Collection
+    {
+        return $this->orderItems;
+    }
+
+    public function addOrderItem(OrderItem $orderItem): static
+    {
+        if (!$this->orderItems->contains($orderItem)) {
+            $this->orderItems->add($orderItem);
+            $orderItem->setSeller($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrderItem(OrderItem $orderItem): static
+    {
+        if ($this->orderItems->removeElement($orderItem)) {
+            // set the owning side to null (unless already changed)
+            if ($orderItem->getSeller() === $this) {
+                $orderItem->setSeller(null);
             }
         }
 

@@ -1,0 +1,1 @@
+http://localhost:5173/seller/sellerPayments/68/MSL-20260814123004-0C40D0-01/accept?confirmationToken=a64689f770ae373e2c25297aa8b15be998b4bbe0dfcff2198c6c8b9338106baa

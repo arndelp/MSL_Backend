@@ -11,6 +11,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Enum\OrderStatus;
 use App\Orders\Domain\Entity\OrderItem;
+use App\SellerPayments\Domain\Entity\SellerPayment;
+
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ApiResource]
@@ -34,7 +36,7 @@ class Order
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $stripe_session_id = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: 'string',length: 255, nullable: true)]
     private ?string $stripe_payment_intent_id = null;
 
     #[ORM\Column(type: Types::BIGINT, nullable: true)]
@@ -68,7 +70,7 @@ class Order
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $modified_at = null;
+    private ?\DateTimeImmutable $updated_at = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $paid_at = null;
@@ -77,17 +79,44 @@ class Order
     #[ORM\JoinColumn(name: "user_id", referencedColumnName: "id", nullable: true)]
     private ?User $user = null;
 
+    #[ORM\Column(length: 30, unique: true)]
+    private ?string $orderNumber = null;
+
+    //Relations
+   
     /**
      * @var Collection<int, OrderItem>
      */
-    #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'order', cascade:['persist'], orphanRemoval: true)]
+    #[ORM\OneToMany(
+        targetEntity: OrderItem::class, 
+        mappedBy: 'order',         
+        cascade:['persist'], 
+        orphanRemoval: true)]
     private Collection $orderItems;
+    
 
+    /**
+     * @var Collection<int, SellerPayment>
+     */
+    #[ORM\OneToMany(
+        targetEntity: SellerPayment::class,
+        mappedBy: 'order',
+        cascade: ['persist'],
+        orphanRemoval: true
+    )]
+    private Collection $sellerPayments;
+
+
+
+    //Constructeur
     public function __construct()
-    {
+    {    
+        $this->sellerPayments = new ArrayCollection();
         $this->orderItems = new ArrayCollection();
     }
 
+
+    //Getter/Setter
     public function getId(): ?int
     {
         return $this->id;
@@ -280,14 +309,14 @@ class Order
         return $this;
     }
 
-    public function getModifiedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?\DateTimeImmutable
     {
-        return $this->modified_at;
+        return $this->updated_at;
     }
 
-    public function setModifiedAt(?\DateTimeImmutable $modified_at): static
+    public function setUpdatedAt(?\DateTimeImmutable $updated_at): static
     {
-        $this->modified_at = $modified_at;
+        $this->updated_at = $updated_at;
 
         return $this;
     }
@@ -316,7 +345,54 @@ class Order
         return $this;
     }
 
-    /**
+    public function getOrderNumber(): ?string
+    {
+        return $this->orderNumber;
+    }
+
+    public function setOrderNumber(?string $orderNumber): static
+    {
+        $this->orderNumber = $orderNumber;
+
+        return $this;
+    }
+
+
+//Collections
+   
+
+     /**
+     * @return Collection<int, SellerPayment>
+     */
+    public function getSellerPayments(): Collection
+    {
+        return $this->sellerPayments;
+    }
+
+    public function addSellerPayment(SellerPayment $sellerPayment): static
+    {
+        if (!$this->sellerPayments->contains($sellerPayment)) {
+            $this->sellerPayments->add($sellerPayment);
+            $sellerPayment->setOrder($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSellerPayment(SellerPayment $sellerPayment): static
+    {
+        if ($this->sellerPayments->removeElement($sellerPayment)) {
+            // set the owning side to null (unless already changed)
+            if ($sellerPayment->getOrder() === $this) {
+                $sellerPayment->setOrder(null);
+            }
+        }
+
+        return $this;
+    }
+    
+
+     /**
      * @return Collection<int, OrderItem>
      */
     public function getOrderItems(): Collection
@@ -345,4 +421,6 @@ class Order
 
         return $this;
     }
+
+
 }

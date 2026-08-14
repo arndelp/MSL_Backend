@@ -23,6 +23,7 @@ class BookMapper
         $book->setPrice($bookDTO->price);
         $book->setQuantity($bookDTO->quantity);
         $book->setFormat(BookFormat::from($bookDTO->format));
+        $book->setWeight($bookDTO->weight);
         $book->setDescription($bookDTO->description);
         $book->setIsbn($bookDTO->isbn);
         $book->setPageCount($bookDTO->pageCount);
@@ -41,8 +42,9 @@ class BookMapper
         $bookDTO->title = $book->getTitle();
         $bookDTO->authorName = $book->getAuthorName();
         $bookDTO->price = $book->getPrice();
-        $bookDTO->quantity = $book->getQuantity();
+        $bookDTO->quantity = $book->getQuantity();       
         $bookDTO->format = $book->getFormat()->value ;
+        $bookDTO->weight = $book->getWeight();
         $bookDTO->description = $book->getDescription();
         $bookDTO->isbn = $book->getIsbn();
         $bookDTO->pageCount = $book->getPageCount();

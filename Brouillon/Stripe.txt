@@ -1,0 +1,9 @@
+ //Annuler le paiement (méthode du StripeGateway)
+        $this->stripeGateway->cancelPaymentIntent(
+            $orderItem->getStripePaymentIntentId()
+        );
+
+ //Capturer le paiement (méthode du StripeGateway)
+        $this->stripeGateway->capturePaymentIntent(
+            $orderItem->getStripePaymentIntentId()
+        );

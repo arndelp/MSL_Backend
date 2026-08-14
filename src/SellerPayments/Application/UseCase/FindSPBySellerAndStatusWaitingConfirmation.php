@@ -1,19 +1,18 @@
 <?php
 
-namespace App\Orders\Application\UseCase;
+namespace App\SellerPayments\Application\UseCase;
 
+use App\SellerPayments\Domain\Repository\SellerPaymentRepositoryInterface;
 
-use App\Orders\Domain\Repository\OrderItemRepositoryInterface;
-
-final class FindOIByStatusandSellerShipped
+final class FindSPBySellerAndStatusWaitingConfirmation
 {
     public function __construct(
-        private OrderItemRepositoryInterface $repository,
+        private SellerPaymentRepositoryInterface $repository,
     ){}
 
-    public function execute($user):  array
+    public function execute($seller): array
     {
-        $items = $this->repository->findByStatusAndSellerShipped($user);
+        $items = $this->repository->findBySellerAndStatusWSC($seller);
 
         $data = array_map(fn($item) => [
             'id' => $item->getId(),
@@ -30,8 +29,12 @@ final class FindOIByStatusandSellerShipped
             'shippingCountry' => $item->getOrder()->getShippingCountry(),
             'createdAt' => $item->getCreatedAt()?->format('d-m-Y'),
             'confirmationToken' => $item->getConfirmationToken(),
+
         ], $items);
 
         return $data;
+
+        
     }
 }
+

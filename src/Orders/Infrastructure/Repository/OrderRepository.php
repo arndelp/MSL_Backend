@@ -36,5 +36,14 @@ class OrderRepository extends ServiceEntityRepository implements OrderRepository
         $em->flush();
     }
 
+    public function findByStripeSessionId(string $stripeSessionId): ?Order
+{
+    return $this->createQueryBuilder('o')
+        ->andWhere('o.stripe_session_id = :sessionId')
+        ->setParameter('sessionId', $stripeSessionId)
+        ->getQuery()
+        ->getOneOrNullResult();
+}
+
    
 }

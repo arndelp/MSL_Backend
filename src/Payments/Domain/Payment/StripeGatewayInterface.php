@@ -1,39 +1,19 @@
 <?php
 
-// src/Infrastructure/Payment/StripeGatewayInterface.php
 namespace App\Payments\Domain\Payment;
 
+use App\Orders\Domain\Entity\Order;
 
-
-interface StripeGatewayInterface 
+interface StripeGatewayInterface
 {
-    public function createSession(array $cart): array; // Retourne l'ID de session Stripe
-     /**
-     * Crée une session Stripe Checkout (paiement en mode manual capture)
-     *
-     * @param array $data
-     * @return array [
-     *     'url' => string,
-     *     'stripe_session_id' => string,
-     *     'stripe_payment_intent_id' => string|null
-     * ]
-     */
+    public function createSession(Order $order): array;
 
-    public function capturePaymentIntent(string $paymentIntentId): void;
-    /**
-     * Capture un PaymentIntent (débit réel du client)
-     *
-     * @param string $paymentIntentId
-     * @return void
-     */
+    public function capturePaymentIntent(
+        string $paymentIntentId, 
+        int $amountToCapture
+    ): void;
 
     public function cancelPaymentIntent(string $paymentIntentId): void;
-    /**
-     * Annule un PaymentIntent (libère l’autorisation)
-     *
-     * @param string $paymentIntentId
-     * @return void
-     */
 
     public function retrieveSession(string $sessionId): \Stripe\Checkout\Session;
 }

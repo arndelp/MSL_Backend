@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Orders\UI\Controller;
+namespace App\SellerPayments\UI\Controller;
 
-use App\Orders\Application\UseCase\FindOIByStatusandSellerShipped;
-use App\Orders\Application\UseCase\FindOIByStatusandSellerConfirmed;
-use App\Orders\Application\UseCase\FindOIByStatusandSellerPendingConfirmation;
+use App\SellerPayments\Application\UseCase\FindSPBySellerAndStatusShipped;
+use App\SellerPayments\Application\UseCase\FindSPBySellerAndStatusConfirmed;
+use App\SellerPayments\Application\UseCase\FindSPBySellerAndStatusWaitingConfirmation;
 use App\Users\Domain\Entity\User;
-use App\Orders\Domain\Repository\OrderItemRepositoryInterface;
+use App\SellerPayments\Domain\Repository\SellerPaymentRepositoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 
 
-final class OrderItemController extends AbstractController
+final class SellerPaymentController extends AbstractController
 {
 
     public function __construct(
@@ -22,15 +22,15 @@ final class OrderItemController extends AbstractController
         
         ) {}
 
-    public function FindOIBySellerPendingConfirmation(FindOIByStatusandSellerPendingConfirmation $findOIByStatusandSellerPendingConfirmation): JsonResponse
+    public function FindSellerPaymentBySellerWaitingConfirmation(FindSPBySellerAndStatusWaitingConfirmation $findSPByStatusandSellerWaitingConfirmation): JsonResponse
     {
-        $user = $this->security->getUser();
+        $seller = $this->security->getUser();
 
-                if (!$user instanceof User) {
+                if (!$seller instanceof User) {
                     return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
                 }
 
-            $data = $findOIByStatusandSellerPendingConfirmation->execute($user);
+            $data = $findSPByStatusandSellerWaitingConfirmation->execute($seller);
 
             
 
@@ -38,32 +38,32 @@ final class OrderItemController extends AbstractController
 
     }
 
-    public function FindOIBySellerConfirmed(FindOIByStatusandSellerConfirmed $findOIByStatusandSellerConfirmed): JsonResponse
+    public function FindSellerPaymentBySellerConfirmed(FindSPBySellerAndStatusConfirmed $findSPByStatusandSellerConfirmed): JsonResponse
     {
         
-        $user = $this->security->getUser();
+        $seller = $this->security->getUser();
 
-                if (!$user instanceof User) {
+                if (!$seller instanceof User) {
                     return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
                 }
 
-            $data = $findOIByStatusandSellerConfirmed->execute($user);
+            $data = $findSPByStatusandSellerConfirmed->execute($seller);
 
             
 
             return $this->json($data);
     }
 
-    public function FindOIBySellerShipped(FindOIByStatusandSellerShipped $findOIByStatusandSellerShipped): JsonResponse
+    public function FindSellerPaymentBySellerShipped(FindSPBySellerAndStatusShipped $findOIByStatusandSellerShipped): JsonResponse
     {
         
-        $user = $this->security->getUser();
+        $seller = $this->security->getUser();
 
-                if (!$user instanceof User) {
+                if (!$seller instanceof User) {
                     return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
                 }
 
-            $data = $findOIByStatusandSellerShipped->execute($user);
+            $data = $findOIByStatusandSellerShipped->execute($seller);
 
             
 
@@ -74,7 +74,7 @@ final class OrderItemController extends AbstractController
     public function CheckConfirmationToken( 
         int $id, 
         Request $request,
-        OrderItemRepositoryInterface $orderItemRepository ): JsonResponse 
+        SellerPaymentRepositoryInterface $orderItemRepository ): JsonResponse 
     {
         $confirmationToken = $request->query->get('confirmationToken');
 

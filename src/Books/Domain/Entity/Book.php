@@ -70,13 +70,17 @@ class Book
     private ?string $price = null; // en centimes
 
     
-    #[ORM\Column(nullable: true)]
-    #[Groups(['book:read'])]
-    private ?int $quantity = null;
+    #[ORM\Column(options: ['default' => 0])]
+    #[Groups(['book:read', 'book:write'])]
+    private ?int $quantity = 0;
 
-    #[ORM\Column(nullable: true)]
-    #[Groups(['book:read'])]
-    private ?int $quantitySold = null;
+     #[ORM\Column(options: ['default' => 0])]
+    #[Groups(['book:read', 'book:write'])]
+    private ?int $quantityReserved = 0;
+
+    #[ORM\Column(options: ['default' => 0])]
+    #[Groups(['book:read', 'book:write'])]
+    private ?int $quantitySold = 0;
 
     #[ORM\Column(enumType: BookFormat::class)]   
     #[Groups(['book:read','book:write'])]
@@ -172,6 +176,9 @@ class Book
     {
         $this->categories = new ArrayCollection();
         $this->orderItems = new ArrayCollection();
+
+        $this->quantityReserved = 0;
+        $this->quantitySold = 0;
     }
 
     // ---------- GETTERS & SETTERS ----------
@@ -195,9 +202,9 @@ class Book
 
     public function setQuantity(?int $quantity): static { $this->quantity = $quantity; return $this; }
 
-    public function getQuantitySold(): ?int { return $this->quantitySold; }
+    public function getQuantityReserved(): ?int { return $this->quantityReserved; }    
 
-    public function setQuantitySold(?int $quantitySold): static { $this->quantitySold = $quantitySold; return $this; } 
+    public function getQuantitySold(): ?int { return $this->quantitySold; }    
 
     public function getFormat(): ?BookFormat  {  return $this->format;   }
     public function setFormat(?BookFormat $format): static  {  $this->format = $format;  return $this; }
@@ -236,19 +243,15 @@ class Book
     public function setStatus(?string $status): static { $this->status = $status; return $this;}
 
     public function getWeight(): ?int { return $this->weight; }
-
     public function setWeight(?int $weight): static  { $this->weight = $weight; return $this;}
 
     public function getWidth(): ?int { return $this->width; }
-
     public function setWidth(?int $width): static  { $this->width = $width; return $this;}
 
     public function getHeight(): ?int { return $this->height; }
-
     public function setHeight(?int $height): static  { $this->height = $height; return $this;}
 
     public function getThickness(): ?int { return $this->thickness; }
-
     public function setThickness(?int $thickness): static  { $this->thickness = $thickness; return $this;}
 
     public function getCover(): ?string { return $this->cover; }
@@ -342,7 +345,7 @@ class Book
         }
       
     }
-
+    
     #[Groups(['book:read'])]
     public function getImageUrls(): array
     {
@@ -383,6 +386,48 @@ class Book
 
         return $this;
     }
+
+
+
+//fonction pour gérer les stocks (pas de setters publics)
+        #[Groups(['book:read'])]
+        public function getQuantityAvailable(): int
+        {
+            return max(0, ($this->quantity ?? 0) - ($this->quantityReserved ?? 0));
+        }
+
+        public function reserve(int $quantity): void
+        {
+            if ($this->quantity === null) {
+                throw new \LogicException('Le stock n\'est pas défini.');
+            }
+
+            if ($this->getQuantityAvailable() < $quantity) {
+                throw new \LogicException('Stock insuffisant.');
+            }
+
+            $this->quantityReserved += $quantity;
+        }
+
+        public function confirmReservation(int $quantity): void
+        {     
+            if ($this->quantityReserved < $quantity) {
+                throw new \LogicException('Réservation insuffisante.');
+            }
+
+            $this->quantityReserved -= $quantity;
+            $this->quantity -= $quantity;
+            $this->quantitySold += $quantity;
+        }
+        
+        public function cancelReservation(int $quantity): void
+        {       
+
+            $this->quantityReserved -= $quantity;
+        }
+
+   
+  
 
 
 }

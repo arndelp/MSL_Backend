@@ -1,0 +1,40 @@
+api.seller.sellerPayment.toBeShipped:
+  path: /api/seller/sellerPayment/{id}/toBeShipped
+  controller: App\SellerPayments\UI\Controller\SellerActionSellerPaymentController::toBeShipped
+  methods: [PATCH]
+
+api.seller.accept.sellerPayment:
+  path: /api/seller/sellerPayment/{id}/accept
+  controller: App\SellerPayments\UI\Controller\SellerActionSellerPaymentController::accept
+  methods: [POST]
+
+api.seller.refuse.sellerPayment:
+  path: /api/seller/sellerPayment/{id}/refuse
+  controller: App\SellerPayments\UI\Controller\SellerActionSellerPaymentController::refuse
+  methods: [POST]
+
+api.seller.find.sellerPayment.checkToken:
+  path: /api/seller/sellerPayment/{id}/checkConfirmationToken
+  controller: App\SellerPayments\UI\Controller\SellerPaymentController::CheckConfirmationToken
+  methods: [GET]
+
+api.seller.find.sellerPayment.pendeingConfirmation:
+  path: /api/seller/findSellerPaymentPendingConfirmation
+  controller: App\SellerPayments\UI\Controller\SellerPaymentController::FindSellerPaymentBySellerWaitingConfirmation
+  methods: [GET]
+
+api.seller.find.sellerPayment.confirmed:
+  path: /api/seller/findSellerPaymentConfirmed
+  controller: App\SellerPayments\UI\Controller\SellerPaymentController::FindSellerPaymentBySellerConfirmed
+  methods: [GET]
+
+api.seller.find.sellerPayment.shipped:
+  path: /api/seller/findSellerPaymentShipped
+  controller: App\SellerPayments\UI\Controller\SellerPaymentController::FindSellerPaymentBySellerShipped
+  methods: [GET]
+
+
+
+
+
+

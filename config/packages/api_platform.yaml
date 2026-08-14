@@ -30,6 +30,7 @@ api_platform:
                 - ['address']
                 - ['author_profile']
                 - ['order']
+                - ['seller_payment']
 
         denormalization_context:
             groups: 
@@ -40,6 +41,7 @@ api_platform:
                 - ['address']
                 - ['author_profile']
                 - ['order']
+                - ['seller_payment']
 
                   
     exception_to_status:

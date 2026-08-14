@@ -31,6 +31,7 @@ class BookProcessor implements ProcessorInterface
     $dto->price = (float) $request->request->get('price');
     $dto->quantity = (int) $request->request->get('quantity');
     $dto->format = $request->request->get('format');
+    $dto->weight = $request->request->get('weight');
     $dto->description = $request->request->get('description');
     $dto->extract = $request->request->get('extract');
     $dto->isbn = $request->request->get('isbn');

@@ -33,21 +33,12 @@ class OrderItemMapper
         $unitPrice = (int) ($book->getPrice() * 100);
         $orderItem->setUnitPrice($unitPrice);
 
-        // Total = quantité × prix unitaire
-        $totalPrice = $unitPrice * $orderItemDTO->quantity;
-        $orderItem->setTotalPrice($totalPrice);
-
         // Vendeur du livre (seller_id)
-        $orderItem->setUser($book->getUser());
+        $orderItem->setSeller($book->getUser());
 
         // Titre du livre
         $orderItem->setBookTitle($book->getTitle());
-
-        // Statut par défaut
-        $orderItem->setStatus(OrderItemStatus::PENDING_PAYMENT);
-
-        // PlateForm Fee
-        $orderItem->setPlatformFee(($totalPrice*12)/100);
+        
 
         //Dates de suivi
         $orderItem->setCreatedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')));

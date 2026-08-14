@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Orders\Application\UseCase;
+namespace App\SellerPayments\Application\UseCase;
 
 
-use App\Orders\Domain\Repository\OrderItemRepositoryInterface;
+use App\SellerPayments\Domain\Repository\SellerPaymentRepositoryInterface;
 
-final class FindOIByStatusandSellerConfirmed
+final class FindSPBySellerAndStatusShipped
 {
     public function __construct(
-        private OrderItemRepositoryInterface $repository,
+        private SellerPaymentRepositoryInterface $repository,
     ){}
 
-    public function execute($user):  array
+    public function execute($seller):  array
     {
-        $items = $this->repository->findByStatusAndSellerConfirmed($user);
+        $items = $this->repository->findBySellerAndStatusShipped($seller);
 
         $data = array_map(fn($item) => [
             'id' => $item->getId(),

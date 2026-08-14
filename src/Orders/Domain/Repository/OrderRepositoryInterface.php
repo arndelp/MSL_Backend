@@ -12,5 +12,6 @@ interface OrderRepositoryInterface
 
     public function remove(Order $order): void;
 
+    public function findByStripeSessionId(string $stripeSessionId): ?Order;
    
 }

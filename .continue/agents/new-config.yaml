@@ -1,0 +1,41 @@
+# This is an example configuration file
+# To learn more, see the full config.yaml reference: https://docs.continue.dev/reference
+
+name: My Config
+version: 1.0.0
+schema: v1
+
+models:
+  - name: qwen2.5-coder-14b-base
+    provider: ollama
+    model: qwen2.5-coder:14b-base
+    roles:
+      - apply
+      - autocomplete
+      - chat
+      - edit
+    defaultCompletionOptions:
+      contextLength: 200000
+      maxTokens: 64000
+    capabilities:
+      - tool_use
+      - image_input
+
+  - name: qwen2.5-coder-7b
+    provider: ollama
+    model: qwen2.5-coder:7b
+    roles:
+      - autocomplete
+      - apply
+      - chat
+      - edit
+  
+  - name: glm-4.7-flash
+    provider: ollama
+    model: qwen2.5-coder:7b
+    roles:
+      - autocomplete
+      - apply
+      - chat
+      - edit
+

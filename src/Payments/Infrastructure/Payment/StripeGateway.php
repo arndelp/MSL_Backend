@@ -4,93 +4,128 @@ namespace App\Payments\Infrastructure\Payment;
 
 use Stripe\StripeClient;
 use App\Payments\Domain\Payment\StripeGatewayInterface;
-use App\Books\Domain\Repository\BookRepositoryInterface;
-
+use App\Orders\Domain\Entity\Order;
 
 class StripeGateway implements StripeGatewayInterface
 {
     private StripeClient $stripe;
-    private BookRepositoryInterface $bookRepository;
 
-    public function __construct(StripeClient $stripe, BookRepositoryInterface $bookRepository)
-    {
+    public function __construct(
+        StripeClient $stripe
+    ) {
         $this->stripe = $stripe;
-        $this->bookRepository = $bookRepository;
     }
 
-    public function createSession(array $data): array
-        {
-            $lineItems = [];
+    public function createSession(Order $order): array
+    {
+        $lineItems = [];
 
-        
-                $cart = $data['cart'] ?? $data;
+        foreach ($order->getOrderItems() as $orderItem) {
 
-        foreach ($cart as $cartEntry) {
+            $book = $orderItem->getBook();
 
-            if (!is_array($cartEntry)) {
-                continue;
+            if (!$book) {
+                throw new \Exception(
+                    'Livre introuvable pour un OrderItem.'
+                );
             }
 
-    // Accepte id OU book_id
-    $bookId = $cartEntry['id'] ?? $cartEntry['book_id'] ?? null;
-    $quantity = $cartEntry['quantity'] ?? null;
+            $quantity = $orderItem->getQuantity();
 
-    if ($bookId && $quantity > 0) {
+            if ($quantity <= 0) {
+                throw new \Exception(
+                    'La quantité du livre doit être supérieure à zéro.'
+                );
+            }
 
-        $title = $this->bookRepository->findTitleById($bookId);
-        $price = $this->bookRepository->findPriceById($bookId);
+            $unitPrice = (int) $orderItem->getUnitPrice();
 
-        if ($title !== null && $price !== null) {
+            if ($unitPrice < 0) {
+                throw new \Exception(
+                    'Prix du livre invalide.'
+                );
+            }
+
             $lineItems[] = [
                 'price_data' => [
-                    'currency' => 'eur',
-                    'product_data' => ['name' => $title],
-                    'unit_amount' => (int)$price * 100,
+                    'currency' => strtolower(
+                        $order->getCurrency() ?? 'eur'
+                    ),
+                    'product_data' => [
+                        'name' => $orderItem->getBookTitle()
+                            ?? $book->getTitle(),
+                    ],
+                    'unit_amount' => $unitPrice,
                 ],
                 'quantity' => $quantity,
             ];
         }
+
+        if (empty($lineItems)) {
+            throw new \Exception(
+                'Impossible de créer la session Stripe : aucun article.'
+            );
+        }
+
+        $session = $this->stripe->checkout->sessions->create([
+            'payment_method_types' => ['card'],
+
+            'mode' => 'payment',
+
+            'line_items' => $lineItems,
+
+            'payment_intent_data' => [
+                'capture_method' => 'manual',
+            ],
+
+            'success_url' =>
+                'http://localhost:5173/successPayment?session_id={CHECKOUT_SESSION_ID}',
+
+            'cancel_url' =>
+                'http://localhost:5173/cancelPayment?session_id={CHECKOUT_SESSION_ID}',
+        ]);
+
+        return [
+            'url' => $session->url,
+            'stripe_session_id' => $session->id,
+            'stripe_payment_intent_id' => $session->payment_intent,
+        ];
     }
-}
 
-if (empty($lineItems)) {
-    throw new \Exception("lineItems vide ! Le format de cart ne correspond pas.");
-}
+    public function capturePaymentIntent(
+        string $paymentIntentId,
+        int $amountToCapture
+    ): void 
+        {
+            $paymentIntent = $this->stripe->paymentIntents->retrieve(
+                $paymentIntentId
+            );
 
+            if ($amountToCapture > $paymentIntent->amount) {
+                throw new \RuntimeException(
+                    'Le montant à capturer est supérieur au montant autorisé par Stripe.'
+                );
+            }
 
-    $session = $this->stripe->checkout->sessions->create([
-        'payment_method_types' => ['card'],
-        'mode' => 'payment',
-        'line_items' => $lineItems,
-        'payment_intent_data' => [
-            'capture_method' => 'manual',
-        ],
-        'success_url' => 'http://localhost:5173/successPayment?session_id={CHECKOUT_SESSION_ID}', 
-        'cancel_url' => 'http://localhost:5173/cancelPayment?session_id={CHECKOUT_SESSION_ID}',
-    ]);
+            $this->stripe->paymentIntents->capture(
+                $paymentIntentId,
+                [
+                    'amount_to_capture' => $amountToCapture,
+                ]
+            );
+        }
 
-    return [
-        'url' => $session->url,
-        'stripe_session_id' => $session->id,
-        'stripe_payment_intent_id' => $session->payment_intent,
-    ];
-}
-
-//Capture du payement intent pour finaliser le paiement
-    public function capturePaymentIntent(string $paymentIntentId): void
-    {
-        $this->stripe->paymentIntents->capture($paymentIntentId);
-    }
-
-//Annulation du payement intent pour annuler le paiement
     public function cancelPaymentIntent(string $paymentIntentId): void
     {
         $this->stripe->paymentIntents->cancel($paymentIntentId);
     }
 
-//Récupération de la session de paiement pour vérifier le statut du paiement (non utilisé pour le moment)
-    public function retrieveSession(string $sessionId): \Stripe\Checkout\Session
-    {
-        return $this->stripe->checkout->sessions->retrieve($sessionId);
+    public function retrieveSession(
+        string $sessionId
+    ): \Stripe\Checkout\Session {
+        return $this->stripe
+            ->checkout
+            ->sessions
+            ->retrieve($sessionId);
     }
 }

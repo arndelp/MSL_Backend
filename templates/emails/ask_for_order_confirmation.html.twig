@@ -19,22 +19,29 @@
                 </h1>
 
                 <p style="font-size:16px; color:#333;">
-                    Bonjour {{ orderItem.user.firstname }},
-                    <br><br>
-                    Vous avez vendu : <strong>{{ orderItem.bookTitle }}</strong><br>
-                    Quantité : <strong>{{ orderItem.quantity }}</strong>
+                    Bonjour cher vendeur,
                 </p>
+                    <br><br>
+                   {% for orderItem in sellerPayment.orderItems %}
+                        <p style="font-size:16px; color:#333;">
+                            Vous avez vendu :
+                            <strong>{{ orderItem.bookTitle }}</strong><br>
+                            Quantité :
+                            <strong>{{ orderItem.quantity }}</strong>
+                        </p>
+                    {% endfor %}
+                
 
-                <p style="font-size:16px; color:#333; margin-top:25px;">
+               <p style="font-size:16px; color:#333; margin-top:25px;">
                     <strong>Adresse d'expédition :</strong>
                 </p>
 
                 <p style="font-size:15px; color:#555; line-height:1.5;">
-                    {{ orderItem.buyerUser.firstname }} {{ orderItem.buyerUser.lastname }}<br>
-                    {{ orderItem.order.shippingAddressLine1 }}<br>
-                    {{ orderItem.order.shippingAddressLine2 }}<br>
-                    {{ orderItem.order.shippingPostalCode }} {{ orderItem.order.shippingCity }}<br>
-                    {{ orderItem.order.shippingCountry }}
+                    {{ sellerPayment.order.shippingFirstname }} {{ sellerPayment.order.shippingLastname }}<br>
+                    {{ sellerPayment.order.shippingAddressLine1 }}<br>
+                    {{ sellerPayment.order.shippingAddressLine2 }}<br>
+                    {{ sellerPayment.order.shippingPostalCode }} {{ sellerPayment.order.shippingCity }}<br>
+                    {{ sellerPayment.order.shippingCountry }}
                 </p>
             </td>
         </tr>

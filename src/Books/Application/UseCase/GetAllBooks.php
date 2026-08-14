@@ -20,8 +20,7 @@ class GetAllBooks
                 'id' => $book->getId(),
                 'title' => $book->getTitle(),
                 'authorName' => $book->getAuthorName(),
-                'price' => $book->getPrice(),
-                'quantity' => $book->getQuantity(),
+                'price' => $book->getPrice(),                
                 'format' => $book->getFormat()?->value,
                 'coverUrl' => $book->getCoverUrl(),
                 'categories' => array_map(
@@ -30,7 +29,9 @@ class GetAllBooks
                         'name' => $cat->getName(),
                     ],
                     $book->getCategories()->toArray()
-                ),
+                ),               
+                'quantityAvailable' => $book->getQuantityAvailable(),
+
             ], $books);
         } catch (Throwable $e) {
             // Log the error or handle it as needed

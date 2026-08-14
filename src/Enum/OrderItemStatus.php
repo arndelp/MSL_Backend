@@ -2,12 +2,11 @@
 namespace App\Enum;
 enum OrderItemStatus: string
 {
-    case PENDING_PAYMENT = 'pending_payment';
-    case PENDING_AUTHOR_CONFIRMATION = 'pending_author_confirmation';
-    case CONFIRMED = 'confirmed';
-    case SHIPPED = 'shipped';
-    case DELIVERED = 'delivered';
-    case RETURNED = 'returned';
-    case CANCELLED = 'cancelled';    
-    case REFUNDED = 'refunded';
+    case CREATED = 'CREATED';    
+    case CONFIRMED = 'CONFIRMED';
+    case SHIPPED = 'SHIPPED';
+    case DELIVERED = 'DELIVERED';
+    case RETURNED = 'RETURNED';
+    case CANCELLED = 'CANCELLED';    
+    case REFUNDED = 'REFUNDED';
 }

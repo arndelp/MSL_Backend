@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Orders\Application\DTO;
+namespace App\SellerPayments\Application\DTO;
 
 
 
-final class OrderItemCancellationDTO
+final class SellerPaymentCancellationDTO
 {
    
     public ?string $reason = null;

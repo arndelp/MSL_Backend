@@ -41,8 +41,7 @@ final class OrderDTO
     #[Assert\Length(max: 255)]
     public ?string $shipping_country = "France";
 
-    #[Assert\Choice(choices: ['pending_payment', 'paid', 'cancelled'])]
-    public ?string $status = "pending_payment";
+  
 
     /** @var OrderItemDTO[] */
     #[Assert\Count(min: 1, minMessage: "La commande doit contenir au moins un article.")]
@@ -69,7 +68,7 @@ final class OrderDTO
         ?string $shipping_postal_code = null,
         ?string $shipping_city = null,
         ?string $shipping_country = "France",
-        ?string $status = null,
+       
         array $order_items = []
     ) {
         $this->shipping_firstname = $shipping_firstname;
@@ -80,7 +79,7 @@ final class OrderDTO
         $this->shipping_postal_code = $shipping_postal_code;
         $this->shipping_city = $shipping_city;
         $this->shipping_country = $shipping_country;
-        $this->status = $status;
+       
         $this->setOrderItems($order_items);
     }
 }

@@ -32,64 +32,7 @@ final class BookController extends AbstractController
         private GetAuthorNamesByUser $getAuthorNameByUser
     ) {}
 
-
-    public function record(
-        Request $request,        
-        LoggerInterface $logger,
-        ValidatorInterface $validator,
-        RecordBookByApi $recordBookByApi,
-    ): Response {
-        {
-            // Récupération des données JSON
-            $data = json_decode($request->getContent(), true); 
-       
-            $logger->info('Données reçues', ['data' => $data]);
-            
-            if (empty($data)) {
-            return new JsonResponse(['error' => 'Données reçues vides'], 400);
-            }
-
-            $dto = new BookDTO(
-                title: $data['title'] ?? null,   
-                authorName: isset($data['authorName']) ? preg_replace('/\s+/', ' ', trim($data['authorName'])) : null,         
-                price: $data['price'] ?? null,
-                quantity: $data['quantity'] ?? null,
-                format: $data['format'] ?? null,
-                description: $data['description'] ?? null,
-                isbn: $data['isbn'] ?? null,
-                pageCount: $data['pageCount'] ?? null,
-                currency: $data['currency'] ?? null,
-                categories: $data['categories'] ?? []
-            
-            );
-            
-            // Validation
-            $errors = $validator->validate($dto);
-            if (count($errors) > 0) {
-                return new JsonResponse(['errors' => (string) $errors], 400);
-            }
-
-        
-            try {
-                //délègue au use case pour enregistrer le livre
-                $book = $recordBookByApi->execute($dto);
-
-                return new JsonResponse(['success' => 'Livre enregistré avec succès'], 201);
-
-            } catch (\InvalidArgumentException $e) {
-                // Erreurs métier (ex: livre déjà enregistré)
-                return new JsonResponse(['error' => $e->getMessage()], 400);
-
-            } catch (Throwable $e) {
-                //Erreurs serveur
-                $logger->error('Erreur en recevant le nouveau client : ' . $e->getMessage(), [
-                    'exception' => $e,
-                    'trace' => $e->getTraceAsString()
-                ]);
-                return new JsonResponse(['error' => 'Erreur interne serveur.'], 500);
-            }            
-        }
-    }
+    //UTILISATION DU PROCESSOR POUR ENREGISTRER UN LIVRE
 
     public function Alls(GetAllBooks $getAllBooks): JsonResponse
     {
@@ -150,17 +93,19 @@ final class BookController extends AbstractController
             'title' => $book->getTitle(),
             'authorName' => $book->getAuthorName(),
             'price' => $book->getPrice(),
-            'quantity' => $book->getQuantity(),
+            'quantityAvailable' => $book->getQuantityAvailable(),
             'format' => $book->getFormat()?->value,
             'pageCount' => $book->getPageCount(),
             'description' => $book->getDescription(),
             'extract' => $book->getExtract(),
             'coverUrl' => $book->getCoverUrl(),
             'imageUrls' => $book->getImageUrls(),
-            'categories' => array_map(fn ($cat) => [
-                'id' => $cat->getId(),
-                'name' => $cat->getName(),
-            ], $book->getCategories()->toArray()),
+            'categories' => 
+                array_map(fn ($cat) => [
+                    'id' => $cat->getId(),
+                    'name' => $cat->getName(),
+                ], $book->getCategories()->toArray()),
+            
         ]);
     }
 

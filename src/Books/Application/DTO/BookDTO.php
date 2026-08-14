@@ -32,13 +32,17 @@ final class BookDTO
     public ?string $format = null;
 
     #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
+    #[Assert\Length(max: 5)]
+    public ?int $weight = null;
+
+    #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
     public ?string $description = null;
 
     public ?string $extract = null;
 
-    
     public ?string $isbn = null;
 
+    #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
     public ?int $pageCount = null;
 
     #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]

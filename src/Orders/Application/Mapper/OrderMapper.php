@@ -4,7 +4,6 @@ namespace App\Orders\Application\Mapper;
 
 use App\Orders\Domain\Entity\Order;
 use App\Orders\Application\DTO\OrderDTO;
-use App\Enum\OrderStatus;
 use Symfony\Bundle\SecurityBundle\Security;
 
 class OrderMapper
@@ -12,6 +11,9 @@ class OrderMapper
     public function __construct(
         private Security $security,
     ){}
+
+    
+    
 
     public function toEntity(OrderDTO $orderDTO): Order
 {
@@ -28,9 +30,9 @@ class OrderMapper
     $order->setShippingPostalCode($orderDTO->shipping_postal_code);
     $order->setShippingCity($orderDTO->shipping_city);
     $order->setShippingCountry($orderDTO->shipping_country);
+    
 
-    // Statut
-    $order->setStatus(OrderStatus::from($orderDTO->status));
+   
 
     // Valeurs par défaut
     $order->setCurrency("EUR");
@@ -52,7 +54,8 @@ public function toDTO(Order $order): OrderDTO
     $orderDTO->shipping_postal_code = $order->getShippingPostalCode();
     $orderDTO->shipping_city = $order->getShippingCity();
     $orderDTO->shipping_country = $order->getShippingCountry();
-    $orderDTO->status = $order->getStatus()->value;
+
+   
 
     return $orderDTO;
 }

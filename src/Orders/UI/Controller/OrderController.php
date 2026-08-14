@@ -56,8 +56,7 @@ final class OrderController extends AbstractController
             shipping_address_line_2: $data['shipping_address_line_2'] ?? null,
             shipping_postal_code: $data['shipping_postal_code'] ?? null,
             shipping_city: $data['shipping_city'] ?? null,
-            shipping_country: $data['shipping_country'] ?? "France",
-            status: $data['status'] ?? "pending_payment",
+            shipping_country: $data['shipping_country'] ?? "France",            
             order_items: $data['order_items']
         );
 

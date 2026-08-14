@@ -1,25 +1,25 @@
 <?php
 
-namespace App\Orders\UI\Controller;
+namespace App\SellerPayments\UI\Controller;
 
-use App\Orders\Application\UseCase\AcceptOrderItem;
-use App\Orders\Application\UseCase\RefuseOrderItem;
+use App\SellerPayments\Application\UseCase\AcceptSellerPayment;
+use App\SellerPayments\Application\UseCase\RefuseSellerPayment;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Orders\Application\UseCase\ToBeShipped;
+use App\SellerPayments\Application\UseCase\ToBeShipped;
 use Symfony\Bundle\SecurityBundle\Security;
 use App\Users\Domain\Entity\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Psr\Log\LoggerInterface;
-use App\Orders\Application\DTO\OrderItemCancellationDTO;
+use App\SellerPayments\Application\DTO\SellerPaymentCancellationDTO;
 use Symfony\Component\Serializer\SerializerInterface;
 
-final class SellerOrderItemController
+final class SellerActionSellerPaymentController 
 {
     public function __construct(
         private Security $security,
-        private AcceptOrderItem $acceptOrder,
-        private RefuseOrderItem $refuseOrder,
+        private AcceptSellerPayment $acceptSellerPayment,
+        private RefuseSellerPayment $refuseSellerPayment,
         private ToBeShipped $toBeShipped,
         private LoggerInterface $logger,
         private SerializerInterface $serializer,
@@ -40,7 +40,7 @@ final class SellerOrderItemController
             );
         }
 
-        $this->acceptOrder->execute(
+        $this->acceptSellerPayment->execute(
             $id,
             $confirmationToken
         );
@@ -54,7 +54,7 @@ final class SellerOrderItemController
     public function refuse(
         int $id,
         Request $request,
-        OrderItemCancellationDTO $dto,
+        SellerPaymentCancellationDTO $dto,
          ): Response 
         {   
 
@@ -78,7 +78,7 @@ final class SellerOrderItemController
             }
      
 
-        $this->refuseOrder->execute($id, $dto);
+        $this->refuseSellerPayment->execute($id, $dto);
         return new Response(
             'Paiement annulé.'
         );

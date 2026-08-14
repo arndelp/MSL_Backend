@@ -56,6 +56,9 @@ services:
     App\Users\Domain\Repository\UserRepositoryInterface:
         alias: App\Users\Infrastructure\Repository\DoctrineUserRepository
 
+    App\Payments\Domain\Repository\SellerPaymentRepositoryInterface:
+        alias: App\Payments\Infrastructure\Repository\SellerPaymentRepository
+
 
     App\Payments\Application\UseCase\CreateStripeSession:
         autowire: true
@@ -72,6 +75,9 @@ services:
     App\Payments\UI\Controller\StripeWebhookController:
         arguments:
             $stripeWebhookSecret: '%stripe_webhook_secret%'
+
+    App\SellerPayments\UI\Controller\SellerActionSellerPaymentController:
+        tags: ['controller.service_arguments']
   
 
 
