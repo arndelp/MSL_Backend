@@ -13,6 +13,7 @@ use App\Orders\Domain\Entity\OrderItem;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Enum\CancellationReason;
+use App\Enum\PayoutStatus;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'seller_payments')]
@@ -102,15 +103,12 @@ class SellerPayment
      | Stripe
      |--------------------------------------------------------------------------
      */
-
-    #[ORM\Column(length:255, nullable:true)]
-    private ?string $stripe_session_id = null;
-
-    #[ORM\Column(length:255, nullable:true)]
-    private ?string $stripe_payment_intent_id = null;
-
+    
     #[ORM\Column(length:255, nullable:true)]
     private ?string $stripe_transfer_id = null;
+
+    #[ORM\Column(enumType: PayoutStatus::class, nullable:true)]
+    private ?PayoutStatus $payout_status = null;
 
     /*
      |--------------------------------------------------------------------------
@@ -354,27 +352,7 @@ class SellerPayment
         return $this;
     }
 
-    public function getStripeSessionId(): ?string
-    {
-        return $this->stripe_session_id;
-    }
-
-    public function setStripeSessionId(?string $stripe_session_id): self
-    {
-        $this->stripe_session_id = $stripe_session_id;
-        return $this;
-    }
-
-    public function getStripePaymentIntentId(): ?string
-    {
-        return $this->stripe_payment_intent_id;
-    }
-
-    public function setStripePaymentIntentId(?string $stripe_payment_intent_id): self
-    {
-        $this->stripe_payment_intent_id = $stripe_payment_intent_id;
-        return $this;
-    }
+    
 
     public function getStripeTransferId(): ?string
     {
@@ -384,6 +362,17 @@ class SellerPayment
     public function setStripeTransferId(?string $stripe_transfer_id): self
     {
         $this->stripe_transfer_id = $stripe_transfer_id;
+        return $this;
+    }
+
+    public function getPayoutStatus(): ?PayoutStatus
+    {
+        return $this->payout_status;
+    }
+
+    public function setPayoutStatus(?PayoutStatus $payout_status): self
+    {
+        $this->payout_status = $payout_status;
         return $this;
     }
 

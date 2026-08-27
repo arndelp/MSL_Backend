@@ -11,4 +11,6 @@ interface UserRepositoryInterface {
     public function findById(int $id): ?User;
     
     public function findByEmail(string $email): ?User;   
+
+     public function findOneByStripeAccount(string $stripeAccountId): ?User;
 }

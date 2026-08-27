@@ -20,5 +20,9 @@ interface SellerPaymentRepositoryInterface
 
     public function save(SellerPayment  $sellerPayment): void;
 
-     public function hasPendingSellerPayments(Order $order): bool;
+    public function hasPendingSellerPayments(Order $order): bool;
+
+    public function findExpiredSellerPayments(
+        \DateTimeImmutable $now
+    ): array;
 }

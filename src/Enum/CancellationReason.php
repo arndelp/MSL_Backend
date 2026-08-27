@@ -10,4 +10,5 @@ enum CancellationReason: string
     case QUALITY_ISSUE = 'QUALITY_ISSUE';
     case STOCK_ERROR = 'STOCK_ERROR';
     case FORCE_MAJEURE = 'FORCE_MAJEURE';
+    case SELLER_TIMEOUT = 'SELLER_TIMEOUT';
 }

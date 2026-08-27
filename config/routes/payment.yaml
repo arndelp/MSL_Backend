@@ -1,7 +1,15 @@
-
-
 stripe_webhook:
     path: /api/stripe/webhook
     controller: App\Payments\UI\Controller\StripeWebhookController
     methods: POST
+
+stripe_connect:
+    path: /api/stripe/connect/onboarding
+    controller: App\Payments\UI\Controller\StripeConnectController::onboarding
+    methods: POST
+
+stripe_connect_check:
+    path: /api/stripe/connect/return
+    controller: App\Payments\UI\Controller\StripeConnectController::returnFromStripe
+    methods: GET
 

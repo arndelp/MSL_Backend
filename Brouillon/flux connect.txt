@@ -1,0 +1,17 @@
+1. L'auteur clique "Configurer mes paiements"
+                ↓
+2. Création du compte Connect Express
+                ↓
+3. acct_xxx enregistré dans User
+                ↓
+4. Création du AccountLink
+                ↓
+5. Redirection vers Stripe
+                ↓
+6. L'auteur renseigne ses informations
+                ↓
+7. Stripe le renvoie sur ton site
+                ↓
+8. Ton backend vérifie réellement son compte
+                ↓
+9. stripeOnboarded = true

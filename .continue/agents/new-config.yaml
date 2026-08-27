@@ -39,3 +39,12 @@ models:
       - chat
       - edit
 
+  - name: deepseek-coder:33b
+    provider: ollama
+    model: deepseek-coder:33b
+    roles:
+      - autocomplete
+      - apply
+      - chat
+      - edit
+

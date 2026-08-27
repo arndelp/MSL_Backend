@@ -1,0 +1,10 @@
+DOCKER
+
+Ouvrir un terminal dans le dossier du projet et exécuter les commandes
+- Monter le conteneur 
+
+docker compose up
+
+- Démonter le conteneur
+
+docker compose down

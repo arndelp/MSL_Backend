@@ -104,7 +104,7 @@ final class HandleStripeWebhook
                         );
 
                         $payment->setConfirmationTokenExpiresAt(
-                            new \DateTimeImmutable('+6 days', new \DateTimeZone('Europe/Paris'))
+                            new \DateTimeImmutable('+48 hours', new \DateTimeZone('Europe/Paris'))
                         );
                     }
               

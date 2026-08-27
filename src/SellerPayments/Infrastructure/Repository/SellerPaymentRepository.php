@@ -13,16 +13,20 @@ use App\Orders\Domain\Entity\Order;
 /**
  * @extends ServiceEntityRepository<SellerPayment>
  */
-class SellerPaymentRepository extends  ServiceEntityRepository implements SellerPaymentRepositoryInterface
+class SellerPaymentRepository extends  ServiceEntityRepository implements SellerPaymentRepositoryInterface    
 {
+    private ?DateTimeImmutable $confirmation_token_expires_at;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, SellerPayment::class);
+       
     }
 
     public function findBySellerAndStatusWSC(User $seller): array
     {
         return
+       
             $this->findBy(
                 [
                     'seller' => $seller,
@@ -83,8 +87,8 @@ class SellerPaymentRepository extends  ServiceEntityRepository implements Seller
     public function save(SellerPayment  $sellerPayment): void
     {
         $em = $this->getEntityManager();
-        $em->persist($sellerPayment);
-        $em->flush();
+        $em->persist($sellerPayment); //persist() signifie : prend cette entité en charge
+        $em->flush(); //flush() signifie : écrit les données en base de donnée
     }
 
     public function hasPendingSellerPayments(Order $order): bool
@@ -100,6 +104,22 @@ class SellerPaymentRepository extends  ServiceEntityRepository implements Seller
             )
             ->getQuery() //transforme le queryBuilder en objet Query prêt à être exécuter
             ->getSingleScalarResult() > 0; //récupère la valeur, si > 0 = true sinon false
+    }
+
+    public function findExpiredSellerPayments(
+        \DateTimeImmutable $now
+    ): array {
+        return $this->createQueryBuilder('sp')
+            ->andWhere('sp.status = :status')
+            ->andWhere('sp.confirmation_token_expires_at IS NOT NULL')
+            ->andWhere('sp.confirmation_token_expires_at < :now')
+            ->setParameter(
+                'status',
+                SellerPaymentStatus::WAITING_SELLER_CONFIRMATION
+            )
+            ->setParameter('now', $now)
+            ->getQuery()
+            ->getResult();
     }
 }
 

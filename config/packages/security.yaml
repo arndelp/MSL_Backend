@@ -42,6 +42,7 @@ security:
         - { path: ^/api/seller/sellerPayment/\d+/refuse, roles: PUBLIC_ACCESS, methods: [POST] }
         - { path: ^/api/seller/sellerPayment/\d+/checkConfirmationToken, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api/authors, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/stripe/connect/return, roles: PUBLIC_ACCESS, methods: [GET] }
 
 
 
@@ -61,6 +62,6 @@ security:
         - { path: ^/api/updateStock/\d+/\d+$, roles: IS_AUTHENTICATED_FULLY, methods: [PATCH]}
         - { path: ^/api/seller/sellerPayment/\d+/toBeShipped, roles: IS_AUTHENTICATED_FULLY, methods: [PATCH] }
 
-        
+        - { path: ^/api/stripe/connect/onboarding, roles: IS_AUTHENTICATED_FULLY, methods: [POST]}
 
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }

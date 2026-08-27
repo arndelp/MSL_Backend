@@ -18,7 +18,7 @@ api.seller.find.sellerPayment.checkToken:
   controller: App\SellerPayments\UI\Controller\SellerPaymentController::CheckConfirmationToken
   methods: [GET]
 
-api.seller.find.sellerPayment.pendeingConfirmation:
+api.seller.find.sellerPayment.pendingConfirmation:
   path: /api/seller/findSellerPaymentPendingConfirmation
   controller: App\SellerPayments\UI\Controller\SellerPaymentController::FindSellerPaymentBySellerWaitingConfirmation
   methods: [GET]

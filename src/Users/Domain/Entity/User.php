@@ -80,7 +80,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(nullable: true)]
     #[Groups(['user:private', 'book:private'])]
-    private ?string $stripeAccount = null;
+    private ?string $stripeConnectAccountId = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['user:private', 'book:private'])]
@@ -238,14 +238,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getStripeAccount(): ?string
+    public function getStripeConnectAccountId(): ?string
     {
-        return $this->stripeAccount;
+        return $this->stripeConnectAccountId;
     }
 
-    public function setStripeAccount(?string $stripeAccount): static
+    public function setStripeConnectAccountId(?string $stripeConnectAccountId): static
     {
-        $this->stripeAccount = $stripeAccount;
+        $this->stripeConnectAccountId = $stripeConnectAccountId;
 
         return $this;
     }
