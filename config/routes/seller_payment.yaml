@@ -1,6 +1,6 @@
 api.seller.sellerPayment.toBeShipped:
   path: /api/seller/sellerPayment/{id}/toBeShipped
-  controller: App\SellerPayments\UI\Controller\SellerActionSellerPaymentController::toBeShipped
+  controller: App\SellerPayments\UI\Controller\SellerActionSellerPaymentController::itemShipped
   methods: [PATCH]
 
 api.seller.accept.sellerPayment:

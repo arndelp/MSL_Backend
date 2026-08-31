@@ -12,70 +12,59 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 
-
-
 final class SellerPaymentController extends AbstractController
 {
-
     public function __construct(
-            private Security $security,
-        
-        ) {}
+        private Security $security,
+        private FindSPBySellerAndStatusShipped $findSPByStatusandSellerShipped,
+        private FindSPBySellerAndStatusConfirmed $findSPByStatusandSellerConfirmed,
+        private FindSPBySellerAndStatusWaitingConfirmation $findSPByStatusandSellerWaitingConfirmation
+    ) {}
 
-    public function FindSellerPaymentBySellerWaitingConfirmation(FindSPBySellerAndStatusWaitingConfirmation $findSPByStatusandSellerWaitingConfirmation): JsonResponse
+    public function FindSellerPaymentBySellerWaitingConfirmation(): JsonResponse
     {
         $seller = $this->security->getUser();
 
-                if (!$seller instanceof User) {
-                    return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
-                }
+        if (!$seller instanceof User) {
+            return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
+        }
 
-            $data = $findSPByStatusandSellerWaitingConfirmation->execute($seller);
+        $data = $this->findSPByStatusandSellerWaitingConfirmation->execute($seller);
 
-            
-
-            return $this->json($data);
-
+        return $this->json($data);
     }
 
-    public function FindSellerPaymentBySellerConfirmed(FindSPBySellerAndStatusConfirmed $findSPByStatusandSellerConfirmed): JsonResponse
+    public function FindSellerPaymentBySellerConfirmed(): JsonResponse
     {
-        
         $seller = $this->security->getUser();
 
-                if (!$seller instanceof User) {
-                    return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
-                }
+        if (!$seller instanceof User) {
+            return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
+        }
 
-            $data = $findSPByStatusandSellerConfirmed->execute($seller);
+        $data = $this->findSPByStatusandSellerConfirmed->execute($seller);
 
-            
-
-            return $this->json($data);
+        return $this->json($data);
     }
 
-    public function FindSellerPaymentBySellerShipped(FindSPBySellerAndStatusShipped $findOIByStatusandSellerShipped): JsonResponse
+    public function FindSellerPaymentBySellerShipped(): JsonResponse
     {
-        
         $seller = $this->security->getUser();
 
-                if (!$seller instanceof User) {
-                    return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
-                }
+        if (!$seller instanceof User) {
+            return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
+        }
 
-            $data = $findOIByStatusandSellerShipped->execute($seller);
+        $data = $this->findSPByStatusandSellerShipped->execute($seller);
 
-            
-
-            return $this->json($data);
+        return $this->json($data);
     }
 
-
-    public function CheckConfirmationToken( 
-        int $id, 
+    public function CheckConfirmationToken(
+        int $id,
         Request $request,
-        SellerPaymentRepositoryInterface $orderItemRepository ): JsonResponse 
-    {
+        SellerPaymentRepositoryInterface $orderItemRepository
+    ): JsonResponse {
         $confirmationToken = $request->query->get('confirmationToken');
 
         if (!$confirmationToken) {
@@ -85,7 +74,6 @@ final class SellerPaymentController extends AbstractController
             ], 400);
         }
 
-        // Vérifie si l’OrderItem existe et si le token est valide
         $orderItem = $orderItemRepository->findConfirmationTokenById($id, $confirmationToken);
 
         if (!$orderItem) {
@@ -98,10 +86,5 @@ final class SellerPaymentController extends AbstractController
         return new JsonResponse([
             'valid' => true
         ]);
-
     }
-
-    
-
-
 }

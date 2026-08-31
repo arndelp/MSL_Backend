@@ -10,18 +10,18 @@ class ToBeShipped
 
     public function execute(int $id): void
     {
-        $orderItem = $this->sellerPaymentRepository->findById($id);
+        $SP = $this->sellerPaymentRepository->findById($id);
 
-        if (!$orderItem) {
+        if (!$SP) {
             throw new \InvalidArgumentException('Élément de commande introuvable');
         }
        
-        $orderItem->setStatus(SellerPaymentStatus::SHIPPED);
+        $SP->setStatus(SellerPaymentStatus::SHIPPED);
 
-        $orderItem->setShippedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')));
+        $SP->setShippedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')));
 
-        $orderItem->setUpdatedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')));
+        $SP->setUpdatedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')));
 
-        $this->sellerPaymentRepository->save($orderItem);
+        $this->sellerPaymentRepository->save($SP);
     }
 }   

@@ -76,7 +76,7 @@ final class ContactMessageController extends AbstractController
                     from: 'Monsalondulivre.fr <automated@monsalondulivre.fr>',   
                     to: $user->getEmail(),
                     subject: $contactMessage->getSubject(),
-                    content: 'Merci pour votre message. Nous vous répondrons dans les plus brefs délais.'
+                    content: $contactMessage->getContent()
                 );
 
                 return new JsonResponse(['success' => 'Message de contact enregistré avec succès'], 201);
