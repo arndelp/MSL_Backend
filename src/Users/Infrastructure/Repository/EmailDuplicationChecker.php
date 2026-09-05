@@ -16,15 +16,10 @@ class EmailDuplicationChecker implements EmailDuplicationCheckerInterface
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * Vérifie si l'email existe déjà dans la base de données
-     *
-     * @param string $email
-     * @return bool
-     */
+
     public function isEmailDuplicate(string $email): bool
     {
-        // Chercher un utilisateur avec cet email dans la base de données
+        // Chercher un utilisateur avec cet email dans la classe User
         $userRepository = $this->entityManager->getRepository(User::class);
         $user = $userRepository->findOneBy(['email' => $email]);
 

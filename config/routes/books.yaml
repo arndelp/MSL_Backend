@@ -44,3 +44,4 @@ api.books.author:
   path: /api/authorNamesByUser
   controller: App\Books\UI\Controller\BookController::getAuthorNamesByUser
   methods: [GET]
+

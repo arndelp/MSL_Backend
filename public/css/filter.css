@@ -1,0 +1,22 @@
+
+#filter {
+  display: none;
+}
+
+#filter.active {
+  display: block;
+}
+
+#openBtn p, #closeBtn p {
+    cursor: pointer;
+    color: #007bff; /* couleur bleue bootstrap */
+    text-decoration: underline;
+}
+
+#openBtn p:hover, #closeBtn p:hover {
+    color: #0056b3; /* couleur plus foncée au survol */
+}
+
+@media (max-width: 991.98px) { 
+  
+}

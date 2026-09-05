@@ -3,6 +3,11 @@ security:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
 
     providers:
+        app_back_user_provider:
+            entity:
+                class: App\BackUsers\Domain\Entity\BackUser
+                property: email
+
         app_user_provider:
             entity:
                 class: App\Users\Domain\Entity\User
@@ -13,6 +18,7 @@ security:
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
 
+        # Frontend / API
         login:
             pattern: ^/api/user_login
             stateless: true
@@ -28,7 +34,23 @@ security:
             provider: app_user_provider
             jwt: ~
 
+        # Backoffice / pages classiques
+        main:
+            lazy: true
+            provider: app_back_user_provider
+            pattern: ^/            
+            custom_authenticator: App\BackUsers\Infrastructure\Security\LoginAuthenticator
+            logout:
+                path: app_logout
+                target: app_login
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+                path: /
+            
+
     access_control:
+        # Accès public (frontend)
         - { path: ^/api/user_login, roles: PUBLIC_ACCESS }
         - { path: ^/api/register, roles: PUBLIC_ACCESS }
         - { path: ^/api/allBooks, roles: PUBLIC_ACCESS, methods: [GET] }
@@ -45,7 +67,7 @@ security:
         - { path: ^/api/stripe/connect/return, roles: PUBLIC_ACCESS, methods: [GET] }
 
 
-
+        # Accès restreint (frontend)
         - { path: ^/api/me, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/orders, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/books, roles: IS_AUTHENTICATED_FULLY, methods: [POST, PUT] }
@@ -65,3 +87,7 @@ security:
         - { path: ^/api/stripe/connect/onboarding, roles: IS_AUTHENTICATED_FULLY, methods: [POST]}
 
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+
+        # Accès public (backend)
+        - { path: ^/ , roles: PUBLIC_ACCESS }
+        - { path: ^/test , roles: PUBLIC_ACCESS }

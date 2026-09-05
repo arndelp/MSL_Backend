@@ -75,6 +75,13 @@ doctrine:
                 dir: '%kernel.project_dir%/src/SellerPayments/Domain/Entity'
                 prefix: 'App\SellerPayments\Domain\Entity'
                 alias: SellerPayments
+            BackUsers:
+                is_bundle: false
+                type: attribute
+                dir: '%kernel.project_dir%/src/BackUsers/Domain/Entity'
+                prefix: 'App\BackUsers\Domain\Entity'
+                alias: BackUsers
+
            
         controller_resolver:
             auto_mapping: false

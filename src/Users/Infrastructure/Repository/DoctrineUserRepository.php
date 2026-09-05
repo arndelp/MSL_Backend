@@ -34,9 +34,8 @@ class DoctrineUserRepository extends ServiceEntityRepository implements UserRepo
         return $this->findOneBy(['email' => $email]);
     }
 
-    public function findOneByStripeAccount(
-        string $stripeAccountId
-    ): ?User {
+    public function findOneByStripeAccount( string $stripeAccountId ): ?User 
+    {
         return $this->findOneBy([
             'stripeConnectAccountId' => $stripeAccountId
         ]);

@@ -1,0 +1,25 @@
+@media (max-width: 1275px) { 
+  .tableauPoi {
+    display: none;
+    height: 5em; 
+  }
+
+  
+}
+
+td {    
+    line-height: 5em;
+   
+}
+
+th {
+    line-height: 5em;
+}
+
+.dropdown-item {
+    line-height: 4em;
+}
+
+#retour {
+  line-height: 10em;
+}

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Formulaire cachable</title>
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+</head>
+<body>
+
+     <div>
+            <img src="{{ asset('images/transparent-logo.svg') }}" alt="Logo" class="logo">
+        </div>
+
+        <div class="label-shortcut">
+            <h1>Cliquez ici pour accéder au site:</h1>
+        </div>
+
+        <div class="shortcut">
+            <a href="http://localhost:5173/" class="shortcut-link">www.monsalondulivre.fr</a>
+        </div>
+
+    <!-- Bouton flèche pour afficher/masquer le formulaire -->
+    <button class="toggle-button" id="toggleForm">▼</button>
+
+    <!-- Conteneur du formulaire -->
+    <div class="form-container" id="formContainer">
+        <div class="form-content">
+            <h2>Connexion</h2>
+            <form id="loginForm" method="post" name="login">
+                {% if error %}
+                    <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {% endif %}
+
+                {% if app.user %}
+                    <div class="mb-3">
+                        Vous êtes connecté en tant que {{ app.user.username }}, <a href="{{ path('app_logout') }}">Se déconnecter</a>
+                    </div>
+                {% endif %}
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" name="username" class="form-input" value="{{ last_username }}" name="username" autocomplete="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" name="password" id="inputPassword" class="form-input" autocomplete="current-password" required>
+                </div>
+                <input type="hidden" name="_csrf_token"
+                    value="{{ csrf_token('authenticate') }}"
+                >  
+                <button type="submit" class="form-button">Se connecter</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript pour gérer l'affichage/masquage
+        const toggleButton = document.getElementById('toggleForm');
+        const formContainer = document.getElementById('formContainer');
+
+        toggleButton.addEventListener('click', function() {
+            formContainer.classList.toggle('active');
+            this.textContent = formContainer.classList.contains('active') ? '▲' : '▼';
+        });
+    </script>
+</body>
+</html>

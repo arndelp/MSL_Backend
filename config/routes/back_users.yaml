@@ -1,0 +1,8 @@
+app_login:
+  path: /
+  controller: App\BackUsers\UI\Controller\SecurityController::login
+
+app_logout:
+  path: /logout
+  controller: App\BackUsers\UI\Controller\SecurityController::logout
+
