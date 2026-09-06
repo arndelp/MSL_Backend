@@ -45,3 +45,11 @@ api.books.author:
   controller: App\Books\UI\Controller\BookController::getAuthorNamesByUser
   methods: [GET]
 
+books.not.verified:
+  path: /notVerifiedBooks
+  controller: App\Books\UI\Controller\BookController::getNotVerifiedBooks
+  methods: [GET]
+  defaults:
+        _format: html
+  requirements:
+        _format: html|json

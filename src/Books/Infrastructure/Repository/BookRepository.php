@@ -38,6 +38,14 @@ class BookRepository extends ServiceEntityRepository implements BookRepositoryIn
         );
     }    
 
+    public function findNotVerified(): array
+    {
+        return $this->findBy(
+            ['isVerified' => false],
+            ['createdAt' => 'DESC']
+        );
+    }
+
     public function findPriceById(int $id): ?float
     {
         $book = $this->find($id);

@@ -1,8 +1,8 @@
 app_login:
-  path: /
-  controller: App\BackUsers\UI\Controller\SecurityController::login
+    path: /login
+    controller: App\BackUsers\UI\Controller\SecurityController::login
+    methods: [GET, POST]
 
 app_logout:
-  path: /logout
-  controller: App\BackUsers\UI\Controller\SecurityController::logout
-
+    path: /logout
+    methods: [GET, POST]

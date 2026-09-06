@@ -154,6 +154,10 @@ class Book
 
     #[ORM\Column(nullable: true)]
     #[Groups(['book:read'])]
+    private ?bool $isVerified = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['book:read'])]
     private ?string $cover = null;
 
     #[ORM\Column(type: 'json', nullable: true)]
@@ -254,6 +258,9 @@ class Book
     public function getThickness(): ?int { return $this->thickness; }
     public function setThickness(?int $thickness): static  { $this->thickness = $thickness; return $this;}
 
+    public function isVerified(): ?bool { return $this->isVerified; }
+    public function setIsVerified(?bool $isVerified): static { $this->isVerified = $isVerified; return $this; }
+    
     public function getCover(): ?string { return $this->cover; }
     public function setCover(?string $cover): static { $this->cover = $cover; return $this; } 
 

@@ -6,6 +6,7 @@ twig:
     paths:
         '%kernel.project_dir%/src/Contacts/UI/Templates': 'Contacts'
         '%kernel.project_dir%/src/BackUsers/UI/Templates': 'BackUser'
+        '%kernel.project_dir%/src/Books/UI/Templates': 'Books'
         
 when@test:
     twig:

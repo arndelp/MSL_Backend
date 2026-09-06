@@ -2,23 +2,29 @@
 
 namespace App\BackUsers\Application\UseCase;
 
-use App\BackUsers\Application\DTO\LoginResponseDTO;
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class Login
 {
-    public function __construct(        
-        private readonly AuthenticationUtils $authenticationUtils
+    public function __construct(
+        private TokenStorageInterface $tokenStorage
     ) {}
 
-    public function execute(): LoginResponseDTO
+    public function execute(string $email, array $roles): array
     {
-        $lastUsername = $this->authenticationUtils->getLastUsername();
-        $lastError = $this->authenticationUtils->getLastAuthenticationError();
+        $token = new UsernamePasswordToken(
+            $email, // On passe juste l'email comme identifiant
+            null,
+            'main',
+            $roles
+        );
 
+        $this->tokenStorage->setToken($token);
 
-      
-        return new LoginResponseDTO($lastUsername, $lastError);
+        return [
+            'email' => $email,
+            'error' => null,
+        ];
     }
 }

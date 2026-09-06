@@ -2,33 +2,28 @@
 
 namespace App\BackUsers\UI\Controller;
 
-use App\BackUsers\Application\UseCase\Login;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
-  
-    public function login(Login $loginUseCase): Response
+    public function login(AuthenticationUtils $authenticationUtils): Response
     {
-        // Si déjà connecté, redirection
         if ($this->getUser()) {
-            return $this->redirectToRoute('/'); // route d'accueil
+            return $this->redirectToRoute('books.not.verified');
         }
-          // Exécution du Use Case
-        $loginResponse = $loginUseCase->execute();
 
         return $this->render('@BackUser/login.html.twig', [
-            'last_username' => $loginResponse->email,
-            'error' => $loginResponse->error,
+            'last_username' => $authenticationUtils->getLastUsername(),
+            'error' => $authenticationUtils->getLastAuthenticationError(),
         ]);
     }
-    
+
     public function logout(): void
     {
-        throw new \LogicException('Logout is handled by Symfony firewall.');
+        throw new \LogicException('Will be intercepted by the logout listener.');
     }
-
-    
 }
 

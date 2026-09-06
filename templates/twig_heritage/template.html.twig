@@ -1,219 +1,260 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="" />
-        <meta name="author" content="" />
-        <title>
-            {% block title %} 
-                Mon salon du livre 
-            {% endblock %}
-        </title>
-        <link href="{{ asset('css/styles.css') }}" rel="stylesheet" />
-        <link href="{{ asset('css/filter.css') }}" rel="stylesheet" />   {# attention:: changer la syntaxe du html #}
-        <link href="{{ asset('css/poi.css') }}" rel="stylesheet" /> 
-        <script src="{{ asset('js/filter.js') }}" defer></script>
-        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous" defer></script>
-    </head>
-    
-      
-    <body>
-        <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-            <!-- Navbar Brand-->
-             
-            <a class="navbar-brand ps-3"><h1>Mon salon du livre</h1></a>
-            
-            <!-- Sidebar Toggle-->
-           <!-- Format mobile    -->
-            <ul class="navbar-nav me-auto d-lg-none ">
-            {% if is_granted('ROLE_ADMIN') %}
-                <li class="nav-item dropdown">
-                    
-                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-bars"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item " >Ajouter un concert</a>
-                        <a class="dropdown-item " >Gérer les concerts</a>
-                        <a class="dropdown-item " >Ajouter un POI</a>
-                        <a class="dropdown-item " >Gérer les POI</a>
-                        <a class="dropdown-item " >Ajouter un partenaire</a>
-                        <a class="dropdown-item" >Gérer les partenaires</a>
-                        <a class="dropdown-item" >Alertes</a>
-                        <a class="dropdown-item" >Message</a>
-                        <a class="dropdown-item" >Clients</a>
-                        
-                        
-                        
-                            
-                    </ul>
-                </li>                        
-            {% endif %}
-            </ul>
-            <!-- Navbar-->
-            {% if  is_granted('IS_AUTHENTICATED_FULLY')  %}
-            <ul class="navbar-nav ms-auto  ">
-                {# si l'utilisateur est authentifié #}
-                <li class="nav-item dropdown  ">
-                    
-                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                   
-                        <li><a class="dropdown-item" href="{{path('app_login')}}">{{ app.user.email }}</a></li>
-                        <li><a class="dropdown-item" href="{{path('app_logout')}}">Se déconnecter</a></li>
-                    
-            {% endif %}
-                       
-                        
-                    </ul>
-                </li>
-            </ul>
-            
-        </nav>
 
-        <!-- Format desktop-->
-            <!-- Sous section Formation -->
-        
-        <div id="layoutSidenav">
-            <div id="layoutSidenav_nav">
-            
-                <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
-                    <div class="sb-sidenav-menu">
-                        <div class="nav">  
-                                               
-                                                       {# ci-dessous:  lien href="{{ path('tab.users')}} où tab.users est le nom de la route dans le controller tabController #}
-                                                                                  
-                            {% if app.user %}
-                                <div class="sb-sidenav-footer">
-                                    <div class="small">Bonjour {{ app.user.email }}  </div>
-                                    
-                                </div>
-                            {% endif %}
-                            
-                             <!-- Sous section CRUD Table Concert  -->
-                            {% if is_granted('ROLE_ADMIN') %}
-                             <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayoutsConcert" aria-expanded="false" aria-controls="collapseLayouts">
-                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                Concerts
-                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                            </a>                          
-                            <div class="collapse" id="collapseLayoutsConcert" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                                <nav class="sb-sidenav-menu-nested nav">
-                                {# ci-dessous:  lien href="{{ path('tab.users')}} où tab.users est le nom de la route dans le controller tabController #}
-                                    <a class="nav-link" href="{{ path('concert.edit') }}">Ajouter</a>
-                                    <a class="nav-link" href="{{ path('concert.list.filtered') }}">Voir tout</a>                                 
-                                </nav>                                
-                            </div>
+<head>
 
-                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayoutsMarker" aria-expanded="false" aria-controls="collapseLayouts">
-                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                Markers
-                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                            </a>                          
-                            <div class="collapse" id="collapseLayoutsMarker" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                                <nav class="sb-sidenav-menu-nested nav">
-                                {# ci-dessous:  lien href="{{ path('tab.users')}} où tab.users est le nom de la route dans le controller tabController #}
-                                    <a class="nav-link" href="{{ path('marker.edit') }}">Ajouter</a>
-                                    <a class="nav-link" href="{{ path('marker.list.filtered') }}">Consulter/Gérer</a>                                 
-                                </nav>                                
-                            </div>
-   
-                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayoutsSponsor" aria-expanded="false" aria-controls="collapseLayouts">
-                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                Partenaires
-                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                            </a>  
-                            <div class="collapse" id="collapseLayoutsSponsor" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                                <nav class="sb-sidenav-menu-nested nav">
-                                {# ci-dessous:  lien href="{{ path('tab.users')}} où tab.users est le nom de la route dans le controller tabController #}
-                                    <a class="nav-link" href="{{ path('sponsor.edit') }}">Ajouter</a>
-                                    <a class="nav-link" href="{{ path('sponsor.list.filtered') }}">Gérer</a>                                 
-                                </nav>                                
-                            </div>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-                            <a class="nav-link" href="{{ path('alert.edit') }}">Alertes</a>
+    <title>
+        {% block title %} 
+            Mon salon du livre 
+        {% endblock %}
+    </title>
 
-                            <a class="nav-link" href="{{ path('contact.list.alls') }}">Messages</a>
+    <!-- Custom fonts for this template-->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
 
-                           <a class="nav-link" href="{{ path('customer.list.alls') }}">Clients</a>
+    <!-- Custom styles for this template-->
+    <link href="css/sb-admin-2.css" rel="stylesheet">
 
-                            
+</head>
 
-                            {%  endif  %} 
-                            
-                                               
-                            
-                             <!-- Section ADDONS -->
-                            
-                            
-                            
-                 
-                    
-                </nav>
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-secondary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/notVerifiedBooks">
+                <div class="sidebar-brand-icon ">
+                    <img src="{{ asset('images/transparent-logo.svg') }}" alt="Logo" class="logo" width="100" height="100">
+                </div>
+               
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+           
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Interface
             </div>
-            <div id="layoutSidenav_content">
-                <main>
-                    <div class="container-fluid px-4">
-                        {% block PageTitle %}
-                    {# titre à insérer #}
-                        {% endblock %}
-                       
-                        <div class="card mb-4">
-                            <div class="card-body">
 
-                                {# Afficher des messages flashBag  directement dans la base du template pour les avoir à toutes les pages #}
-                                {# Message type info #}
-                                {% for message in app.session.flashBag.get('info') %}
-                                    <div class="alert alert-info">      <!-- class bootstrap pour la forme et couleur des messages-->
-                                        {{ message }}
-                                    </div>
-                                {% endfor %}
+             <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="/notVerifiedBooks" >
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Accueil</span>
+                </a>
+                
+            </li>
 
-                                {# Message type success #}
-                                {% for message in app.session.flashBag.get('success') %}
-                                    <div class="alert alert-success">      <!-- class bootstrap pour la forme et couleur des messages-->
-                                        {{ message }}
-                                    </div>
-                                {% endfor %}
-
-                                {# Message type error #}
-                                {% for message in app.session.flashBag.get('error') %}
-                                    <div class="alert alert-danger">      <!-- class bootstrap pour la forme et couleur des messages-->
-                                        {{ message }}
-                                    </div>
-                                {% endfor %}
-
-                                 {# Message type warning #}
-                                {% for message in app.session.flashBag.get('warning') %}
-                                    <div class="alert alert-warning">      <!-- class bootstrap pour la forme et couleur des messages-->
-                                        {{ message }}
-                                    </div>
-                                {% endfor %}
-
-
-
-                                {% block body %}
-                            {# corp de page à insérer #}
-                                {% endblock %}
-                            </div>
-                        </div>
-                       
-                </main>
-                <footer class="py-4 bg-light mt-auto">
-                    <div class="container-fluid px-4">
-                        <div class="d-flex align-items-center justify-content-between small">
-                            <div class="text-muted">Copyright &copy; Live Events 2025</div>
-                            <div>
-                                <a href="#">Privacy Policy</a>
-                                &middot;
-                                <a href="#">Terms &amp; Conditions</a>
-                            </div>
-                        </div>
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
+                    aria-expanded="true" aria-controls="collapseTwo">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>SellerPayments</span>
+                </a>
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">                        
+                        <a class="collapse-item" href="buttons.html">Gérer</a>                        
                     </div>
-                </footer>
+                </div>
+            </li>
+
+            <!-- Nav Item - Utilities Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
+                    aria-expanded="true" aria-controls="collapseUtilities">
+                    <i class="fas fa-fw fa-wrench"></i>
+                    <span>Livres</span>
+                </a>
+                <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
+                    data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        
+                        <a class="collapse-item" href="/notVerifiedBooks">A valider</a>
+                        <a class="collapse-item" href="#">Gérer</a>
+                       
+                    </div>
+                </div>
+            </li>
+
+
+            
+
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+
+        </ul>
+        <!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i ><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 20 20" stroke="currentColor"> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7"  /> </svg></i>
+                    </button>
+
+                    <!-- Topbar  -->
+                    
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">                      
+
+                        <div class="topbar-divider d-none d-sm-block"></div>
+
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ app.user.firstname }}</span>
+                                <img class="img-profile rounded-circle"
+                                    src="img/undraw_profile.svg">
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="userDropdown">
+                                
+                                
+                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Se déconnecter
+                                </a>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </nav>
+                <!-- End of Topbar -->
+
+
+                <!-- Begin Page Content -->
+                <main>
+                    <div class="container-fluid">
+
+                        {# Afficher des messages flashBag  directement dans la base du template pour les avoir à toutes les pages #}
+                                    {# Message type info #}
+                                    {% for message in app.session.flashBag.get('info') %}
+                                        <div class="alert alert-info">      <!-- class bootstrap pour la forme et couleur des messages-->
+                                            {{ message }}
+                                        </div>
+                                    {% endfor %}
+
+                                    {# Message type success #}
+                                    {% for message in app.session.flashBag.get('success') %}
+                                        <div class="alert alert-success">      <!-- class bootstrap pour la forme et couleur des messages-->
+                                            {{ message }}
+                                        </div>
+                                    {% endfor %}
+
+                                    {# Message type error #}
+                                    {% for message in app.session.flashBag.get('error') %}
+                                        <div class="alert alert-danger">      <!-- class bootstrap pour la forme et couleur des messages-->
+                                            {{ message }}
+                                        </div>
+                                    {% endfor %}
+
+                                    {# Message type warning #}
+                                    {% for message in app.session.flashBag.get('warning') %}
+                                        <div class="alert alert-warning">      <!-- class bootstrap pour la forme et couleur des messages-->
+                                            {{ message }}
+                                        </div>
+                                    {% endfor %}
+
+
+
+                                    {% block body %}
+                                {# corp de page à insérer #}
+                                    {% endblock %}
+
+                    </div>
+                </main>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; Mon salon du livre 2026</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Es-tu sûr de vouloir te déconnecter ?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+               
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
+                    <a class="btn btn-primary" href="/logout">Se déconnecter</a>
+                </div>
             </div>
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script> {# attention:: changer la syntaxe du html #}
-       
-    </body>
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="js/sb-admin-2.min.js"></script>
+
+</body>
+
 </html>

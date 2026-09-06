@@ -1,0 +1,30 @@
+{# Fichier de template pour afficher les livres non vérifiés #}
+
+{% extends 'twig_heritage/template.html.twig'  %}
+
+
+{# Définition du bloc title #}
+{% block title %}Livres non vérifiés{% endblock %}
+
+{# Définition du bloc content #}
+{% block body %}
+    <h1>Livres non vérifiés</h1>
+    <div class="row">        
+        {% for book in books%}
+            <div class="card"  style="width: 13rem; margin: 1rem; margin-bottom: 1rem; "  >
+                <div class="card-body">                    
+                    <img src="{{ asset('uploads/covers/' ~ book.cover) }}" style="  width:10rem; height:14rem; align-self: center; justify-content: center; " alt="Couverture du livre {{ book.title }}" onerror="this.src='{{ asset('images/no-image.svg') }}'" class="card-img-top">               
+                    <h5 class="card-title"  >{{ book.title }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ book.authorName }} </h6>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ book.price }} </h6>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ book.format }} </h6>
+                                    
+                </div >
+            </div>        
+        {% endfor %}
+    </div>
+
+   
+
+   
+{% endblock %}

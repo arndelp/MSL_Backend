@@ -21,6 +21,7 @@ use App\Books\Application\UseCase\ToBeUnavailable;
 use App\Books\Application\UseCase\ToChangeStock;
 use App\Books\Application\UseCase\GetAuthorNameAvailable;
 use App\Books\Application\UseCase\GetAuthorNamesByUser;
+use App\Books\Application\UseCase\GetNotVerifiedBooks;
 
 final class BookController extends AbstractController
 {
@@ -29,7 +30,8 @@ final class BookController extends AbstractController
         private BookRepositoryInterface $bookRepository,
         private GetAllBooks $getAllBooks,
         private GetAuthorNameAvailable $getAuthorNameAvailable,
-        private GetAuthorNamesByUser $getAuthorNameByUser
+        private GetAuthorNamesByUser $getAuthorNameByUser,
+        private GetNotVerifiedBooks $getNotVerifiedBooks
     ) {}
 
     //UTILISATION DU PROCESSOR POUR ENREGISTRER UN LIVRE
@@ -185,6 +187,17 @@ final class BookController extends AbstractController
        
 
         return $this->json($authorNames, 200, [], ['groups' => 'authorNames:read']);
+    }
+
+    public function getNotVerifiedBooks(GetNotVerifiedBooks $getNotVerifiedBooks): Response
+    {
+        $books = $this->getNotVerifiedBooks->execute();
+
+        
+
+        return $this->render('@Books/not_verified_books.html.twig', [
+            'books' => $books,
+        ]);
     }
 }
 

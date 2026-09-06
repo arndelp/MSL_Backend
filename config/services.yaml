@@ -59,6 +59,8 @@ services:
     App\Payments\Domain\Repository\SellerPaymentRepositoryInterface:
         alias: App\Payments\Infrastructure\Repository\SellerPaymentRepository
 
+    App\BackUsers\Domain\Repository\BackUserRepositoryInterface:
+        alias: App\BackUsers\Infrastructure\Repository\BackUserRepository
 
     App\Payments\Application\UseCase\CreateStripeSession:
         autowire: true

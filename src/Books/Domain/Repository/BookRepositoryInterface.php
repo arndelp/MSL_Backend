@@ -26,5 +26,7 @@ interface BookRepositoryInterface
     public function findAllAuthorNames(): array;
 
     public function findAuthorNamesByUser(User $user): array;
+
+    public function findNotVerified(): array;
     
 }

@@ -61,6 +61,8 @@ final class RecordBookByApi
 
             $book->setImages($dto->images ?? []);
 
+            $book->setIsVerified(false); // Marquer le livre comme non vérifié par défaut
+
            
 
             // Sauvegarder
