@@ -28,5 +28,9 @@ interface BookRepositoryInterface
     public function findAuthorNamesByUser(User $user): array;
 
     public function findNotVerified(): array;
+
+    public function findDeletedBooks(): array;
+
+    public function remove(Book $book): void;
     
 }

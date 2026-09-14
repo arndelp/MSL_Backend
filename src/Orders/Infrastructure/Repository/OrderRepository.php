@@ -37,13 +37,43 @@ class OrderRepository extends ServiceEntityRepository implements OrderRepository
     }
 
     public function findByStripeSessionId(string $stripeSessionId): ?Order
-{
-    return $this->createQueryBuilder('o')
-        ->andWhere('o.stripe_session_id = :sessionId')
-        ->setParameter('sessionId', $stripeSessionId)
-        ->getQuery()
-        ->getOneOrNullResult();
-}
+    {
+        return $this->createQueryBuilder('o')
+            ->andWhere('o.stripe_session_id = :sessionId')
+            ->setParameter('sessionId', $stripeSessionId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 
+    public function findPaginated(int $page,int $nbre): array
+    {
+        $query = $this -> createQueryBuilder('m');
+
+        $countQb = clone $query;               // on clone $query pour séparer le comptage des marker et la récupération des résultats
+        $total = (int) $countQb ->select('COUNT(m.id)')
+                                ->getQuery()
+                                ->getSingleScalarResult(); 
+        
+        // ----------- Pagination -----------
+        $query  ->orderBy('m.id', 'DESC')
+                ->setFirstResult(($page - 1) * $nbre)
+                ->setMaxResults($nbre);
+
+        $orders = $query->getQuery()->getResult() ?? []; //si pas de résultat on retourne un tableau vide
+
+        return [
+            'orders'   => $orders,
+            'total'     => $total,
+            'nbrePage'  => (int) ceil($total / $nbre),
+            'currentPage' => $page
+        ];
+    }
+
+    public function countAll(): int
+    {
+        return $this->count([]);
+    }
+
+   
    
 }

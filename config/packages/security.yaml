@@ -91,3 +91,6 @@ security:
         # Accès public (backend)
         - { path: ^/ , roles: PUBLIC_ACCESS }
         - { path: ^/test , roles: PUBLIC_ACCESS }
+
+        # Accès restreint (backend)
+        - { path: ^/admin, roles: ROLE_ADMIN, methods: [GET, POST, PUT, DELETE, PATCH] }

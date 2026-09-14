@@ -3,6 +3,19 @@ api.orders.post:
   controller: App\Orders\UI\Controller\OrderController::recordOrder
   methods: [POST]
 
+orders.list.alls:
+  path: /admin/order/alls/{page}/{nbre}
+  controller: App\Orders\UI\Controller\OrderController::indexAlls
+  defaults:
+      page: 1
+      nbre: 20
+  methods: [GET]
+
+orders.delete:
+  path: /admin/order/delete/{id}
+  controller: App\Orders\UI\Controller\deleteOrder
+  methods: [GET, DELETE]
+
 
 
 

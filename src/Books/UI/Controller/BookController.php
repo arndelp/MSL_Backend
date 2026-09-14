@@ -22,6 +22,11 @@ use App\Books\Application\UseCase\ToChangeStock;
 use App\Books\Application\UseCase\GetAuthorNameAvailable;
 use App\Books\Application\UseCase\GetAuthorNamesByUser;
 use App\Books\Application\UseCase\GetNotVerifiedBooks;
+use App\Books\Application\UseCase\GetBook;
+use App\Books\Application\UseCase\ToBeVerified;
+use App\Books\Application\UseCase\RejectBook;
+use App\Books\Application\UseCase\GetDeletedBooks;
+use App\Books\Application\UseCase\RemoveBook;
 
 final class BookController extends AbstractController
 {
@@ -31,8 +36,15 @@ final class BookController extends AbstractController
         private GetAllBooks $getAllBooks,
         private GetAuthorNameAvailable $getAuthorNameAvailable,
         private GetAuthorNamesByUser $getAuthorNameByUser,
-        private GetNotVerifiedBooks $getNotVerifiedBooks
+        private GetNotVerifiedBooks $getNotVerifiedBooks,
+        private GetBook $getBook,
+        private GetDeletedBooks $getDeletedBooks,
+        
     ) {}
+
+    /*
+    * Foonctions pour l'API (front-end))
+    */
 
     //UTILISATION DU PROCESSOR POUR ENREGISTRER UN LIVRE
 
@@ -189,6 +201,11 @@ final class BookController extends AbstractController
         return $this->json($authorNames, 200, [], ['groups' => 'authorNames:read']);
     }
 
+
+/* 
+* FONCTIONS POUR L'ADMINISTRATION (back-office) 
+*/
+   
     public function getNotVerifiedBooks(GetNotVerifiedBooks $getNotVerifiedBooks): Response
     {
         $books = $this->getNotVerifiedBooks->execute();
@@ -199,5 +216,85 @@ final class BookController extends AbstractController
             'books' => $books,
         ]);
     }
+
+    public function detailBookToBeVerified(GetBook $getBook, int $id): Response
+    {
+        $book = $getBook->execute($id);
+
+        if (!$book) {
+            $this->addFlash('error', "Le livre n'existe pas");
+            return $this->redirectToRoute('books.not.verified');
+        }
+
+        return $this->render('@Books/details.html.twig', [
+            'book' => $book,
+        ]);
+    }
+
+    public function toBeVerified(int $id, ToBeVerified $toBeVerified): Response
+    {
+        try {
+            $toBeVerified->execute($id);
+
+            $this->addFlash('success', 'Livre vérifié avec succès');
+            return $this->redirectToRoute('books.not.verified');
+
+        } catch (\InvalidArgumentException $e) {
+            $this->addFlash('error', $e->getMessage());
+            return $this->redirectToRoute('books.not.verified');
+
+        } catch (\Throwable $e) {
+            $this->addFlash('error', 'Vérification du livre impossible');
+            return $this->redirectToRoute('books.not.verified');
+        }
+    }
+
+    public function toBeRejected(int $id, RejectBook $rejectBook): Response
+    {
+        try {
+            $rejectBook->execute($id);
+
+            $this->addFlash('success', 'Livre rejeté avec succès');
+            return $this->redirectToRoute('books.not.verified');
+
+        } catch (\InvalidArgumentException $e) {
+            $this->addFlash('error', $e->getMessage());
+            return $this->redirectToRoute('books.not.verified');
+
+        } catch (\Throwable $e) {
+            $this->addFlash('error', 'Rejet du livre impossible');
+            return $this->redirectToRoute('books.not.verified');
+        }
+    }
+
+    public function getDeletedBooks(GetDeletedBooks $getDeletedBooks): Response
+    {
+        $books = $this->getDeletedBooks->execute();
+
+        return $this->render('@Books/deleted_books.html.twig', [
+            'books' => $books,
+        ]);
+    }
+
+    public function removeBook(int $id, RemoveBook $removeBook): Response
+    {
+        try {
+            $removeBook->execute($id);
+
+            $this->addFlash('success', 'Livre supprimé avec succès');
+            return $this->redirectToRoute('books.deleted');
+
+        } catch (\InvalidArgumentException $e) {
+            $this->addFlash('error', $e->getMessage());
+            return $this->redirectToRoute('books.deleted');
+
+        } catch (\Throwable $e) {
+            $this->addFlash('error', 'Suppression du livre impossible');
+            return $this->redirectToRoute('books.deleted');
+        }
+    }
+
+
+
 }
 

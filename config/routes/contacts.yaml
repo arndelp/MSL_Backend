@@ -2,3 +2,28 @@ api.contacts.post:
   path: /api/contact
   controller: App\Contacts\UI\Controller\ContactMessageController::record
   methods: [POST]
+
+contacts.list.alls:
+    path: /admin/contact/alls/{page}/{nbre}
+    controller: App\Contacts\UI\Controller\ContactController::indexAlls
+    defaults:
+        page: 1
+        nbre: 15    
+    methods: [GET]
+
+contacts.detail:
+  path: /admin/contact/{id}
+  controller: App\Contacts\UI\Controller\ContactController::detail
+  requirements:
+    id: '\d+'    #entier positif
+  methods: [GET]
+
+contacts.delete:
+  path: /admin/contact/delete/{id}
+  controller: App\Contacts\UI\Controller\ContactController::deleteContact
+  methods: [GET, DELETE]
+
+contacts.answer:
+  path: /admin/answer/{id}
+  controller: App\Contacts\UI\Controller\ContactController::answerContact
+  methods: [POST]

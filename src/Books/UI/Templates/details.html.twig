@@ -1,0 +1,47 @@
+{# Fichier: templates/books/detail.html.twig #}
+{% extends 'twig_heritage/template.html.twig' %}
+
+{% block title %}
+    {{ book.title }} - Détails
+{% endblock %}
+
+{% block body %}
+    
+        <div class="card" style="width: 100%;">
+            <div class="card-body">
+                <img src="{{ asset('uploads/covers/' ~ book.cover) }}" style="width:15rem;" alt="Couverture du livre {{ book.title }}" onerror="this.src='{{ asset('images/no-image.svg') }}'">
+                <h5 class="card-title">titre: {{ book.title }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">auteur: {{ book.authorName }}</h6>
+                <h6 class="card-subtitle mb-2 text-muted">prix: {{ book.price }}</h6>
+                <p class="card-text">format : {{ book.format.value }}</p>
+                <p class="card-text">nb de pages: {{ book.pageCount }}</p>
+                <p class="card-text">description: {{ book.description }}</p>
+                <p class="card-text">extrait: {{ book.extract }}</p>
+                <p class="card-text">categories:
+                    {% for category in book.categories %}
+                        {{ category.name }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </p>
+                <p class="card-text">images:
+                    {% for imageUrl in book.imageUrls %}
+                        <img src="{{ asset(imageUrl) }}" style="width:50px; margin-left: 1rem; margin-right: 1rem;" alt="Image du livre {{ book.title }}" onerror="this.src='{{ asset('images/no-image.svg') }}'">
+                    {% endfor %}
+                    
+                </p>
+                <div class="action-buttons" style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <form method="POST" action="{{ path('book.verify', {id: book.id}) }}">
+                        <button type="submit" class="btn btn-success">
+                            Difuser le livre
+                        </button>
+                    </form>
+                    
+                    <form method="POST" action="{{ path('book.reject', {id: book.id}) }}">
+                        <button type="submit" class="btn btn-danger">
+                            Rejeter le livre
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    
+{% endblock %}

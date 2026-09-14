@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Orders\Application\DTO\OrderDTO;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Users\Domain\Entity\User;
+use App\Orders\Application\UseCase\GetOrder;
+use App\Orders\Application\UseCase\DeleteOrder;
+use App\Orders\Application\UseCase\GetPaginatedOrder;
 
 final class OrderController extends AbstractController
 {
@@ -21,8 +24,6 @@ final class OrderController extends AbstractController
         RecordOrderByApi $recordOrderByApi,
     ): Response
     {
-        
-
         $user = $this->getUser();
 
             if (!$user instanceof User) {
@@ -85,5 +86,46 @@ final class OrderController extends AbstractController
             'success' => true,
             'url' => $result['url']
         ], 201);
+    }
+
+// BackOffice
+
+
+
+    public function indexAlls(
+        GetPaginatedOrder $getPaginatedOrder,
+        int $page,
+        int $nbre
+        ): Response
+    {
+        $result = $getPaginatedOrder->execute($page, $nbre);
+
+        return $this->render('@Orders/index.html.twig', [
+            'orders' => $result['orders'],
+            'isPaginated' => true,
+            'nbrePage' => $result['nbrePage'],
+            'page' => $result['currentPage'],
+            'nbre' => $nbre
+        ]);
+
+    }
+
+    public function deleteOrder(
+        DeleteOrder $deleteOrder,
+        GetOrder $getOrder,
+        int $id
+    ): Response {
+        $order = $getOrder->execute($id);
+
+        if ($order) {
+            $deleteOrder->execute($id);
+
+
+        $this->addFlash('success', "La commande a été supprimée avec succès");
+        } else {
+            $this->addFlash('error', "Commande inexistante");
+           
+        }
+        return $this->redirectToRoute('orders.list.alls');
     }
 }

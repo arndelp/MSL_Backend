@@ -33,15 +33,15 @@ class BookRepository extends ServiceEntityRepository implements BookRepositoryIn
     public function findAvailable(): array
     {
         return $this->findBy(
-            ['status' => 'available'],
-            ['title' => 'ASC']
+            ['status' => 'available', 'isVerified' => true],         
+            ['createdAt' => 'DESC']
         );
     }    
 
     public function findNotVerified(): array
     {
         return $this->findBy(
-            ['isVerified' => false],
+            ['status' => 'available','isVerified' => false],
             ['createdAt' => 'DESC']
         );
     }
@@ -69,6 +69,7 @@ class BookRepository extends ServiceEntityRepository implements BookRepositoryIn
             [
                 'user' => $user,
                 'status' => 'available',
+                'isVerified' => true,
             ],
             ['title' => 'ASC'],
         );
@@ -104,6 +105,21 @@ class BookRepository extends ServiceEntityRepository implements BookRepositoryIn
             ->orderBy('b.authorName', 'ASC');
 
         return $qb->getQuery()->getResult();
+    }
+
+    public function findDeletedBooks(): array
+    {
+        return $this->findBy(
+            ['status' => 'deleted'],
+            ['title' => 'ASC']
+        );
+    }
+
+    public function remove(Book $book): void
+    {
+        $em = $this->getEntityManager();
+        $em->remove($book);
+        $em->flush();
     }
 
    

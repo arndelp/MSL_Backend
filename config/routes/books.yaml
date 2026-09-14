@@ -46,10 +46,43 @@ api.books.author:
   methods: [GET]
 
 books.not.verified:
-  path: /notVerifiedBooks
+  path: /admin/notVerifiedBooks
   controller: App\Books\UI\Controller\BookController::getNotVerifiedBooks
   methods: [GET]
   defaults:
         _format: html
   requirements:
         _format: html|json
+
+book.detail:
+    path: /admin/notVerifiedBooks/{id}
+    controller: App\Books\UI\Controller\BookController::detailBookToBeVerified
+    methods: [GET]
+    defaults:
+        _format: html
+    requirements:
+        _format: html|json
+ 
+book.verify:
+    path: /admin/notVerifiedBooks/{id}/verify
+    controller: App\Books\UI\Controller\BookController::toBeVerified
+    methods: [POST, PATCH]
+
+book.reject:
+    path: /admin/notVerifiedBooks/{id}/reject
+    controller: App\Books\UI\Controller\BookController::toBeRejected
+    methods: [POST, PATCH]
+
+books.deleted:
+    path: /admin/deletedBooks
+    controller: App\Books\UI\Controller\BookController::getDeletedBooks
+    methods: [GET]
+    defaults:
+        _format: html
+    requirements:
+        _format: html|json
+
+book.remove:
+    path: /admin/deletedBooks/{id}/remove
+    controller: App\Books\UI\Controller\BookController::removeBook
+    methods: [POST]

@@ -7,6 +7,9 @@ twig:
         '%kernel.project_dir%/src/Contacts/UI/Templates': 'Contacts'
         '%kernel.project_dir%/src/BackUsers/UI/Templates': 'BackUser'
         '%kernel.project_dir%/src/Books/UI/Templates': 'Books'
+        '%kernel.project_dir%/src/Orders/UI/Templates': 'Orders'
+       
+        
         
 when@test:
     twig:

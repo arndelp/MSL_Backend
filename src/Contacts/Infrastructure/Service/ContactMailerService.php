@@ -35,4 +35,24 @@ class ContactMailerService implements ContactMailerServiceInterface
      
          $this->mailer->send($email);
     }
+
+    public function sendContactAnswer(string $from,string $to,  string $subject, string $content): void
+    {
+        $email = (new TemplatedEmail())
+            ->from($from)
+            ->to($to)            
+            ->subject($subject)
+            ->htmlTemplate('emails/answer_contact_message.html.twig')
+            ->context([
+                'subject' => $subject,
+                'content' => $content,
+                'to' => $to
+            ]);
+
+       
+     
+         $this->mailer->send($email);
+    }
+
+
 }

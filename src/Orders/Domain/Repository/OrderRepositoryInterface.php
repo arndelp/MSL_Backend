@@ -14,4 +14,7 @@ interface OrderRepositoryInterface
 
     public function findByStripeSessionId(string $stripeSessionId): ?Order;
    
+    public function findPaginated(int $page, int $nbre): array;
+    
+    public function countAll(): int;
 }

@@ -3,27 +3,36 @@
 
 
 {# Définition du bloc title #}
-{% block title %}Livres non vérifiés{% endblock %}
+{% block title %}Livres rejetés{% endblock %}
 
 {# Définition du bloc content #}
 {% block body %}
-    <h1>Livres non vérifiés</h1>
+    <h1>Livres rejetés</h1>
     <div class="row">        
         {% for book in books%}
+        <div class="deleteBooks" style="background-color: #ff2727; border: 1; margin: 1rem; padding-bottom: 1rem;">
             <form action="{{ path('book.detail', {id: book.id}) }}">
+                
                 <button type="submit" style="margin:1rem; border: none; background: none; padding: 0; cursor: pointer;" >
                     <div class="card hoverCard"  style="width: 13rem;  margin-bottom: 1rem; "  >
                         <div class="card-body">                    
-                            <img src="{{ asset('uploads/covers/' ~ book.cover) }}" style="  width:10rem; height:14rem; align-self: center; justify-content: center; " alt="Couverture du livre {{ book.title }}" onerror="this.src='{{ asset('images/no-image.svg') }}'" class="card-img-top">               
-                            <h5 class="card-title"  >{{ book.title }}</h5>
+                            <img src="{{ asset('uploads/covers/' ~ book.cover) }}" style="  width:auto; height:5rem; align-self: center; justify-content: center; " alt="Couverture du livre {{ book.title }}" onerror="this.src='{{ asset('images/no-image.svg') }}'" class="card-img-top">               
+                            <h6 class="card-title"  >{{ book.title }}</h6>
                             <h6 class="card-subtitle mb-2 text-muted">{{ book.authorName }} </h6>
                             <h6 class="card-subtitle mb-2 text-muted">{{ book.price }} </h6>
                             <h6 class="card-subtitle mb-2 text-muted">{{ book.format }} </h6>
                                         
                         </div >
                     </div>    
-                </button>
+                </button>              
+                
             </form>    
+            <form method="POST" action="{{ path('book.remove', {id: book.id}) }}">
+                    <button type="submit" class="btn btn-warning " style="margin-left: 1rem;">
+                        Supprimer définitivement
+                    </button>
+                </form>
+        </div>
         {% endfor %}
     </div>
 

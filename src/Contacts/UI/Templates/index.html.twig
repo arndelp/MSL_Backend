@@ -1,0 +1,130 @@
+{% extends 'twig_heritage/template.html.twig' %}
+
+{% block title %}Boite de réception{% endblock %}
+
+{% block body %}
+
+<h1>Boite de réception</h1>
+
+<div class="row">
+    <table class="table table-striped">
+
+        <thead>
+            <tr >
+                <th scope="col" class="tableauPoi">Date</th>
+                <th scope="col" class="tableauPoi">Expéditeur</th>
+                <th scope="col" class="tableauPoi">Objet</th>
+                <th scope="col" class="tableauPoi"></th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for contact in contacts %}
+
+            <tr class="{% if not contact.isRead %}font-weight-bold{% endif %}">
+
+                {# Date : clic vers le détail #}
+                <td>
+                    <a href="{{ path('contacts.detail', {id: contact.id}) }}"
+                       class="text-decoration-none text-dark">
+                        {{ contact.createdAt | date('d/m/Y H:i') }}
+                    </a>
+                </td>
+
+                {# Expéditeur : clic vers le détail #}
+                <td>
+                    <a href="{{ path('contacts.detail', {id: contact.id}) }}"
+                       class="text-decoration-none text-dark">
+                        {{ contact.user.email }}
+                    </a>
+                </td>
+
+                {# Objet : clic vers le détail #}
+                <td>
+                    <a href="{{ path('contacts.detail', {id: contact.id}) }}"
+                       class="text-decoration-none text-dark">
+                        {{ contact.subject }}
+                    </a>
+                </td>
+
+                {# Bouton supprimer #}
+                <td class="tableauPoi">
+                             
+                    <form action="{{ path('contacts.delete', {id: contact.id}) }}">
+                        <button type="submit"  class="btn  btn-sm card-link" ><svg xmlns="http://www.w3.org/2000/svg" height="20" width="17.5" viewBox="0 0 448 512"><!--!Font Awesome Free v7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path fill="rgb(238, 15, 15)" d="M136.7 5.9C141.1-7.2 153.3-16 167.1-16l113.9 0c13.8 0 26 8.8 30.4 21.9L320 32 416 32c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 96C14.3 96 0 81.7 0 64S14.3 32 32 32l96 0 8.7-26.1zM32 144l384 0 0 304c0 35.3-28.7 64-64 64L96 512c-35.3 0-64-28.7-64-64l0-304zm88 64c-13.3 0-24 10.7-24 24l0 192c0 13.3 10.7 24 24 24s24-10.7 24-24l0-192c0-13.3-10.7-24-24-24zm104 0c-13.3 0-24 10.7-24 24l0 192c0 13.3 10.7 24 24 24s24-10.7 24-24l0-192c0-13.3-10.7-24-24-24zm104 0c-13.3 0-24 10.7-24 24l0 192c0 13.3 10.7 24 24 24s24-10.7 24-24l0-192c0-13.3-10.7-24-24-24z"/></svg></button>
+                    </form>               
+                
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+{# Pagination #}
+{% if isPaginated and nbrePage > 1 %}
+
+    <div class="row mt-3 ml-1">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+
+                {# Bouton Précédent #}
+                {% if page > 1 %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="{{ path('contacts.list.alls', {
+                               page: page - 1,
+                               nbre: nbre
+                           }) }}">
+                            Précédent
+                        </a>
+                    </li>
+                {% endif %}
+
+
+                {# Numéros de pages #}
+                {% set start = max(page - 2, 1) %}
+                {% set end = min(page + 2, nbrePage) %}
+
+                {% for p in start..end %}
+
+                    <li class="page-item {{ p == page ? 'active' : '' }}">
+
+                        <a class="page-link"
+                           href="{{ path('contacts.list.alls', {
+                               page: p,
+                               nbre: nbre
+                           }) }}">
+                            {{ p }}
+                        </a>
+
+                    </li>
+
+                {% endfor %}
+
+
+                {# Bouton Suivant #}
+                {% if page < nbrePage %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="{{ path('contacts.list.alls', {
+                               page: page + 1,
+                               nbre: nbre
+                           }) }}">
+                            Suivant
+                        </a>
+                    </li>
+                {% endif %}
+
+            </ul>
+        </nav>
+    </div>
+
+{% endif %}
+
+    </div>
+{% endblock %}

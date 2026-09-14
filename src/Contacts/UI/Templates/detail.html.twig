@@ -1,0 +1,45 @@
+{% extends 'twig_heritage/template.html.twig'  %}
+
+{% block title %}
+    {{ contact.subject }}
+{% endblock %}
+
+{% block body %}
+   
+
+    <div class="card" style="width: 100%;">
+        <div class="card-body">               
+            
+            <h5 class="card-title">{{ contact.user.firstname }} {{ contact.user.lastname }}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">{{ contact.user.email }} </h6>
+            <h6 style="margin-top: 1em;">Objet: {{ contact.subject }}</h6>
+            <p class="card-text" style="margin-top: 2em;">{{ contact.content }}</p>
+            <div class='row ' style="margin-top: 3em; justify-content: flex-end">                
+                <form action="{{ path('contacts.delete', {id: contact.id}) }}">
+                    <button type="submit"  class="btn btn-danger btn-sm card-link" >Supprimer</button>
+                </form>                            
+            </div>               
+
+        <form method="post" action="{{ path('contacts.answer', {id: contact.id}) }}" style="margin-left: 2em;" >
+            <textarea 
+                name='message'  
+                id="message" 
+                style="margin-top: 2em; width: 100%; height: 100px; "
+                placeholder="Écrivez votre réponse..."></textarea>
+
+            <div class='row ' style="margin-top: 3em; justify-content: flex-end">                
+                <button type="submit" id="answer" class="btn btn-primary btn-sm card-link" >Répondre</button>                                        
+            </div> 
+        </form>
+
+                 {# Lien vers la liste des concerts #}
+            <div>
+                <a href="{{ path('contacts.list.alls') }}" class="card-link" id="retour" style="margin-top: 2em;">Retour</a>
+            </div>
+
+            
+               
+        </div>
+    </div>
+    
+{% endblock %}
