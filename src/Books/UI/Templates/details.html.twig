@@ -24,7 +24,7 @@
                 </p>
                 <p class="card-text">images:
                     {% for imageUrl in book.imageUrls %}
-                        <img src="{{ asset(imageUrl) }}" style="width:50px; margin-left: 1rem; margin-right: 1rem;" alt="Image du livre {{ book.title }}" onerror="this.src='{{ asset('images/no-image.svg') }}'">
+                        <img src="{{ asset(imageUrl) }}" style="width:200px; margin-left: 1rem; margin-right: 1rem;" alt="Image du livre {{ book.title }}" onerror="this.src='{{ asset('images/no-image.svg') }}'">
                     {% endfor %}
                     
                 </p>

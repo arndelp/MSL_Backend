@@ -153,19 +153,13 @@ class SellerPayment
 
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $estimated_shipping_date = null;
-
-    #[ORM\Column(nullable:true)]
-    private ?\DateTimeImmutable $authorized_at = null;
+    private ?\DateTimeImmutable $estimated_shipping_date = null;   
 
     #[ORM\Column(nullable:true)]
     private ?\DateTimeImmutable $captured_at = null;
 
     #[ORM\Column(nullable:true)]
-    private ?\DateTimeImmutable $cancelled_at = null;
-
-    #[ORM\Column(nullable:true)]
-    private ?\DateTimeImmutable $transferred_at = null;
+    private ?\DateTimeImmutable $cancelled_at = null;    
 
     #[ORM\Column(nullable:true)]
     private ?\DateTimeImmutable $fulfilled_at = null;
@@ -476,16 +470,7 @@ class SellerPayment
         return $this;
     }
 
-    public function getAuthorizedAt(): ?\DateTimeImmutable
-    {
-        return $this->authorized_at;
-    }
-
-    public function setAuthorizedAt(?\DateTimeImmutable $authorized_at): self
-    {
-        $this->authorized_at = $authorized_at;
-        return $this;
-    }
+   
 
     public function getCapturedAt(): ?\DateTimeImmutable
     {
@@ -508,17 +493,7 @@ class SellerPayment
         $this->cancelled_at = $cancelled_at;
         return $this;
     }
-
-    public function getTransferredAt(): ?\DateTimeImmutable
-    {
-        return $this->transferred_at;
-    }
-
-    public function setTransferredAt(?\DateTimeImmutable $transferred_at): self
-    {
-        $this->transferred_at = $transferred_at;
-        return $this;
-    }
+   
 
     public function getFulfilledAt(): ?\DateTimeImmutable
     {

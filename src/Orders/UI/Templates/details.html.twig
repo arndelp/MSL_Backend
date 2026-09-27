@@ -1,0 +1,141 @@
+{# Fichier: templates/orders/detail.html.twig #}
+{% extends 'twig_heritage/template.html.twig' %}
+
+{% block title %}
+    {{ order.orderNumber }} - Détails
+{% endblock %}
+
+{% block body %}
+            {# Retour vers les commandes #}
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb margin-top:1em; margin-bottom:1em; margin-left:1em">
+                <li class="breadcrumb-item"><a href="{{ path('orders.list.alls') }}">Commandes</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ order.orderNumber }}</li>
+                
+            </ol>
+        </nav>
+    
+        <div class="card" style="width: 100%;">
+            
+            <div class="card-body">
+                
+                <h1 class="card-title">{{ order.orderNumber }}</h1>
+                <div style="margin:1em">
+                    <p class="card-text"><span style="font-weight: bold">Status:</span> {{ order.status.value }}</p>
+                    <P class="card-text"><span style="font-weight: bold">Montant authorisé: </span>{{ order.totalAmount | centimes_to_euros }} {{ order.currency }}</h6>
+                    <p class="card-text"><span style="font-weight: bold">Stripe session ID:</span> {{ order.stripeSessionId }}</p>
+                    <p class="card-text"><span style="font-weight: bold">Stripe payment intent ID:</span> {{ order.stripePaymentIntentId }}</p>
+                    <p class="card-text"><span style="font-weight: bold">Date de création:</span> {{ order.createdAt | european_date }}</p>
+                    <p class="card-text"><span style="font-weight: bold">Dernière modification:</span> {{ order.updatedAt | european_date }}</p>
+                    <p class="card-text"><span style="font-weight: bold">Date de paiement:</span> 
+                        {% if order.paidAt == null %}
+                        non payé
+                        {%else %}
+                        {{ order.paidAt | european_date }}
+                        {%endif %}                
+                    </p>
+                </div>
+                <div style="border: 1px solid black; padding:1em; margin:1em;">
+                    <p class="card-text" style="font-weight: bold">Client</p>
+                    <p class="card-text"><span style="font-weight: bold">ID:</span> {{ order.userId.id }}</p>
+                    <p class="card-text">{{ order.userId.firstname }} {{ order.userId.lastname }} </p>
+                    <p class="card-text">{{ order.userId.email }}</p>
+                </div>
+                <div style="border: 1px solid black; padding:1em; margin:1em;">
+                    <p class="card-text" style="font-weight: bold">Addresse d'expédition </p>
+                    <p class="card-text"> {{ order.shippingFirstname }} {{ order.shippingLastname  }}</p>
+                    <p class="card-text"> {{ order.shippingAddressLine1  }}</p>
+                    {% if order.shippingAddressLine2 %}
+                        <p class="card-text"> {{ order.shippingAddressLine2  }}</p>
+                    {% endif  %}
+                    <p class="card-text"> {{ order.shippingPostalCode }}</p>
+                    <p class="card-text"> {{ order.shippingCity }} </p>
+                    <p class="card-text"> {{ order.shippingCountry }}</p>
+                    <p class="card-text"> {{ order.shippingPhoneNumber }}</p>
+                </div>
+                <div style="border: 1px solid black; padding:1em; margin:1em;">
+                    <p class="card-text" style="font-weight: bold">Paiement(s) vendeur </p>
+                    <div class="row">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr >
+                                    <th scope="col" class="tableauPoi">N° paiement</th>
+                                    <th scope="col" class="tableauPoi">Vendeur(se)</th>
+                                    <th scope="col" class="tableauPoi">Status</th>
+                                    <th scope="col" class="tableauPoi">Livraison</th>                                       
+                                </tr>
+                            </thead>
+                                {% for sellerPayment in order.sellerPayments %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ path('sellerPayments.details', {id: sellerPayment.id}) }}" class="text-decoration-none text-dark">
+                                            {{ sellerPayment.paymentNumber }}
+                                        </td>
+                                        <td>
+                                            <a href="{{ path('sellerPayments.details', {id: sellerPayment.id}) }}" class="text-decoration-none text-dark">
+                                            {{ sellerPayment.seller.firstname  }}{{ sellerPayment.seller.lastname  }}
+                                        </td>
+                                        <td>
+                                            <a href="{{ path('sellerPayments.details', {id: sellerPayment.id}) }}" class="text-decoration-none text-dark">
+                                            {{ sellerPayment.status.value }}
+                                        </td>
+                                        <td>
+                                            <a href="{{ path('sellerPayments.details', {id: sellerPayment.id}) }}" class="text-decoration-none text-dark">
+                                            {{ sellerPayment.shippingStatus.value }}
+                                        </td>
+
+                                    </tr>
+                                    
+                                {% endfor %}
+                            </div>
+                        </table>
+                    </div>
+                
+                </div>
+                    <!-- Bouton Acceptation / refus à droite -->
+                {% if order.status.value == 'PENDING_PAYMENT' %}
+                    <div class="row">
+                        <div class="col-md-12 f-flex flex-col">                            
+                            <div class="d-flex justify-content-end mt-1 mb-3">
+                                <button class="btn btn-danger" style="color:white; margin-top:1em; " id="refusVendeur" data-toggle="modal" data-target="#cancelModal">Annuler la commande</button>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                
+
+
+                     {# Retour vers les commandes #}
+            <div>
+                <a href="{{ path('orders.list.alls') }}" class="card-link" id="retour" >Retour vers Commandes</a>
+            </div>
+                
+            </div>
+            
+        </div>
+
+        <!-- Modal de confirmation pour l'annulation de commande -->
+
+            <div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="cancelModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="cancelModalLabel">Annuler la commande</h5>
+                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Êtes-vous sûr de vouloir annuler cette commande ?<br> Cette action annulera tout les sellerPayments associés.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Retour</button>
+                            <form  action="{{ path('orders.cancel', {id: order.id}) }}">
+                                <button class="btn btn-danger" type="submit" id="confirmCancel">Annuler la commande</button>
+                            </form> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+{% endblock %}

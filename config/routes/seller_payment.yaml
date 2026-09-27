@@ -33,6 +33,11 @@ api.seller.find.sellerPayment.shipped:
   controller: App\SellerPayments\UI\Controller\SellerPaymentController::FindSellerPaymentBySellerShipped
   methods: [GET]
 
+sellerPayments.details:
+  path: /admin/sellerPayment/{id}
+  controller: App\SellerPayments\UI\Controller\SellerPaymentController::details
+  methods: [GET]
+
 
 
 

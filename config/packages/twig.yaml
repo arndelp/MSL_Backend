@@ -8,8 +8,7 @@ twig:
         '%kernel.project_dir%/src/BackUsers/UI/Templates': 'BackUser'
         '%kernel.project_dir%/src/Books/UI/Templates': 'Books'
         '%kernel.project_dir%/src/Orders/UI/Templates': 'Orders'
-       
-        
+        '%kernel.project_dir%/src/SellerPayments/UI/Templates': 'SellerPayments'        
         
 when@test:
     twig:

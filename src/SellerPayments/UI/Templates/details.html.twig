@@ -1,0 +1,172 @@
+{% extends 'twig_heritage/template.html.twig' %}
+
+{% block title %}
+    {{ sellerPayment.paymentNumber }} - Détails
+{% endblock %}
+
+{% block body %}
+   
+
+    {# Fil d'ariane #}
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb margin-top:1em; margin-bottom:1em; margin-left:1em">
+                <li class="breadcrumb-item"><a href="{{ path('orders.list.alls') }}">Commandes</a></li>
+                <li class="breadcrumb-item"><a href="{{ path('orders.details', {id: sellerPayment.order.id}) }}">{{ sellerPayment.order.orderNumber }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ sellerPayment.paymentNumber }}</li>
+            </ol>
+        </nav>
+
+
+
+
+        <div class="card" style="width: 100%;">
+            <div class="card-body">              
+                <h1 class="card-title">{{ sellerPayment.paymentNumber }}</h1>
+                <div style="margin:1em">
+                    <p class="card-text"><span style="font-weight: bold">Date de création:</span> {{ sellerPayment.createdAt | european_date }}</p>
+                    <p class="card-text"><span style="font-weight: bold">Dernière modification:</span> {{ sellerPayment.updatedAt | european_date }}</p>
+                    <p class="card-text"><span style="font-weight: bold">Status:</span> {{ sellerPayment.status.value }}</p>                                      
+                    <p class="card-text"><span style="font-weight: bold">Montant total: </span>{{ sellerPayment.totalAmount|centimes_to_euros }} {{ sellerPayment.currency }}</h6>
+                    <p class="card-text"><span style="font-weight: bold">Montant vendeur:</span> {{ sellerPayment.sellerAmount|centimes_to_euros }} {{ sellerPayment.currency }}</p>
+                    <p class="card-text"><span style="font-weight: bold">Commission plateforme:</span> {{ sellerPayment.platformFee|centimes_to_euros }} {{ sellerPayment.currency }}</p>
+                    {% if sellerPayment.refundAmount  %}
+                        <p class="card-text"><span style="font-weight: bold; color: red">Montant remboursé:</span><span style="color: red"> {{ sellerPayment.refundAmount|centimes_to_euros }} {{ sellerPayment.currency }}</span></p>
+                    {% endif %}
+                    {% if sellerPayment.sellerConfirmedAt  %}
+                        <p class="card-text"><span style="font-weight: bold">Confirmation vendeur:</span> {{ sellerPayment.sellerConfirmedAt | european_date }}</p>
+                        {% if sellerPayment.stripeTransferId %}
+                            <p class="card-text"><span style="font-weight: bold">Status Paiement:</span> {{ sellerPayment.payoutStatus.value }}</p>                       
+                            <p class="card-text"><span style="font-weight: bold">Stripe Transfert ID:</span> {{ sellerPayment.stripeTransferId }}</p>                        
+                            <p class="card-text"><span style="font-weight: bold">Paiement vendeur:</span> {{ sellerPayment.paidToSellerAt | european_date }} </p>                           
+                        {% endif %}
+                    {% endif %}
+                    {% if sellerPayment.cancelledAt %}
+                        <p class="card-text"><span style="font-weight: bold">Annulation vendeur:</span> {{ sellerPayment.cancelledAt| european_date }}</p>
+                        <p class="card-text"><span style="font-weight: bold">Raison d'annulation:</span> {{ sellerPayment.cancellationReason.value }} </p>
+                    {% endif %}
+                    
+                </div>
+                <div style="border: 1px solid black; padding:1em; margin:1em;">
+                    <p class="card-text" style="font-weight: bold">Livraison</p>
+                    <p class="card-text"><span style="font-weight: bold">Status:</span> {{ sellerPayment.shippingStatus.value  }}</p>
+                    {% if not sellerPayment.carrierName is null %}
+                        <p class="card-text"><span style="font-weight: bold">Transporteur:</span> {{ sellerPayment.carrierName   }}</p>
+                        <p class="card-text"><span style="font-weight: bold">Service:</span> {{ sellerPayment.carrierService   }}</p>
+                        <p class="card-text"><span style="font-weight: bold">Tracking Number:</span> {{ sellerPayment.trackingNumber   }}</p>
+                        <p class="card-text"><span style="font-weight: bold">Shipping Label ID:</span> {{ sellerPayment.shippingLabelId   }}</p>
+                        <p class="card-text"><span style="font-weight: bold">Date d'envoi estimée:</span> {{ sellerPayment.estimatedShippingDate | european_date  }}</p>
+                        <p class="card-text"><span style="font-weight: bold">Date d'envoi:</span> {{ sellerPayment.shippedAt | european_date  }}</p>
+
+                    {% endif %}
+                </div>
+                <div style="border: 1px solid black; padding:1em; margin:1em;">
+                    <p class="card-text" style="font-weight: bold">Article(s) </p>
+                    <div class="row">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr >
+                                    <th scope="col" class="tableauPoi">Titre</th>
+                                    <th scope="col" class="tableauPoi">Quantité</th>
+                                    <th scope="col" class="tableauPoi">Format</th> 
+                                    <th scope="col" class="tableauPoi">Prix unitaire</th>
+                                                                          
+                                </tr>
+                            </thead>
+                                {% for orderItem in sellerPayment.order.orderItems  %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ path('orderItems.details', {id: orderItem.id}) }}" class="text-decoration-none text-dark">
+                                        {{ orderItem.bookTitle }}
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('orderItems.details', {id: orderItem.id}) }}" class="text-decoration-none text-dark">
+                                        {{ orderItem.quantity   }}
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('orderItems.details', {id: orderItem.id}) }}" class="text-decoration-none text-dark">
+                                        {{ orderItem.book.format.value }}
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('orderItems.details', {id: orderItem.id}) }}" class="text-decoration-none text-dark">
+                                        {{ orderItem.book.price|centimes_to_euros }} {{ orderItem.book.currency }}
+                                    </td>
+
+                                </tr>
+                                    
+                                {% endfor %}
+                            
+                        </table>
+                    </div>      
+                </div>
+
+                <!-- Bouton Acceptation / refus à droite -->
+                {% if sellerPayment.status.value == 'WAITING_SELLER_CONFIRMATION' %}
+                    <div class="row">
+                        <div class="col-md-12 f-flex flex-col">
+                            <div class="d-flex justify-content-end mt-2">
+                                <button class="btn btn-primary" id="acceptationVendeur" data-toggle="modal" data-target="#acceptModal">Acceptation vendeur</button>
+                            </div>
+                            <div class="d-flex justify-content-end mt-4">
+                                <button class="btn btn-danger" style="color:white; margin-top:1em; " id="refusVendeur" data-toggle="modal" data-target="#refuseModal">Refus vendeur</button>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div>
+            <a href="{{ path('orders.details', {id: sellerPayment.order.id}) }}" class="card-link" id="retour">Retour vers la commande globale</a>
+        </div>
+
+<!-- Modals-->
+
+<!-- Acceptation Modal -->
+<div class="modal fade" id="acceptModal" tabindex="-1" role="dialog" aria-labelledby="acceptModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="acceptModalLabel">Accepter le sellerPayment</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir accepter le sellerPayment? </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
+                <button class="btn btn-primary" type="button" id="confirmAccept">Accepter pour le vendeur</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Refus Modal -->
+<div class="modal fade" id="refuseModal" tabindex="-1" role="dialog" aria-labelledby="refuseModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="refuseModalLabel">Refuser le sellerPayment</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir refuser le sellerPayment? </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Retour</button>
+                <button class="btn btn-danger" type="button" id="confirmRefund">Refuser pour le vendeur</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+{% endblock %}

@@ -37,13 +37,52 @@ class CategoryRepository extends ServiceEntityRepository implements CategoryRepo
     }
 
     public function findByIds(array $ids): array 
-{
-    return $this->createQueryBuilder('c')   // 'c' est l'alias pour la table Category
-        ->where('c.id IN (:ids)')           // Filtre les catégories dont l'ID est dans le tableau $ids
-        ->setParameter('ids', $ids)         // Associe le paramètre :ids au tableau $ids
-        ->getQuery()                        // Exécute la requête
-        ->getResult();                      // Retourne un tableau d'objets Category correspondant aux IDs fournis
-}
+    {
+        return $this->createQueryBuilder('c')   // 'c' est l'alias pour la table Category
+            ->where('c.id IN (:ids)')           // Filtre les catégories dont l'ID est dans le tableau $ids
+            ->setParameter('ids', $ids)         // Associe le paramètre :ids au tableau $ids
+            ->getQuery()                        // Exécute la requête
+            ->getResult();                      // Retourne un tableau d'objets Category correspondant aux IDs fournis
+    }
+
+
+
+    public function findAllCategoriesWithBookCount(): array
+    {
+        return $this->createQueryBuilder('c')
+
+            // Ce que je veux récupérer
+            ->select('c.id')
+            ->addSelect('c.name')
+            ->addSelect('parent.id AS parentId')
+            ->addSelect('COUNT(b.id) AS bookCount')
+
+            // Récupérer le parent de la catégorie
+            ->leftJoin('c.parent', 'parent')
+
+            // Récupérer les livres de la catégorie
+            ->leftJoin(
+                'c.books',
+                'b',
+                'WITH',
+                'b.status = :status AND b.isVerified = :verified'
+            )
+
+            ->setParameter('status', 'available')
+            ->setParameter('verified', true)
+
+            // Comme on utilise COUNT(), on groupe
+            ->groupBy('c.id')
+            ->addGroupBy('c.name')
+            ->addGroupBy('parent.id')
+
+            ->orderBy('c.position', 'ASC')
+            ->addOrderBy('c.name', 'ASC')
+            
+
+            ->getQuery()
+            ->getArrayResult();
+    }
 
 
 

@@ -2,6 +2,7 @@
 
 namespace App\Books\Application\UseCase;
 
+use App\Books\Application\DTO\BookFilterDTO;
 use App\Books\Domain\Repository\BookRepositoryInterface;
 use Throwable;
 
@@ -11,16 +12,20 @@ class GetAllBooks
         private readonly BookRepositoryInterface $bookRepository
     ) {}
 
-    public function execute(): array
+    public function execute(BookFilterDTO $filter, int $page = 1): array
     {
         try {
-            $books = $this->bookRepository->findAvailable();
+            $result = $this->bookRepository->findByFilters(
+                $filter,
+                $page,
+                3
+            );
 
-            return array_map(fn ($book) => [
+            $books = array_map(fn ($book) => [
                 'id' => $book->getId(),
                 'title' => $book->getTitle(),
                 'authorName' => $book->getAuthorName(),
-                'price' => $book->getPrice(),                
+                'price' => $book->getPrice(),
                 'format' => $book->getFormat()?->value,
                 'coverUrl' => $book->getCoverUrl(),
                 'categories' => array_map(
@@ -29,13 +34,21 @@ class GetAllBooks
                         'name' => $cat->getName(),
                     ],
                     $book->getCategories()->toArray()
-                ),               
+                ),
                 'quantityAvailable' => $book->getQuantityAvailable(),
+            ], $result['books']);
 
-            ], $books);
+            return [
+                'books' => $books,
+                'total' => $result['total'],
+                'nbrePage' => $result['nbrePage'],
+                'currentPage' => $result['currentPage'],
+            ];
+
         } catch (Throwable $e) {
-            // Log the error or handle it as needed
-            throw new \RuntimeException('Aucun livre trouvé: ' . $e->getMessage());   
+            throw new \RuntimeException(
+                'Aucun livre trouvé: ' . $e->getMessage()
+            );
         }
     }
 }

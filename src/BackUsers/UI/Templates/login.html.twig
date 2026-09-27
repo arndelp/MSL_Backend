@@ -62,7 +62,13 @@ const formContainer = document.getElementById('formContainer');
 toggleButton.addEventListener('click', function() {
     formContainer.classList.toggle('active');
     this.textContent = formContainer.classList.contains('active') ? '▲' : '▼';
+
+     // Faire défiler jusqu'au formulaire lorsqu'il est activé
+    if (formContainer.classList.contains('active')) {
+        formContainer.scrollIntoView({ behavior: 'smooth' });
+    }
 });
+
 </script>
 </body>
 </html>

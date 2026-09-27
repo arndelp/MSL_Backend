@@ -1,0 +1,118 @@
+{# héritage du template de base #}
+{% extends 'twig_heritage/template.html.twig' %}
+
+{% block title %}Liste des livres de monsalondulivre.fr{% endblock %}
+
+{% block body %}   
+
+    <h1>Liste des livres de monsalondulivre.fr</h1>
+
+    <a href="#" id="openBtn" class="filter-toggle" >
+        <p>Filtres +</p>
+    </a>
+    <a href="#" id="closeBtn" class="filter-toggle" style="display: none;">
+        <p>Filtres -</p>
+    </a>
+
+    {#Affichage du filtre#}
+    <div id="filter" style=" margin-bottom: 2em; ">
+
+        {% if filterForm is defined %}
+            {{ form_start(filterForm, {'method': 'GET'}) }}
+                <div class="mb-3">
+                    {{ form_row(filterForm.status) }}             
+                
+                    {{ form_row(filterForm.authorName) }}
+                   
+                </div>   
+                        
+                <button type="submit" class="btn btn-primary">Filtrer</button>
+            {{ form_end(filterForm) }}
+        {% endif %}        
+    </div>
+
+    {#Affichage des livres#}
+    <div class="row">        
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col" >Titre</th>
+                    <th scope="col" >Auteur</th>
+                    <th scope="col" >Format</th>
+                    <th scope="col" >Status</th>
+                </tr>
+            </thead>
+            <tbody>
+        {% for book in books %} 
+           <tr>
+                <td >
+                    <a href="{{ path('books.list.details', {id: book.id}) }}"
+                        class="text-decoration-none text-dark">
+                        {{ book.title }}
+                    </a>
+                </td>
+                <td >
+                   <a href="{{ path('books.list.details', {id: book.id}) }}"
+                        class="text-decoration-none text-dark">
+                   {{ book.authorName }}
+                   </a>
+                </td>
+                <td >
+                    <a href="{{ path('books.list.details', {id: book.id}) }}"
+                            class="text-decoration-none text-dark">
+                    {{ book.format.value }}
+                    </a>
+                </td>
+                <td >
+                    <a href="{{ path('books.list.details', {id: book.id}) }}"
+                            class="text-decoration-none text-dark">
+                    {{ book.status }}
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        
+        </table>
+    </div>
+
+    {% if isPaginated and nbrePage > 1 %}
+    
+        <div class="row mt-3">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">             
+                    {#récupération des paramètres GET passés dans l'URL et les transformer sous forme de tableau associatif avec la méthode .all()#}
+                    {% set queryParams = app.request.query.all() %}
+
+                    {# Bouton Précédent #}
+                    {% if page > 1 %}
+                        {% set prevParams = queryParams | merge({'page': page - 1, 'nbre': nbre}) %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ path('books.filtered', prevParams) }}">Précédent</a>
+                        </li>
+                    {% endif %}
+
+                    {# Pages #}
+
+                    {% set start = max(page - 1, 1) %}
+                    {% set end = min(page + 1, nbrePage) %}
+
+                    {% for p in range(start, end) %}
+                        {% set pageParams = queryParams | merge({'page': p, 'nbre': nbre}) %}
+                        <li class="page-item {{ p == page ? 'active' : '' }}">
+                            <a class="page-link" href="{{ path('books.filtered', pageParams) }}">{{ p }}</a>
+                        </li>
+                    {% endfor %}
+
+                    {# Bouton Suivant #}
+                    {% if page < nbrePage %}
+                        {% set nextParams = queryParams | merge({'page': page + 1, 'nbre': nbre}) %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ path('books.filtered', nextParams) }}">Suivant</a>
+                        </li>
+                    {% endif %}          
+                    
+                </ul>
+            </nav>
+        </div>
+    {% endif %}
+{% endblock %}

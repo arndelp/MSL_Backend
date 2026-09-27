@@ -5,6 +5,7 @@ namespace App\SellerPayments\Application\UseCase;
 use App\SellerPayments\Domain\Repository\SellerPaymentRepositoryInterface;
 use App\Enum\SellerPaymentStatus;
 use App\Enum\OrderItemStatus;
+use App\Enum\OrderStatus;
 use App\Orders\Domain\Service\OrderNotificationMailerInterface;
 use App\Payments\Application\UseCase\FinalizeOrderPayment;
 
@@ -17,10 +18,7 @@ final class AcceptSellerPayment
     ) {
     }
 
-    public function execute(
-        int $id,
-        string $confirmationToken
-    ): void {
+    public function execute( int $id, string $confirmationToken ): void {
 
         /*
          * Charger le SellerPayment
@@ -136,6 +134,10 @@ final class AcceptSellerPayment
                 'now',
                 new \DateTimeZone('Europe/Paris')
             )
+        );
+
+        $SP->getOrder()->setStatus(
+            OrderStatus::PARTIALLY_CONFIRMED
         );
 
         /*

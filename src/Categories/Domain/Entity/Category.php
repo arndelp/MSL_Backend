@@ -39,6 +39,10 @@ class Category
     #[Groups(['category:read'])]
     private ?self $parent = null;
 
+    #[ORM\Column]
+    #[Groups(['category:read'])]
+    private int $position = 0;
+
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class, cascade: ['persist'])]// une catégorie peut avoir plusieurs catégories enfants. MappedBy: 'parent' indique que la relation est définie par la propriété $parent de la même classe. cascade: ['persist'] permet de persister automatiquement les sous-catégories lorsque la catégorie parente est persistée
     #[Groups(['category:read'])]
     private Collection $children;
@@ -78,6 +82,18 @@ class Category
     public function setSlug(string $slug): static
     {
         $this->slug = $slug;
+        return $this;
+    }
+
+    public function getPosition(): int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(int $position): static
+    {
+        $this->position = $position;
+
         return $this;
     }
 

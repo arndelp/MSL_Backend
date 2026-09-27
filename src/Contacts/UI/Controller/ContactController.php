@@ -37,7 +37,7 @@ class ContactController extends AbstractController
     }
         
        
-    public function detail(GetContact $getContact, int $id ):Response          //initialisation à null
+    public function details(GetContact $getContact, int $id ):Response          //initialisation à null
     {       
 
         $contact = $getContact->execute($id); //Récupère le contact par son ID       
@@ -50,7 +50,7 @@ class ContactController extends AbstractController
         }
     //si l'id existe       
         
-        return $this->render('@Contacts/detail.html.twig', ['contact' => $contact]);     
+        return $this->render('@Contacts/details.html.twig', ['contact' => $contact]);     
         
     } 
 
@@ -72,33 +72,37 @@ class ContactController extends AbstractController
         return $this->redirectToRoute('contacts.list.alls');
     }
 
-    public function answerContact(GetContact $getContact, Request $request, int $id,  SendMailAnswer $sendMail): Response
+    public function answerContact(GetContact $getContact, Request $request, int $id, SendMailAnswer $sendMail): Response
     {
         $contact = $getContact->execute($id);
 
-         // Si le message existe, on le supprime, sinon message inexistant
-        if ($contact) {
-            // Récupération du contenu du textarea
-            $message = $request->request->get('message');
-            $email = $contact -> getUser() -> getEmail();
-            $subject = $contact -> getSubject();
+        // Récupération du contenu du textarea
+        $message = $request->request->get('message');
 
-            //Récupération de l'id et envoi au useCase de suppression
+        // Vérification du message en premier
+        if (empty($message)) {
+            $this->addFlash('error', "Message inexistant");
+            return $this->redirectToRoute('contacts.list.alls');
+        }
+
+        // Si le contact existe, on envoie le message
+        if ($contact) {
+            $email = $contact->getUser()->getEmail();
+            $subject = $contact->getSubject();
+
             $sendMail->execute(
-                    from: 'Monsalondulivre.fr <automated@monsalondulivre.fr>',   
-                    to: $email,
-                    subject: $subject,
-                    content: $message
-                );
+                from: 'Monsalondulivre.fr <automated@monsalondulivre.fr>',
+                to: $email,
+                subject: $subject,
+                content: $message
+            );
 
             $this->addFlash('success', "Le message a été envoyé");
         } else {
-            $this->addFlash('error', "Message inexistant");
-           
+            $this->addFlash('error', "Contact inexistant");
         }
-        return $this->redirectToRoute('contacts.list.alls');
 
-       
+        return $this->redirectToRoute('contacts.list.alls');
     }
 
 }

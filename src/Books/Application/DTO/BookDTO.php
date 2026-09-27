@@ -18,12 +18,10 @@ final class BookDTO
     #[Assert\Length(max: 100)]
     public ?string $authorName = null;    
     
-    #[Assert\PositiveOrZero(message: 'Le prix doit être positif ou nul.')]
-    #[Assert\Type(type: 'numeric', message: 'Le prix doit être un nombre.')]
-    #[Assert\Regex(pattern: '/^\d+(\.\d{1,2})?$/', message: 'Le prix doit être un nombre avec au maximum deux décimales.')]
+    #[Assert\Type(type: 'numeric', message: 'Le prix doit être un nombre.')]    
     #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
-    #[Assert\Range(min: 0, max: 999999.99, notInRangeMessage: 'Le prix doit être compris entre {{ min }} et {{ max }}.')]
-    public ?float $price = null;
+    #[Assert\Range(min: 1, max: 99999, notInRangeMessage: 'Le prix doit être compris entre 1,00 EUR et 999,00 EUR.')]
+    public ?int $price = null;
 
     #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
     public ?int $quantity = null;
@@ -32,7 +30,12 @@ final class BookDTO
     public ?string $format = null;
 
     #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
-    #[Assert\Length(max: 5)]
+    #[Assert\Type(type: 'integer', message: 'Le poids doit être un nombre entier.')]
+    #[Assert\Range(
+    min: 1,
+    max: 30000,
+    notInRangeMessage: 'Le poids doit être compris entre {{ min }} et {{ max }} g.'
+)]
     public ?int $weight = null;
 
     #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]

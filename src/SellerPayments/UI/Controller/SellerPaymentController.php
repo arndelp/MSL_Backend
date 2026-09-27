@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use App\SellerPayments\Application\UseCase\GetSellerPayment;
 
 final class SellerPaymentController extends AbstractController
 {
@@ -18,7 +20,8 @@ final class SellerPaymentController extends AbstractController
         private Security $security,
         private FindSPBySellerAndStatusShipped $findSPByStatusandSellerShipped,
         private FindSPBySellerAndStatusConfirmed $findSPByStatusandSellerConfirmed,
-        private FindSPBySellerAndStatusWaitingConfirmation $findSPByStatusandSellerWaitingConfirmation
+        private FindSPBySellerAndStatusWaitingConfirmation $findSPByStatusandSellerWaitingConfirmation,
+        private GetSellerPayment $getSellerPayment
     ) {}
 
     public function FindSellerPaymentBySellerWaitingConfirmation(): JsonResponse
@@ -86,5 +89,18 @@ final class SellerPaymentController extends AbstractController
         return new JsonResponse([
             'valid' => true
         ]);
+    }    
+
+    public function details(GetSellerPayment $getSellerPayment, int $id): Response
+    {
+        $sellerPayment = $getSellerPayment->execute($id);
+
+        if(!$sellerPayment) {
+            $this->addFlash(type: 'error', message: 'Aucun paiement vendeur trouvé');
+            return $this->redirectToRoute('orders.list.alls');
+        }
+
+        return $this->render('@SellerPayments/details.html.twig', ['sellerPayment' => $sellerPayment]);
     }
+    
 }

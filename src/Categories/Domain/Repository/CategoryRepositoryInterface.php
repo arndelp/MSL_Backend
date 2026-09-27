@@ -15,4 +15,6 @@ interface CategoryRepositoryInterface
     public function save(Category $entity, bool $flush = false): void;
 
     public function findByIds(array $ids): array;
+
+    public function findAllCategoriesWithBookCount(): array;
 }

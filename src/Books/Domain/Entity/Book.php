@@ -433,7 +433,43 @@ class Book
             $this->quantityReserved -= $quantity;
         }
 
-   
+        //récupérer le nombre de livre pour chaque catégorie
+        public function findCategoriesWithCount(): array
+        {
+            return $this->createQueryBuilder('b')
+                ->select('c.id AS categoryId')
+                ->addSelect('c.name AS categoryName')
+                ->addSelect('c.slug AS categorySlug')
+                ->addSelect('COUNT(b.id) AS count')
+                ->join('b.categories', 'c')
+                ->where('b.status = :status')
+                ->andWhere('b.isVerified = :verified')
+                ->setParameter('status', 'available')
+                ->setParameter('verified', true)
+                ->groupBy('c.id')
+                ->addGroupBy('c.name')
+                ->addGroupBy('c.slug')
+                ->orderBy('c.name', 'ASC')
+                ->getQuery()
+                ->getArrayResult();
+        }
+
+        //récupérer le nombre de livre pour chaque auteur
+        public function findAuthorNamesWithCount(): array
+        {
+            return $this->createQueryBuilder('b')
+                ->select('b.authorName AS authorName')
+                ->addSelect('COUNT(b.id) AS count')
+                ->where('b.status = :status')
+                ->andWhere('b.isVerified = :verified')
+                ->andWhere('b.authorName IS NOT NULL')
+                ->setParameter('status', 'available')
+                ->setParameter('verified', true)
+                ->groupBy('b.authorName')
+                ->orderBy('b.authorName', 'ASC')
+                ->getQuery()
+                ->getArrayResult();
+        }
   
 
 

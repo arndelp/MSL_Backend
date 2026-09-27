@@ -27,6 +27,14 @@ use App\Books\Application\UseCase\ToBeVerified;
 use App\Books\Application\UseCase\RejectBook;
 use App\Books\Application\UseCase\GetDeletedBooks;
 use App\Books\Application\UseCase\RemoveBook;
+use App\Books\Application\UseCase\GetFilteredBooks;
+use App\Books\Application\UseCase\GetDistinctFilterValues;
+use App\Books\Application\DTO\BookFilterDTO;
+use App\Books\UI\Form\BookFilteredType;
+
+
+
+
 
 final class BookController extends AbstractController
 {
@@ -39,6 +47,8 @@ final class BookController extends AbstractController
         private GetNotVerifiedBooks $getNotVerifiedBooks,
         private GetBook $getBook,
         private GetDeletedBooks $getDeletedBooks,
+        private GetFilteredBooks $getFilteredBooks,
+        private GetDistinctFilterValues $getDistinctFilterValues,        
         
     ) {}
 
@@ -48,12 +58,35 @@ final class BookController extends AbstractController
 
     //UTILISATION DU PROCESSOR POUR ENREGISTRER UN LIVRE
 
-    public function Alls(GetAllBooks $getAllBooks): JsonResponse
-    {
-        $books = $getAllBooks->execute();
-        return new JsonResponse($books);
-    }
+    public function Alls(
+    GetAllBooks $getAllBooks,
+    Request $request
+): JsonResponse {
 
+    $page = max(
+        1,
+        $request->query->getInt('page', 1)
+    );
+
+    $filter = new BookFilterDTO([
+        'status' => 'available',
+        'isVerified' => true,
+        'authorName' => $request->query->get('author'),
+        'category' => $request->query->get('category'),
+        'search' => $request->query->get('search'),
+    ]);
+
+    $books = $getAllBooks->execute(
+        $filter,
+        $page
+    );
+
+    return new JsonResponse($books);
+}
+
+   
+
+    //Récupérer les livres de l'auteur connecté
     public function getPersonnalBooks(GetPersonnalBooksByApi $getPersonnalBooksByApi): JsonResponse
     {
         $user = $this->security->getUser();
@@ -66,7 +99,7 @@ final class BookController extends AbstractController
 
         return new JsonResponse($data);
     }
- 
+    // rendre un livre supprimmé (status->deleted)
     public function delete(int $id, DeleteBook $deleteBook ): JsonResponse
     {
          $user = $this->security->getUser();
@@ -94,6 +127,7 @@ final class BookController extends AbstractController
         }
     }
 
+    //page dérails d'un livre
     public function detail(int $id): JsonResponse
     {
         $book = $this->bookRepository->findById($id);
@@ -123,6 +157,7 @@ final class BookController extends AbstractController
         ]);
     }
 
+    //Rendre un livre indisponible 
     public function toBeUnavailable(int $id, ToBeUnavailable $toBeUnavailable): JsonResponse
     {
          $user = $this->security->getUser();
@@ -150,6 +185,7 @@ final class BookController extends AbstractController
         }
     }
 
+    //Mettre à jour le stock d'un livre de l'auteur
     public function toUpdateStock(int $id, int $quantity, ToChangeStock $toChangeStock): JsonResponse
     {
         $user = $this->security->getUser();
@@ -158,8 +194,7 @@ final class BookController extends AbstractController
             return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
         }
 
-        try {
-            
+        try {            
             $toChangeStock->execute($id, $quantity);
 
             return new JsonResponse([
@@ -202,10 +237,15 @@ final class BookController extends AbstractController
     }
 
 
+
+
 /* 
 * FONCTIONS POUR L'ADMINISTRATION (back-office) 
 */
-   
+
+
+
+   //Récupérer les livres à vérifier
     public function getNotVerifiedBooks(GetNotVerifiedBooks $getNotVerifiedBooks): Response
     {
         $books = $this->getNotVerifiedBooks->execute();
@@ -217,6 +257,7 @@ final class BookController extends AbstractController
         ]);
     }
 
+    //Page de détails d'un livre à vérifier
     public function detailBookToBeVerified(GetBook $getBook, int $id): Response
     {
         $book = $getBook->execute($id);
@@ -231,6 +272,7 @@ final class BookController extends AbstractController
         ]);
     }
 
+    //Rendre un livre vérifié (diffusé)
     public function toBeVerified(int $id, ToBeVerified $toBeVerified): Response
     {
         try {
@@ -249,6 +291,7 @@ final class BookController extends AbstractController
         }
     }
 
+    //Rejeter un livre
     public function toBeRejected(int $id, RejectBook $rejectBook): Response
     {
         try {
@@ -267,6 +310,7 @@ final class BookController extends AbstractController
         }
     }
 
+    //Récupérer les livres au status "deleted"
     public function getDeletedBooks(GetDeletedBooks $getDeletedBooks): Response
     {
         $books = $this->getDeletedBooks->execute();
@@ -276,6 +320,7 @@ final class BookController extends AbstractController
         ]);
     }
 
+    //Supprimer un livre de la base de données
     public function removeBook(int $id, RemoveBook $removeBook): Response
     {
         try {
@@ -294,6 +339,57 @@ final class BookController extends AbstractController
         }
     }
 
+    //Récupérer les livres en fonction des filtres (avec pagination)
+    public function indexFiltered(Request $request): Response
+    {
+        // On récupère la page et la limite dans la query string
+        $page = $request->query->get('page', 1);
+        $limit = $request->query->get('limit', 10);
+
+        // Récupération des Valeurs distincts pour les filtres dynamiques
+        //on utitlise $this-> car la méthode est dans le constructeur et non en local
+        $distinctValues = $this->getDistinctFilterValues->execute();  
+
+       // Créer le DTO vide (sera rempli par le formulaire)
+        $filter = new BookFilterDTO();
+
+        //Créer le formulaire et le lier au DTO
+        $form = $this->createForm(BookFilteredType::class, $filter, [
+            'method' => 'GET',
+            'status' => $distinctValues['status'],  
+            'authorName' => $distinctValues['authorName'],          
+        ]);
+
+         //Remplir le DTO avec les valeurs GET si formulaire soumis
+        $form->handleRequest($request);
+
+        //Appel au useCaseFiltré
+        $result = $this->getFilteredBooks->execute($filter, $page, $limit);
+
+        //Rendu du template
+        return $this->render('@Books/index_filtered.html.twig', [
+            'books'         => $result['books'],
+            'isPaginated'      => true,
+            'nbrePage'         => $result['nbrePage'] ?? 1,
+            'page'             => $result['currentPage'] ?? 1,
+            'nbre'             => $limit,
+            'filterForm'       => $form->createView(),
+            'selectedStatus'   => $filter->status,       // pour Twig    
+            'selectedAuthorName' => $filter->authorName,         // pour Twig 
+        ]);
+    }
+
+    //Page de détails d'un livre
+    public function booksDetails(int $id): Response
+    {
+        $book = $this->getBook->execute($id);
+
+        return $this->render('@Books/details.list.html.twig', [
+            'book' => $book
+        ]);
+    }
+
+    
 
 
 }

@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Books\Domain\Repository\BookRepositoryInterface;
 use App\Users\Domain\Entity\User;
+use App\Books\Application\DTO\BookFilterDTO;
 /**
  * @extends ServiceEntityRepository<Book>
  */
@@ -30,13 +31,37 @@ class BookRepository extends ServiceEntityRepository implements BookRepositoryIn
         return $this->findBy([], ['title' => 'ASC']);
     }
 
-    public function findAvailable(): array
+    public function findAvailable(int $page = 1, int $limit = 20): array //On ne peut plus utiliser findBy car on a besoin de la pagination
     {
-        return $this->findBy(
-            ['status' => 'available', 'isVerified' => true],         
-            ['createdAt' => 'DESC']
-        );
-    }    
+        $query = $this->createQueryBuilder('b')
+            ->where('b.status = :status')
+            ->andWhere('b.isVerified = :verified')
+            ->setParameter('status', 'available')
+            ->setParameter('verified', true);
+
+        // Comptage total
+        $countQb = clone $query;
+
+        $total = (int) $countQb
+            ->select('COUNT(b.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        // Pagination
+        $books = $query
+            ->orderBy('b.createdAt', 'DESC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+
+        return [
+            'books' => $books,
+            'total' => $total,
+            'nbrePage' => (int) ceil($total / $limit),
+            'currentPage' => $page,
+        ];
+    }
 
     public function findNotVerified(): array
     {
@@ -122,6 +147,104 @@ class BookRepository extends ServiceEntityRepository implements BookRepositoryIn
         $em->flush();
     }
 
-   
+    public function findByFilters(BookFilterDTO $dto, int $page, int $limit): array
+    {
+        $query = $this->createQueryBuilder('m');
+
+        if ($dto->status) {
+            $query->andWhere('m.status = :status')
+                ->setParameter('status', $dto->status);
+        }
+
+        if ($dto->authorName) {
+            $query->andWhere('m.authorName = :authorName')
+                ->setParameter('authorName', $dto->authorName);
+        }
+
+        if ($dto->search) {
+            $query->andWhere(
+                'm.title LIKE :search OR m.authorName LIKE :search'
+            )
+            ->setParameter('search', '%' . $dto->search . '%');
+        }
+
+        if ($dto->category) {
+            $query->join('m.categories', 'c')
+                ->andWhere('c.id = :category')
+                ->setParameter('category', $dto->category);
+        }
+
+        if ($dto->isVerified !== null) {
+            $query->andWhere('m.isVerified = :verified')
+                ->setParameter('verified', $dto->isVerified);
+        }
+
+
+        // Comptage total avant pagination
+        $countQb = clone $query;
+
+        $total = (int) $countQb
+            ->select('COUNT(DISTINCT m.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        // Pagination
+        $query
+            ->orderBy('m.title', 'ASC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
+
+        $books = $query
+            ->getQuery()
+            ->getResult();
+
+        return [
+            'books' => $books,
+            'total' => $total,
+            'nbrePage' => (int) ceil($total / $limit),
+            'currentPage' => $page
+        ];
+    }
+
+    //récupération des statuss pour filtre dynamique
+    public function findDistinctStatus(): array
+    {
+        $qb = $this->createQueryBuilder('c') 
+            ->select('DISTINCT c.status')
+            ->orderBy('c.status', 'ASC');
+
+        $results = $qb->getQuery()->getArrayResult();
+
+        return array_map(fn($item) => $item['status'], $results);
+    }
+
+    public function findDistinctAuthorNames(): array
+    {
+        $qb = $this->createQueryBuilder('c')
+           ->select('DISTINCT c.authorName')
+           ->orderBy('c.authorName', 'ASC');
+
+        $results = $qb->getQuery()->getArrayResult();
+
+        return array_map(fn($item) => $item['authorName'], $results);
+    }   
     
+
+    public function findAuthorNamesWithBookCount(): array
+    {
+        return $this->createQueryBuilder('b')
+            ->select('b.authorName AS authorName')
+            ->addSelect('COUNT(b.id) AS count')
+            ->where('b.status = :status')
+            ->andWhere('b.isVerified = :verified')
+            ->andWhere('b.authorName IS NOT NULL')
+            ->setParameter('status', 'available')
+            ->setParameter('verified', true)
+            ->groupBy('b.authorName')
+            ->orderBy('b.authorName', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+    }
+
+
 }

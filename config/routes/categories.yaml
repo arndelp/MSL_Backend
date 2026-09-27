@@ -8,3 +8,8 @@ category.add:
   path: /api/categories/add
   controller: App\Categories\UI\Controller\CategoryController::add
   methods: [POST]
+
+category.authorname.bookcount:
+  path: /api/catwithbookcount
+  controller: App\Categories\UI\Controller\CategoryController::getBookFiltersWithCount
+  methods: [GET]

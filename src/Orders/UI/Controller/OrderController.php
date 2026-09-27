@@ -12,6 +12,7 @@ use App\Orders\Application\DTO\OrderDTO;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Users\Domain\Entity\User;
 use App\Orders\Application\UseCase\GetOrder;
+use App\Orders\Application\UseCase\GetOrderItem;
 use App\Orders\Application\UseCase\DeleteOrder;
 use App\Orders\Application\UseCase\GetPaginatedOrder;
 
@@ -128,4 +129,35 @@ final class OrderController extends AbstractController
         }
         return $this->redirectToRoute('orders.list.alls');
     }
+
+    public function details(GetOrder $getOrder, int $id): Response
+    {
+        $order = $getOrder->execute($id);
+
+         //si l'id n'existe pas
+        if(!$order){ 
+            //message flash
+            $this->addFlash(type: 'error', message: "Il n'y a pas de message"); 
+            return $this->redirectToRoute('orders.list.alls');      
+        }
+        //si l'id existe       
+        
+        return $this->render('@Orders/details.html.twig', ['order' => $order]);     
+    }
+
+    public function detailsOrderItem(GetOrderItem $getOrderItem, int $id): Response
+    {
+        $orderItem = $getOrderItem->execute($id);
+
+        //si l'id n'existe pas
+        if(!$orderItem){ 
+            //message flash
+            $this->addFlash(type: 'error', message: "orderItem introuvable"); 
+            return $this->redirectToRoute('orders.list.alls');      
+        }
+        //si l'id existe       
+
+        return $this->render('@Orders/orderItem.details.html.twig', ['orderItem' => $orderItem]);     
+    }
+        
 }

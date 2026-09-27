@@ -1,0 +1,122 @@
+{% extends 'twig_heritage/template.html.twig' %}
+
+{% block title %}
+    Détails
+{% endblock %}
+
+{% block body %}
+{# Fil d'ariane #}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb margin-top:1em; margin-bottom:1em; margin-left:1em">
+        <li class="breadcrumb-item"><a href="{{ path('orders.list.alls') }}">Commandes</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('orders.details', {id: orderItem.order.id}) }}">{{ orderItem.order.orderNumber }}</a></li>
+        <li class="breadcrumb-item "><a href="{{ path('sellerPayments.details', {id: orderItem.sellerPayment.id}) }}">{{ orderItem.sellerPayment.paymentNumber }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ orderItem.BookTitle }}</li>
+    </ol>
+</nav>
+<h1>Détails</h1>
+
+<div class="card" style="width: 100%;">
+    <div class="card-body">
+        <div class="d-flex flex-row flex-wrap justify-content-center">
+            <img src="{{ asset('uploads/covers/' ~ orderItem.book.cover) }}" style="width:250px; height:auto; margin-left:1em">
+        {% for img in orderItem.book.images %}
+            <div>
+                <img src="{{ asset('uploads/images/' ~ img) }}" style="width:200px; height:auto; margin-left:1em; margin-top:1em;">
+            </div>
+        {% endfor %}
+        </div>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <h5 class="card-title mt-4">Titre: {{ orderItem.bookTitle }}</h5>
+                    <h6 class="card-subtitle mb-2 mt-2 text-muted">Auteur(e): {{ orderItem.book.authorName }}</h6>
+                    <h6 class="card-subtitle mb-2 mt-2 text-muted">Format: {{ orderItem.book.format.value }}</h6>
+                    {% if not orderItem.book.isbn is null %}
+                        <h6 class="card-subtitle mb-2 mt-2 text-muted">ISBN: {{ orderItem.book.isbn }}</h6>
+                    {% endif %}
+                    <h6 class="card-subtitle mb-2 mt-2 text-muted">Prix unitaire: {{ orderItem.book.price|centimes_to_euros }} {{ orderItem.book.currency }}</h6>
+                    <h6 class="card-subtitle mb-2 mt-2 text-muted">Quantité: {{ orderItem.quantity }} article(s)</h6>
+                    <h6 class="card-subtitle mb-2 mt-2 text-muted">Poids unitaire (sans emballage): {{ orderItem.book.weight }} g</h6>
+
+                    <p class="card-text mb-2 mt-2">Description: {{ orderItem.book.description }}</p>
+                    <p class="card-text mb-2 mt-2">Extrait: {{ orderItem.book.extract }}</p>
+                </div>
+            </div>
+
+        <!-- Bouton de remboursement à droite -->
+        {% if orderItem.order.status.value == 'PAID' %}
+            <div class="row">
+                <div class="col-md-12 f-flex flex-col">
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-warning" id="gift" data-toggle="modal" data-target="#giftModal">Faire un geste commercial</button>
+                    </div>
+                    <div class="d-flex justify-content-end mt-4">
+                        <button class="btn btn-danger" style="color:white; margin-top:1em; " id="remboursement" data-toggle="modal" data-target="#refundModal">Rembourser cet article</button>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        </div>
+    </div>
+</div>
+
+<div>
+    <a href="{{ path('sellerPayments.details', {id: orderItem.sellerPayment.id}) }}" class="card-link" id="retour">Retour vers le SellerPayment</a>
+</div>
+
+<!-- Remboursement Modal -->
+<div class="modal fade" id="refundModal" tabindex="-1" role="dialog" aria-labelledby="refundModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="refundModalLabel">Confirmer le remboursement</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir rembourser cet article ? Cette action ne peut pas être annulée.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
+                <button class="btn btn-danger" type="button" id="confirmRefund">Confirmer le remboursement</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Geste commercial Modal -->
+<div class="modal fade" id="giftModal" tabindex="-1" role="dialog" aria-labelledby="giftModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="giftModalLabel">Geste commercial</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Indiquer la valeur du geste commercial:</p>
+                <div class="row justify-content-center">
+                    <input type="text" id="giftValue"/><span style="font-size: 2em">&nbsp;€</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
+                <button class="btn btn-warning" type="button" id="confirmRefund">Confirmer le geste commercial</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+{% endblock %}

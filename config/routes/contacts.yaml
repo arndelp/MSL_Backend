@@ -4,16 +4,16 @@ api.contacts.post:
   methods: [POST]
 
 contacts.list.alls:
-    path: /admin/contact/alls/{page}/{nbre}
-    controller: App\Contacts\UI\Controller\ContactController::indexAlls
-    defaults:
-        page: 1
-        nbre: 15    
-    methods: [GET]
+  path: /admin/contact/alls/{page}/{nbre}
+  controller: App\Contacts\UI\Controller\ContactController::indexAlls
+  defaults:
+      page: 1
+      nbre: 15    
+  methods: [GET]
 
-contacts.detail:
+contacts.details:
   path: /admin/contact/{id}
-  controller: App\Contacts\UI\Controller\ContactController::detail
+  controller: App\Contacts\UI\Controller\ContactController::details
   requirements:
     id: '\d+'    #entier positif
   methods: [GET]

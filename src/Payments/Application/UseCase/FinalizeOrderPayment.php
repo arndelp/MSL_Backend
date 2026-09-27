@@ -44,10 +44,13 @@ final class FinalizeOrderPayment
          */
         if (
             $order->getStatus() === OrderStatus::PAID ||
-            $order->getStatus() === OrderStatus::CANCELLED
-        ) {
+            $order->getStatus() === OrderStatus::CANCELLED            
+        ) {           
             return;
         }
+
+       
+            
 
         $paymentIntentId = $order->getStripePaymentIntentId();
 
@@ -109,6 +112,8 @@ final class FinalizeOrderPayment
             $amountToCapture
         );
 
+        $order->setAmountCaptured($amountToCapture);
+
         $order->setPaidAt(
             new \DateTimeImmutable(
                 'now',
@@ -133,12 +138,18 @@ final class FinalizeOrderPayment
          */
         foreach ($order->getSellerPayments() as $payment) {
 
-            if (
+            if (                
                 $payment->getStatus() ===
                 SellerPaymentStatus::CONFIRMED
             ) {
-                $this->paySeller->execute($payment);
-            }
+                $payment->setCapturedAt(
+                    new \DateTimeImmutable('Europe/Paris')
+                );
+
+                $this->paySeller->execute($payment);   
+                
+               
+            } 
         }
 
         $this->entityManager->flush();

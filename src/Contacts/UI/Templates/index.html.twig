@@ -26,15 +26,15 @@
 
                 {# Date : clic vers le détail #}
                 <td>
-                    <a href="{{ path('contacts.detail', {id: contact.id}) }}"
+                    <a href="{{ path('contacts.details', {id: contact.id}) }}"
                        class="text-decoration-none text-dark">
-                        {{ contact.createdAt | date('d/m/Y H:i') }}
+                        {{ contact.createdAt | european_date }}
                     </a>
                 </td>
 
                 {# Expéditeur : clic vers le détail #}
                 <td>
-                    <a href="{{ path('contacts.detail', {id: contact.id}) }}"
+                    <a href="{{ path('contacts.details', {id: contact.id}) }}"
                        class="text-decoration-none text-dark">
                         {{ contact.user.email }}
                     </a>
@@ -42,7 +42,7 @@
 
                 {# Objet : clic vers le détail #}
                 <td>
-                    <a href="{{ path('contacts.detail', {id: contact.id}) }}"
+                    <a href="{{ path('contacts.details', {id: contact.id}) }}"
                        class="text-decoration-none text-dark">
                         {{ contact.subject }}
                     </a>

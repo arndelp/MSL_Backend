@@ -20,6 +20,8 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,500,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
     <link href="{{ asset('css/sb-admin-2.css') }}" rel="stylesheet">
     <link href="{{ asset('css/detail.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/filter.css') }}" rel="stylesheet">
+    
 </head>
 
 <body id="page-top">
@@ -31,7 +33,7 @@
         <ul class="navbar-nav bg-gradient-secondary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/notVerifiedBooks">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ path('books.not.verified') }}">
                 <div class="sidebar-brand-icon ">
                     <img src="{{ asset('images/transparent-logo.svg') }}" alt="Logo" class="logo" width="100" height="100">
                 </div>
@@ -94,6 +96,7 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         
                         <a class="collapse-item" href="{{ path('books.not.verified') }}">A valider</a>
+                        <a class="collapse-item" href="{{ path('books.filtered') }}">Tout les livres</a>
                         <a class="collapse-item" href="{{ path('books.deleted') }}">Gérer les rejets</a>
                        
                     </div>
@@ -128,7 +131,7 @@
                         <i ><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 20 20" stroke="currentColor"> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7"  /> </svg></i>
                     </button>
 
-                    <!-- Topbar  -->
+                   
                     
 
                     <!-- Topbar Navbar -->
@@ -166,39 +169,39 @@
                     <div class="container-fluid">
 
                         {# Afficher des messages flashBag  directement dans la base du template pour les avoir à toutes les pages #}
-                                    {# Message type info #}
-                                    {% for message in app.session.flashBag.get('info') %}
-                                        <div class="alert alert-info">      <!-- class bootstrap pour la forme et couleur des messages-->
-                                            {{ message }}
-                                        </div>
-                                    {% endfor %}
+                        {# Message type info #}
+                        {% for message in app.session.flashBag.get('info') %}
+                            <div class="alert alert-info">      <!-- class bootstrap pour la forme et couleur des messages-->
+                                {{ message }}
+                            </div>
+                        {% endfor %}
 
-                                    {# Message type success #}
-                                    {% for message in app.session.flashBag.get('success') %}
-                                        <div class="alert alert-success">      <!-- class bootstrap pour la forme et couleur des messages-->
-                                            {{ message }}
-                                        </div>
-                                    {% endfor %}
+                        {# Message type success #}
+                        {% for message in app.session.flashBag.get('success') %}
+                            <div class="alert alert-success">      <!-- class bootstrap pour la forme et couleur des messages-->
+                                {{ message }}
+                            </div>
+                        {% endfor %}
 
-                                    {# Message type error #}
-                                    {% for message in app.session.flashBag.get('error') %}
-                                        <div class="alert alert-danger">      <!-- class bootstrap pour la forme et couleur des messages-->
-                                            {{ message }}
-                                        </div>
-                                    {% endfor %}
+                        {# Message type error #}
+                        {% for message in app.session.flashBag.get('error') %}
+                            <div class="alert alert-danger">      <!-- class bootstrap pour la forme et couleur des messages-->
+                                {{ message }}
+                            </div>
+                        {% endfor %}
 
-                                    {# Message type warning #}
-                                    {% for message in app.session.flashBag.get('warning') %}
-                                        <div class="alert alert-warning">      <!-- class bootstrap pour la forme et couleur des messages-->
-                                            {{ message }}
-                                        </div>
-                                    {% endfor %}
+                        {# Message type warning #}
+                        {% for message in app.session.flashBag.get('warning') %}
+                            <div class="alert alert-warning">      <!-- class bootstrap pour la forme et couleur des messages-->
+                                {{ message }}
+                            </div>
+                        {% endfor %}
 
 
 
-                                    {% block body %}
-                                {# corp de page à insérer #}
-                                    {% endblock %}
+                        {% block body %}
+                    {# corp de page à insérer #}
+                        {% endblock %}
 
                     </div>
                 </main>
@@ -256,6 +259,8 @@
     <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
 
     <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
+
+    <script src="{{ asset('js/filter.js') }}"></script>
 
 </body>
 

@@ -11,11 +11,24 @@ orders.list.alls:
       nbre: 20
   methods: [GET]
 
-orders.delete:
-  path: /admin/order/delete/{id}
-  controller: App\Orders\UI\Controller\deleteOrder
-  methods: [GET, DELETE]
+orders.cancel:
+  path: /admin/order/cancel/{id}
+  controller: App\Orders\UI\Controller\cancelOrder
+  methods: [GET, POST]
 
+orders.details:
+  path: /admin/order/details/{id}
+  controller: App\Orders\UI\Controller\OrderController::details
+  requirements:
+    id: '\d+'    #entier positif
+  methods: [GET]
+
+orderItems.details:
+  path: /admin/orderItem/details/{id}
+  controller: App\Orders\UI\Controller\OrderController::detailsOrderItem
+  requirements:
+    id: '\d+'    #entier positif
+  methods: [GET]
 
 
 

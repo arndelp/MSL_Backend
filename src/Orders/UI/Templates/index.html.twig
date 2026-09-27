@@ -12,59 +12,94 @@
         <thead>
             <tr >
                 <th scope="col" class="tableauPoi">Numéro de commande</th>
-                <th scope="col" class="tableauPoi">Date</th>
-                <th scope="col" class="tableauPoi">Acheteur</th>
+                <th scope="col" class="tableauPoi">Status</th>
+                <th scope="col" class="tableauPoi">Date</th>                
                 <th scope="col" class="tableauPoi">Montant total</th>
+                <th scope="col" class="tableauPoi">Montant capturé</th>
             </tr>
         </thead>
 
         <tbody>
 
         {% for order in orders %} 
-
-            <tr >
-
-                {# Date : clic vers le détail #}
+            <tr >                
                 <td>
-                    {# <a href="{{ path('orders.detail', {id: order.id}) }}"#}
+                    <a href="{{ path('orders.details', {id: order.id}) }}"
                        class="text-decoration-none text-dark">
                         {{ order.orderNumber }}
                     </a>
                 </td>
 
-                {# Expéditeur : clic vers le détail #}
-                <td>
-                     {# <a href="{{ path('orders.detail', {id: order.id}) }}"#}
+                 <td>
+                    <a href="{{ path('orders.details', {id: order.id}) }}"
                        class="text-decoration-none text-dark">
-                        {{ order.createdAt | date('d/m/Y H:i') }}
+                        {{ order.status.value }}
                     </a>
                 </td>
-
-                {# Objet : clic vers le détail #}
-                <td>
-                     {# <a href="{{ path('orders.detail', {id: order.id}) }}"#}
-                       class="text-decoration-none text-dark">
-                        {{ order.userId.firstname }} {{ order.userId.lastname }}
-                    </a>
-                </td>
-
-                <td>
-                     {# <a href="{{ path('orders.detail', {id: order.id}) }}"#}
-                       class="text-decoration-none text-dark">
-                        {{ order.createdAt | date('d/m/Y H:i') }}
-                    </a>
-                </td>
-
-                {# Bouton supprimer #}
-                <td class="tableauPoi">
-                             
-                    <form action="{{ path('orders.delete', {id: order.id}) }}">
-                        <button type="submit"  class="btn  btn-sm card-link" ><svg xmlns="http://www.w3.org/2000/svg" height="20" width="17.5" viewBox="0 0 448 512"><!--!Font Awesome Free v7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path fill="rgb(238, 15, 15)" d="M136.7 5.9C141.1-7.2 153.3-16 167.1-16l113.9 0c13.8 0 26 8.8 30.4 21.9L320 32 416 32c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 96C14.3 96 0 81.7 0 64S14.3 32 32 32l96 0 8.7-26.1zM32 144l384 0 0 304c0 35.3-28.7 64-64 64L96 512c-35.3 0-64-28.7-64-64l0-304zm88 64c-13.3 0-24 10.7-24 24l0 192c0 13.3 10.7 24 24 24s24-10.7 24-24l0-192c0-13.3-10.7-24-24-24zm104 0c-13.3 0-24 10.7-24 24l0 192c0 13.3 10.7 24 24 24s24-10.7 24-24l0-192c0-13.3-10.7-24-24-24zm104 0c-13.3 0-24 10.7-24 24l0 192c0 13.3 10.7 24 24 24s24-10.7 24-24l0-192c0-13.3-10.7-24-24-24z"/></svg></button>
-                    </form>               
                 
+                <td>
+                    <a href="{{ path('orders.details', {id: order.id}) }}"
+                       class="text-decoration-none text-dark">
+                        {{ order.createdAt | european_date }}
+                    </a>
+                </td>               
+
+                <td>
+                    <a href="{{ path('orders.details', {id: order.id}) }}"
+                       class="text-decoration-none text-dark">
+                        {{ order.totalAmount | centimes_to_euros  }}
+                    </a>
                 </td>
 
+                <td>
+                    
+                    <a href="{{ path('orders.details', {id: order.id}) }}"
+                       class="text-decoration-none text-dark">
+                       {% if  order.amountCaptured is empty  %}                        <!-- si amountCaptured == 0 ou null ou false -->
+                        0,00
+                        {%else  %}
+                        {{ order.amountCaptured | centimes_to_euros  }}
+                        {%endif  %}
+                    </a>
+                </td>
+
+                {# Bouton Annuler #}
+                
+                <td class="tableauPoi">
+                    {% if order.status.value == 'PENDING_PAYMENT'  %}
+                            <button type="submit"  class="btn  btn-sm card-link" id="annulation" data-toggle="modal" data-target="#cancelModal"><svg xmlns="http://www.w3.org/2000/svg" height="20" width="17.5" viewBox="0 0 448 512"><!--!Font Awesome Free v7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path fill="rgb(238, 15, 15)" d="M136.7 5.9C141.1-7.2 153.3-16 167.1-16l113.9 0c13.8 0 26 8.8 30.4 21.9L320 32 416 32c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 96C14.3 96 0 81.7 0 64S14.3 32 32 32l96 0 8.7-26.1zM32 144l384 0 0 304c0 35.3-28.7 64-64 64L96 512c-35.3 0-64-28.7-64-64l0-304zm88 64c-13.3 0-24 10.7-24 24l0 192c0 13.3 10.7 24 24 24s24-10.7 24-24l0-192c0-13.3-10.7-24-24-24zm104 0c-13.3 0-24 10.7-24 24l0 192c0 13.3 10.7 24 24 24s24-10.7 24-24l0-192c0-13.3-10.7-24-24-24zm104 0c-13.3 0-24 10.7-24 24l0 192c0 13.3 10.7 24 24 24s24-10.7 24-24l0-192c0-13.3-10.7-24-24-24z"/></svg></button>
+                    {% endif %}
+                </td>                
             </tr>
+
+            <!-- Modal de confirmation pour l'annulation de commande -->
+
+            <div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="cancelModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="cancelModalLabel">Annuler la commande</h5>
+                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Êtes-vous sûr de vouloir annuler cette commande ?<br> Cette action annulera tout les sellerPayments associés.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Retour</button>
+                            <form  action="{{ path('orders.cancel', {id: order.id}) }}">
+                                <button class="btn btn-danger" type="submit" id="confirmCancel">Annuler la commande</button>
+                            </form> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
 
         {% endfor %}
 
@@ -130,8 +165,25 @@
             </ul>
         </nav>
     </div>
-
 {% endif %}
+</div>
 
-    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 {% endblock %}

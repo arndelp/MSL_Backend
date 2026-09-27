@@ -65,6 +65,7 @@ security:
         - { path: ^/api/seller/sellerPayment/\d+/checkConfirmationToken, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api/authors, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api/stripe/connect/return, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/catwithbookcount, roles: PUBLIC_ACCESS, methods: [GET]}
 
 
         # Accès restreint (frontend)

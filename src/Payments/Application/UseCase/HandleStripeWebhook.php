@@ -65,6 +65,10 @@ final class HandleStripeWebhook
                     $session->payment_intent
                 );
 
+                $order->setAuthorizedAt(
+                    new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris'))
+                );
+
                 
                 $order->setUpdatedAt(
                     new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris'))
@@ -106,9 +110,8 @@ final class HandleStripeWebhook
                         $payment->setConfirmationTokenExpiresAt(
                             new \DateTimeImmutable('+48 hours', new \DateTimeZone('Europe/Paris'))
                         );
-                    }
-              
-            }
+                    }              
+                }
              /*
                  * Sauvegarde de la commande,
                  * des OrderItems et du PaymentIntent.
@@ -119,8 +122,6 @@ final class HandleStripeWebhook
                  * Notification des vendeurs.  
                  */
                 foreach ($order->getSellerPayments() as $payment) {
-
-
 
                      $this->sellerNotification
                         ->sendOrderConfirmation($payment);

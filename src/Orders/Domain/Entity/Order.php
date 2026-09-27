@@ -30,6 +30,9 @@ class Order
     #[ORM\Column(type: Types::BIGINT)]
     private ?string $total_amount = null;
 
+    #[ORM\Column(type: Types::BIGINT, nullable:true)]
+    private ?string $amount_captured = null;
+
     #[ORM\Column(length: 10)]
     private ?string $currency = null;
 
@@ -37,10 +40,7 @@ class Order
     private ?string $stripe_session_id = null;
 
     #[ORM\Column(type: 'string',length: 255, nullable: true)]
-    private ?string $stripe_payment_intent_id = null;
-
-    #[ORM\Column(type: Types::BIGINT, nullable: true)]
-    private ?string $stripe_fee_total = null;
+    private ?string $stripe_payment_intent_id = null;    
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $shipping_firstname = null;
@@ -71,6 +71,9 @@ class Order
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updated_at = null;
+
+    #[ORM\Column(nullable:true)]
+    private ?\DateTimeImmutable $authorized_at = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $paid_at = null;
@@ -153,6 +156,18 @@ class Order
         return $this;
     }
 
+    public function getAmountCaptured(): ?string
+    {
+        return $this->amount_captured;
+    }
+
+    public function setAmountCaptured(string $amount_captured): static
+    {
+        $this->amount_captured = $amount_captured;
+
+        return $this;
+    }
+
     public function getCurrency(): ?string
     {
         return $this->currency;
@@ -189,18 +204,7 @@ class Order
         return $this;
     }
 
-    public function getStripeFeeTotal(): ?string
-    {
-        return $this->stripe_fee_total;
-    }
-
-    public function setStripeFeeTotal(?string $stripe_fee_total): static
-    {
-        $this->stripe_fee_total = $stripe_fee_total;
-
-        return $this;
-    }
-
+    
     public function getShippingFirstname(): ?string
     {
         return $this->shipping_firstname;
@@ -318,6 +322,17 @@ class Order
     {
         $this->updated_at = $updated_at;
 
+        return $this;
+    }
+
+    public function getAuthorizedAt(): ?\DateTimeImmutable
+    {
+        return $this->authorized_at;
+    }
+
+    public function setAuthorizedAt(?\DateTimeImmutable $authorized_at): self
+    {
+        $this->authorized_at = $authorized_at;
         return $this;
     }
 

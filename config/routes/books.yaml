@@ -45,6 +45,9 @@ api.books.author:
   controller: App\Books\UI\Controller\BookController::getAuthorNamesByUser
   methods: [GET]
 
+
+
+
 books.not.verified:
   path: /admin/notVerifiedBooks
   controller: App\Books\UI\Controller\BookController::getNotVerifiedBooks
@@ -86,3 +89,13 @@ book.remove:
     path: /admin/deletedBooks/{id}/remove
     controller: App\Books\UI\Controller\BookController::removeBook
     methods: [POST]
+
+books.filtered:
+    path: /admin/booksFiltered
+    controller: App\Books\UI\Controller\BookController::indexFiltered
+    methods: [GET]
+
+books.list.details:
+    path: /admin/books/{id}
+    controller: App\Books\UI\Controller\BookController::booksDetails
+    methods: [GET]

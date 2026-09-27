@@ -30,7 +30,7 @@ class OrderItemMapper
         $orderItem->setQuantity($orderItemDTO->quantity);
 
         // Prix unitaire = prix du livre
-        $unitPrice = (int) ($book->getPrice() * 100);
+        $unitPrice = (int) ($book->getPrice());
         $orderItem->setUnitPrice($unitPrice);
 
         // Vendeur du livre (seller_id)
