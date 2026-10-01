@@ -12,13 +12,13 @@ class GetAllBooks
         private readonly BookRepositoryInterface $bookRepository
     ) {}
 
-    public function execute(BookFilterDTO $filter, int $page = 1): array
+    public function execute(BookFilterDTO $filter, int $page = 1, int $limit): array
     {
         try {
             $result = $this->bookRepository->findByFilters(
                 $filter,
                 $page,
-                3
+                $limit,                             
             );
 
             $books = array_map(fn ($book) => [

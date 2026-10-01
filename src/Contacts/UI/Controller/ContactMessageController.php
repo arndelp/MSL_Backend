@@ -58,9 +58,7 @@ final class ContactMessageController extends AbstractController
             if (count($errors) > 0) {
                 return new JsonResponse(['errors' => (string) $errors], 400);
             }
-
-
-        
+                    
             try {
                 //délègue au use case pour enregistrer le message de contact
                 $contactMessage = $recordContactMessageByApi->execute($dto);

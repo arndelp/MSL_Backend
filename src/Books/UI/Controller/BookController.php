@@ -78,7 +78,8 @@ final class BookController extends AbstractController
 
     $books = $getAllBooks->execute(
         $filter,
-        $page
+        $page,
+        $limit= 12,                  // <--- Réglage du nombre de livres par page
     );
 
     return new JsonResponse($books);
