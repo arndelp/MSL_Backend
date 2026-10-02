@@ -8,12 +8,14 @@ use App\Enum\SellerPaymentStatus;
 use App\SellerPayments\Application\DTO\SellerPaymentCancellationDTO;
 use App\Enum\CancellationReason;
 use App\Payments\Application\UseCase\FinalizeOrderPayment;
+use App\SellerPayments\Domain\Service\SellerNotificationMailerInterface;
 
 final class RefuseSellerPayment
 {
     public function __construct(
         private SellerPaymentRepositoryInterface $repository,
         private FinalizeOrderPayment $finalizeOrderPayment,
+        private SellerNotificationMailerInterface $sellerNotificationMailer,
     ) {
     }
 
@@ -153,5 +155,17 @@ final class RefuseSellerPayment
          * -> PaySeller(A)
          */
         $this->finalizeOrderPayment->execute($SP);
+
+        /*
+         * Notification au vendeur
+         */
+        try {
+            $this->sellerNotificationMailer
+                ->sendSellerPaymentCancellationEmail($SP);
+        } catch (\Exception $e) {
+            // Log the error or handle it as needed
+            // For example, you could log the error message:
+            error_log('Error sending seller payment cancellation email: ' . $e->getMessage());
+        }
     }
 }

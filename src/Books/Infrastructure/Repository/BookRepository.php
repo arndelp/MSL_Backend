@@ -190,7 +190,7 @@ class BookRepository extends ServiceEntityRepository implements BookRepositoryIn
 
         // Pagination
         $query
-            ->orderBy('m.title', 'ASC')
+            ->orderBy('m.createdAt', 'DESC')
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
 

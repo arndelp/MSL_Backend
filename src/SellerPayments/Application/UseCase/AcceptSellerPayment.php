@@ -8,6 +8,7 @@ use App\Enum\OrderItemStatus;
 use App\Enum\OrderStatus;
 use App\Orders\Domain\Service\OrderNotificationMailerInterface;
 use App\Payments\Application\UseCase\FinalizeOrderPayment;
+use App\SellerPayments\Domain\Service\SellerNotificationMailerInterface;
 
 final class AcceptSellerPayment
 {
@@ -15,6 +16,7 @@ final class AcceptSellerPayment
         private SellerPaymentRepositoryInterface $repository,
         private OrderNotificationMailerInterface $notificationMailer,
         private FinalizeOrderPayment $finalizeOrderPayment,
+        private SellerNotificationMailerInterface $sellerNotificationMailer,
     ) {
     }
 
@@ -149,6 +151,7 @@ final class AcceptSellerPayment
          */
         $this->repository->save($SP);
 
+
         /*
          * Finaliser éventuellement la commande.
          *
@@ -175,5 +178,21 @@ final class AcceptSellerPayment
                     ->sendOutOfStockMail($orderItem);
             }
         }
+
+        /*
+         * Notification au vendeur
+         */
+        try {
+            $this->sellerNotificationMailer
+                ->sendSellerPaymentConfirmationEmail($SP);
+        } catch (\Exception $e) {
+            // Log the error or handle it as needed
+            // For example, you could log the error message:
+            error_log('Error sending seller payment confirmation email: ' . $e->getMessage());
+        }
+       
+
+
+       
     }
 }

@@ -57,4 +57,32 @@ final class SellerNotificationMailer implements SellerNotificationMailerInterfac
      
         $this->mailer->send($email);     
     }
+
+
+    public function sendSellerPaymentConfirmationEmail(SellerPayment $sellerPayment): void
+    {
+        $email = (new TemplatedEmail())
+            ->from(new Address('admin@monsalondulivre.fr', 'Monsalondulivre.fr'))
+            ->to($sellerPayment->getOrder()->getUserId()->getEmail())
+            ->subject('Confirmation de votre commande')
+            ->htmlTemplate('emails/seller_payment_confirmation.html.twig')
+            ->context([
+                'sellerPayment' => $sellerPayment,
+            ]);
+
+        $this->mailer->send($email);
+    }
+
+    public function sendSellerPaymentCancellationEmail(SellerPayment $sellerPayment): void
+    {
+        $email = (new TemplatedEmail())
+            ->from(new Address('admin@monsalondulivre.fr', 'Monsalondulivre.fr'))
+            ->to($sellerPayment->getOrder()->getUserId()->getEmail())
+            ->subject('Annulation de votre commande')
+            ->htmlTemplate('emails/seller_payment_cancellation.html.twig')
+            ->context([
+                'sellerPayment' => $sellerPayment,
+            ]);
+        $this->mailer->send($email);
+    }
 }
