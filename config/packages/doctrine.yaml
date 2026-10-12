@@ -75,6 +75,18 @@ doctrine:
                 dir: '%kernel.project_dir%/src/SellerPayments/Domain/Entity'
                 prefix: 'App\SellerPayments\Domain\Entity'
                 alias: SellerPayments
+            Claims:
+                is_bundle: false
+                type: attribute
+                dir: '%kernel.project_dir%/src/SellerPayments/Domain/Entity'
+                prefix: 'App\SellerPayments\Domain\Entity'
+                alias: Claims
+            ClaimMessages:
+                is_bundle: false
+                type: attribute
+                dir: '%kernel.project_dir%/src/SellerPayments/Domain/Entity'
+                prefix: 'App\SellerPayments\Domain\Entity'
+                alias: ClaimMessages
             BackUsers:
                 is_bundle: false
                 type: attribute

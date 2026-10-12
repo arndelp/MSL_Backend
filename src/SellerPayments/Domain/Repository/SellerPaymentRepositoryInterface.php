@@ -22,7 +22,7 @@ interface SellerPaymentRepositoryInterface
 
     public function hasPendingSellerPayments(Order $order): bool;
 
-    public function findExpiredSellerPayments(
-        \DateTimeImmutable $now
-    ): array;
+    public function findExpiredSellerPayments(\DateTimeImmutable $now ): array;
+
+    public function findByBuyerAndStatusDelivered(User $buyer): array;
 }

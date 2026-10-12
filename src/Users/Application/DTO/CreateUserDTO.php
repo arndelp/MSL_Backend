@@ -26,6 +26,22 @@ final class CreateUserDTO
     #[Assert\Length(max: 50)]
     public ?string $password = null;    
 
+    public ?string $sellerType = null; // "INDIVIDUAL" ou "PROFESSIONAL"
+
+    #[Assert\When(
+    expression: 'this.sellerType == "PROFESSIONAL"',
+    constraints: [
+        new Assert\NotBlank(
+            message: 'Le SIRET est obligatoire pour un vendeur professionnel.'
+        ),
+        new Assert\Regex(
+            pattern: '/^\d{14}$/',
+            message: 'Le SIRET doit contenir exactement 14 chiffres.'
+        )
+    ]
+    )]
+    public ?string $siret = null;
+
     public ?string $type = null; // "buyer_only" ou "author"
 
     public function __construct(
@@ -34,16 +50,18 @@ final class CreateUserDTO
         string $email,
         string $password,
         string $type,
+        string $sellerType = null,
+        string $siret = null,
        
-        
     ) {        
         $this->firstname = $firstname;
         $this->lastname = $lastname;
         $this->email = $email;
         $this->password = $password;
         $this->type = $type;
+        $this->sellerType = $sellerType;
+        $this->siret = $siret;
        
-        
     }
 }
         /*

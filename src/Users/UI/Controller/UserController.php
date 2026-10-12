@@ -63,6 +63,8 @@ class UserController extends AbstractController
         email: $data['email'] ?? '',
         type: $data['type'] ?? '',
         password: $data['password'] ?? '',
+        sellerType: $data['sellerType'] ?? null,
+        siret: $data['siret'] ?? null,
        
     );   
 

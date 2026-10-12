@@ -8,14 +8,14 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 final class BookDTO
 {
     #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
-    #[Assert\Length(max: 100)]
+    #[Assert\Length(max: 20, message: "Le titre ne doit pas dépasser 20 caractères")]
     #[Assert\Regex(pattern: '/^[a-zA-Z0-9\s\-]+$/', message: 'Le titre ne doit contenir que des lettres, des chiffres, des espaces et des tirets.')]
     public ?string $title = null;  
 
      
 
     #[Assert\NotBlank(message: 'Veuillez remplir ce champ.')]
-    #[Assert\Length(max: 100)]
+    #[Assert\Length(max: 20, message: "Ne pas dépasser 20 caractères ")]
     public ?string $authorName = null;    
     
     #[Assert\Type(type: 'numeric', message: 'Le prix doit être un nombre.')]    

@@ -6,11 +6,14 @@ namespace App\Orders\Domain\Entity;
 use App\Books\Domain\Entity\Book;
 use App\Orders\Infrastructure\Repository\OrderItemRepository;
 use App\Users\Domain\Entity\User;
+use App\SellerPayments\Domain\Entity\Claim;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Enum\OrderItemStatus;
 use App\SellerPayments\Domain\Entity\SellerPayment;
 use App\Orders\Domain\Entity\Order;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 
 #[ORM\Entity(repositoryClass: OrderItemRepository::class)]
@@ -49,14 +52,26 @@ class OrderItem
     #[ORM\Column(enumType: OrderItemStatus::class)]
     private ?OrderItemStatus $status = null;
 
+    /**
+     * @var Collection<int, Claim>
+     */
+    #[ORM\ManyToMany(
+        targetEntity: Claim::class, 
+        mappedBy: 'orderItems')]
+    private Collection $claims;
+
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updated_at = null;
 
-    
 
+    
+    public function __construct()
+    {
+        $this->claims = new ArrayCollection();
+    }
    
 
     public function getId(): ?int
@@ -170,6 +185,7 @@ class OrderItem
         return $this;
     }
 
+    
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->created_at;
@@ -190,6 +206,34 @@ class OrderItem
     public function setUpdatedAt(?\DateTimeImmutable $updated_at): static
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+
+    /**
+     * @return Collection<int, Claim>
+     */
+    public function getClaims(): Collection
+    {
+        return $this->claims;
+    }
+
+    public function addClaim(Claim $claim): static
+    {
+        if (!$this->claims->contains($claim)) {
+            $this->claims->add($claim);
+            $claim->addOrderItem($this);
+        }
+
+        return $this;
+    }
+
+    public function removeClaim(Claim $claim): static
+    {
+        if ($this->claims->removeElement($claim)) {
+            $claim->removeOrderItem($this);
+        }
 
         return $this;
     }

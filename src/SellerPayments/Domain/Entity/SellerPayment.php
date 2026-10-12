@@ -2,6 +2,8 @@
 
 namespace App\SellerPayments\Domain\Entity;
 
+
+use App\SellerPayments\Domain\Entity\Claim;
 use App\Orders\Domain\Entity\Order;
 use App\Users\Domain\Entity\User;
 use App\Enum\SellerPaymentStatus;
@@ -21,7 +23,7 @@ class SellerPayment
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column()]
     private ?int $id = null;
 
     /*
@@ -182,6 +184,19 @@ class SellerPayment
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $shipped_at = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $delivered_at = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $end_cooling_off_period_at = null;
+
+    /**
+     * @var Collection<int, Claim>
+     */
+    #[ORM\OneToMany(targetEntity: Claim::class, mappedBy: 'sellerPayment')]
+    private Collection $claims;
+
+  
     
    
 
@@ -195,6 +210,7 @@ class SellerPayment
         $this->status = SellerPaymentStatus::CREATED;
         $this->currency = 'EUR';
         $this->orderItems = new ArrayCollection();
+        $this->claims = new ArrayCollection();
         
     }
 
@@ -572,6 +588,29 @@ class SellerPayment
         return $this;
     }
 
+    public function getDeliveredAt() : ?\DateTimeImmutable
+    {
+        return $this->delivered_at;
+    }
+
+    public function setDeliveredAt(?\DateTimeImmutable $delivered_at) : static
+    {
+        $this->delivered_at = $delivered_at;
+        return $this;
+    }
+
+    public function getEndCoolingOffPeriodAt() : ?\DateTimeImmutable
+    {
+        return $this->end_cooling_off_period_at;
+    }
+
+    public function setEndCoolingOffPeriodAt(?\DateTimeImmutable $end_cooling_off_period_at) : static
+    {
+        $this->end_cooling_off_period_at = $end_cooling_off_period_at;
+        return $this;
+    }
+
+
     /**
      * @return Collection<int, OrderItem>
      */
@@ -601,6 +640,38 @@ class SellerPayment
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Claim>
+     */
+    public function getClaims(): Collection
+    {
+        return $this->claims;
+    }
+
+    public function addClaim(Claim $claim): static
+    {
+        if (!$this->claims->contains($claim)) {
+            $this->claims->add($claim);
+            $claim->setSellerPayment($this);
+        }
+
+        return $this;
+    }
+
+    public function removeClaim(Claim $claim): static
+    {
+        if ($this->claims->removeElement($claim)) {
+            // set the owning side to null (unless already changed)
+            if ($claim->getSellerPayment() === $this) {
+                $claim->setSellerPayment(null);
+            }
+        }
+
+        return $this;
+    }
+
+   
 
     
 

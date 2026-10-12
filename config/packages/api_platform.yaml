@@ -9,6 +9,7 @@ api_platform:
             - '%kernel.project_dir%/src/Addresses/Domain/Entity/'
             - '%kernel.project_dir%/src/AuthorProfiles/Domain/Entity/'
             - '%kernel.project_dir%/src/Orders/Domain/Entity/'
+            - '%kernel.project_dir%/src/SellerPayments/Domain/Entity/'
     formats:        
         json: ['application/json']   
         jsonld: ['application/ld+json']     
@@ -31,6 +32,7 @@ api_platform:
                 - ['author_profile']
                 - ['order']
                 - ['seller_payment']
+                - ['claim']
 
         denormalization_context:
             groups: 
@@ -42,6 +44,7 @@ api_platform:
                 - ['author_profile']
                 - ['order']
                 - ['seller_payment']
+                - ['claim']
 
                   
     exception_to_status:

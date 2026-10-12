@@ -26,6 +26,8 @@ class AuthorProfile
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $website = null;
 
+    
+
     #[ORM\OneToOne(inversedBy: 'authorProfile', targetEntity: User::class)]
     #[ORM\JoinColumn]
     private ?User $user = null;
@@ -71,6 +73,8 @@ class AuthorProfile
 
         return $this;
     }
+
+   
 
     public function getUser(): ?User
     {

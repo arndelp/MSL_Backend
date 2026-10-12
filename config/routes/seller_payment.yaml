@@ -15,28 +15,35 @@ api.seller.refuse.sellerPayment:
 
 api.seller.find.sellerPayment.checkToken:
   path: /api/seller/sellerPayment/{id}/checkConfirmationToken
-  controller: App\SellerPayments\UI\Controller\SellerPaymentController::CheckConfirmationToken
+  controller: App\SellerPayments\UI\Controller\SellerPaymentController::checkConfirmationToken
   methods: [GET]
 
 api.seller.find.sellerPayment.pendingConfirmation:
   path: /api/seller/findSellerPaymentPendingConfirmation
-  controller: App\SellerPayments\UI\Controller\SellerPaymentController::FindSellerPaymentBySellerWaitingConfirmation
+  controller: App\SellerPayments\UI\Controller\SellerPaymentController::findSellerPaymentBySellerWaitingConfirmation
   methods: [GET]
 
 api.seller.find.sellerPayment.confirmed:
   path: /api/seller/findSellerPaymentConfirmed
-  controller: App\SellerPayments\UI\Controller\SellerPaymentController::FindSellerPaymentBySellerConfirmed
+  controller: App\SellerPayments\UI\Controller\SellerPaymentController::findSellerPaymentBySellerConfirmed
   methods: [GET]
 
 api.seller.find.sellerPayment.shipped:
   path: /api/seller/findSellerPaymentShipped
-  controller: App\SellerPayments\UI\Controller\SellerPaymentController::FindSellerPaymentBySellerShipped
+  controller: App\SellerPayments\UI\Controller\SellerPaymentController::findSellerPaymentBySellerShipped
+  methods: [GET]
+
+api.buyer.find.sellerPayment.delivered:
+  path: /api/buyer/findSellerPaymentDelivered
+  controller: App\SellerPayments\UI\Controller\SellerPaymentController::findSellerPaymentByBuyerDelivered
   methods: [GET]
 
 sellerPayments.details:
   path: /admin/sellerPayment/{id}
   controller: App\SellerPayments\UI\Controller\SellerPaymentController::details
   methods: [GET]
+
+
 
 
 

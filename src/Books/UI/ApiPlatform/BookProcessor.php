@@ -19,48 +19,48 @@ class BookProcessor implements ProcessorInterface
        
          $request = $context['request'] ?? null;
 
-    if (!$request) {
-        throw new \Exception('Request not found');
-    }
+        if (!$request) {
+            throw new \Exception('Request not found');
+        }
 
-    $dto = new BookDTO();
+        $dto = new BookDTO();
 
-    // ❌ PLUS $data
-    $dto->title = $request->request->get('title');
-    $dto->authorName = $request->request->get('authorName');
-    $dto->price = (float) $request->request->get('price');
-    $dto->quantity = (int) $request->request->get('quantity');
-    $dto->format = $request->request->get('format');
-    $dto->weight = $request->request->get('weight');
-    $dto->description = $request->request->get('description');
-    $dto->extract = $request->request->get('extract');
-    $dto->isbn = $request->request->get('isbn');
-    $dto->pageCount = (int) $request->request->get('pageCount');
-    $dto->currency = $request->request->get('currency');
+        // ❌ PLUS $data
+        $dto->title = $request->request->get('title');
+        $dto->authorName = $request->request->get('authorName');
+        $dto->price = (float) $request->request->get('price');
+        $dto->quantity = (int) $request->request->get('quantity');
+        $dto->format = $request->request->get('format');
+        $dto->weight = $request->request->get('weight');
+        $dto->description = $request->request->get('description');
+        $dto->extract = $request->request->get('extract');
+        $dto->isbn = $request->request->get('isbn');
+        $dto->pageCount = (int) $request->request->get('pageCount');
+        $dto->currency = $request->request->get('currency');
 
-    // categories
-    $dto->categories = $request->request->all('categories');
+        // categories
+        $dto->categories = $request->request->all('categories');
 
-    // cover (Vich)
-    $dto->cover = $request->files->get('cover');
+        // cover (Vich)
+        $dto->cover = $request->files->get('cover');
 
-    // images
-    $files = $request->files->get('images', []);
+        // images
+        $files = $request->files->get('images', []);
 
-    if ($files instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
-        $files = [$files];
-    }
+        if ($files instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
+            $files = [$files];
+        }
 
-    $filenames = [];
+        $filenames = [];
 
-    foreach ($files as $file) {
-        $name = uniqid().'.'.$file->guessExtension();
-        $file->move('uploads/images', $name);
-        $filenames[] = $name;
-    }
+        foreach ($files as $file) {
+            $name = uniqid().'.'.$file->guessExtension();
+            $file->move('uploads/images', $name);
+            $filenames[] = $name;
+        }
 
-    $dto->images = $filenames;
+        $dto->images = $filenames;
 
-    return $this->useCase->execute($dto);
+        return $this->useCase->execute($dto);
     }
 }

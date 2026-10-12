@@ -38,6 +38,20 @@ class SellerPaymentRepository extends  ServiceEntityRepository implements Seller
             );
     }
 
+     public function findByBuyerAndStatusDelivered(User $buyer): array
+    {
+         
+        return $this->createQueryBuilder('sp')        // Je pars de SellerPayment
+            ->join('sp.order', 'o')                     // Je rejoins la commande associée
+            ->andWhere('o.user = :buyer')               // Je filtre sur l'acheteur de cette commande
+            ->andWhere('sp.status = :status')           // Je filtre sur le statut du sellerPayment
+            ->setParameter('buyer', $buyer)
+            ->setParameter('status', SellerPaymentStatus::DELIVERED)
+            ->orderBy('sp.updated_at', 'DESC')           // Je trie par date de mise à jour
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findBySellerAndStatusConfirmed(User $seller): array
     {
         return

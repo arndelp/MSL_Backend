@@ -5,6 +5,7 @@ namespace App\SellerPayments\UI\Controller;
 use App\SellerPayments\Application\UseCase\FindSPBySellerAndStatusShipped;
 use App\SellerPayments\Application\UseCase\FindSPBySellerAndStatusConfirmed;
 use App\SellerPayments\Application\UseCase\FindSPBySellerAndStatusWaitingConfirmation;
+use App\SellerPayments\Application\UseCase\FindSPByBuyerAndStatusDelivered;
 use App\Users\Domain\Entity\User;
 use App\SellerPayments\Domain\Repository\SellerPaymentRepositoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,10 +22,11 @@ final class SellerPaymentController extends AbstractController
         private FindSPBySellerAndStatusShipped $findSPByStatusandSellerShipped,
         private FindSPBySellerAndStatusConfirmed $findSPByStatusandSellerConfirmed,
         private FindSPBySellerAndStatusWaitingConfirmation $findSPByStatusandSellerWaitingConfirmation,
-        private GetSellerPayment $getSellerPayment
+        private GetSellerPayment $getSellerPayment,
+        private FindSPByBuyerAndStatusDelivered $findSPByBuyerAndStatusDelivered
     ) {}
 
-    public function FindSellerPaymentBySellerWaitingConfirmation(): JsonResponse
+    public function findSellerPaymentBySellerWaitingConfirmation(): JsonResponse
     {
         $seller = $this->security->getUser();
 
@@ -37,7 +39,7 @@ final class SellerPaymentController extends AbstractController
         return $this->json($data);
     }
 
-    public function FindSellerPaymentBySellerConfirmed(): JsonResponse
+    public function findSellerPaymentBySellerConfirmed(): JsonResponse
     {
         $seller = $this->security->getUser();
 
@@ -50,7 +52,7 @@ final class SellerPaymentController extends AbstractController
         return $this->json($data);
     }
 
-    public function FindSellerPaymentBySellerShipped(): JsonResponse
+    public function findSellerPaymentBySellerShipped(): JsonResponse
     {
         $seller = $this->security->getUser();
 
@@ -63,7 +65,7 @@ final class SellerPaymentController extends AbstractController
         return $this->json($data);
     }
 
-    public function CheckConfirmationToken(
+    public function checkConfirmationToken(
         int $id,
         Request $request,
         SellerPaymentRepositoryInterface $orderItemRepository
@@ -101,6 +103,23 @@ final class SellerPaymentController extends AbstractController
         }
 
         return $this->render('@SellerPayments/details.html.twig', ['sellerPayment' => $sellerPayment]);
+    }
+
+    public function findSellerPaymentByBuyerDelivered(): JsonResponse
+    {
+        $buyer = $this->security->getUser();
+
+       
+
+        if (!$buyer instanceof User) {
+            return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
+        }
+
+        $data = $this->findSPByBuyerAndStatusDelivered->execute($buyer);
+
+       
+
+        return $this->json($data);
     }
     
 }

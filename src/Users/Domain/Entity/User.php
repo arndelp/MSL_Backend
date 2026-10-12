@@ -6,6 +6,8 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\ApiResource;
+use App\SellerPayments\Domain\Entity\ClaimMessage;
+use App\SellerPayments\Domain\Entity\Claim;
 use App\Orders\Domain\Entity\OrderItem;
 use App\Orders\Domain\Entity\Order;
 use App\Users\Infrastructure\Repository\DoctrineUserRepository;
@@ -23,6 +25,7 @@ use App\Users\Application\DTO\LoginDTO;
 use App\Addresses\Domain\Entity\Address;
 use App\Contacts\Domain\Entity\Contact;
 use App\SellerPayments\Domain\Entity\SellerPayment;
+use App\Enum\SellerTypeStatus;
 
 #[ORM\Entity(repositoryClass: DoctrineUserRepository::class)]
 #[ApiResource(
@@ -86,6 +89,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:private', 'book:private'])]
     private ?bool $stripeOnboarded = null;
 
+    #[ORM\Column(enumType: SellerTypeStatus::class, nullable: true)]
+    private ?SellerTypeStatus $sellerType = null;
+
+    #[ORM\Column(length: 14, nullable: true)]
+    private ?string $siret = null;
+
     #[ORM\Column(name:'roles',type: 'json')]
     #[Groups(['user:private', 'book:private', 'contact:private'])]
     private array $roles = [];
@@ -134,8 +143,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var Collection<int, OrderItem>
      */
     #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'seller')]
-    private Collection $orderItems;   // adresses de livraison de l'utilisateur (OneToMany)
+    private Collection $orderItems;
 
+    /**
+     * @var Collection<int, Claim>
+     */
+    #[ORM\OneToMany(targetEntity: Claim::class, mappedBy: 'buyer')]
+    private Collection $buyerClaims;
+
+    /**
+     * @var Collection<int, Claim>
+     */
+    #[ORM\OneToMany(targetEntity: Claim::class, mappedBy: 'seller')]
+    private Collection $sellerClaims;
+
+    /**
+     * @var Collection<int, ClaimMessage>
+     */
+    #[ORM\OneToMany(targetEntity: ClaimMessage::class, mappedBy: 'author')]
+    private Collection $claimMessages;
     
 
 
@@ -172,6 +198,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->contacts = new ArrayCollection();
         $this->sellerPayments = new ArrayCollection();
         $this->orderItems = new ArrayCollection();
+        $this->claims = new ArrayCollection();
+        $this->buyerClaims = new ArrayCollection();
+        $this->sellerClaims = new ArrayCollection();
+        $this->claimMessages = new ArrayCollection();
     }
 
 
@@ -246,6 +276,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setStripeConnectAccountId(?string $stripeConnectAccountId): static
     {
         $this->stripeConnectAccountId = $stripeConnectAccountId;
+
+        return $this;
+    }
+
+    public function getSellerType(): ?SellerTypeStatus
+    {
+        return $this->sellerType;
+    }
+
+    public function setSellerType(?SellerTypeStatus $sellerType): static
+    {
+        $this->sellerType = $sellerType;
+
+        return $this;
+    }
+
+    public function getSiret(): ?string
+    {
+        return $this->siret;
+    }
+
+    public function setSiret(?string $siret): static
+    {
+        $this->siret = $siret;
 
         return $this;
     }
@@ -504,6 +558,96 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($orderItem->getSeller() === $this) {
                 $orderItem->setSeller(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Claim>
+     */
+    public function getBuyerClaims(): Collection
+    {
+        return $this->claims;
+    }
+
+    public function addBuyerClaim(Claim $claim): static
+    {
+        if (!$this->claims->contains($claim)) {
+            $this->claims->add($claim);
+            $claim->setBuyer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBuyerClaim(Claim $claim): static
+    {
+        if ($this->claims->removeElement($claim)) {
+            // set the owning side to null (unless already changed)
+            if ($claim->getBuyer() === $this) {
+                $claim->setBuyer(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Claim>
+     */
+    public function getSellerClaims(): Collection
+    {
+        return $this->claims;
+    }
+
+    public function addSellerClaim(Claim $claim): static
+    {
+        if (!$this->claims->contains($claim)) {
+            $this->claims->add($claim);
+            $claim->setBuyer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSellerClaim(Claim $claim): static
+    {
+        if ($this->claims->removeElement($claim)) {
+            // set the owning side to null (unless already changed)
+            if ($claim->getBuyer() === $this) {
+                $claim->setBuyer(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ClaimMessage>
+     */
+    public function getClaimMessages(): Collection
+    {
+        return $this->claimMessages;
+    }
+
+    public function addClaimMessage(ClaimMessage $claimMessage): static
+    {
+        if (!$this->claimMessages->contains($claimMessage)) {
+            $this->claimMessages->add($claimMessage);
+            $claimMessage->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeClaimMessage(ClaimMessage $claimMessage): static
+    {
+        if ($this->claimMessages->removeElement($claimMessage)) {
+            // set the owning side to null (unless already changed)
+            if ($claimMessage->getAuthor() === $this) {
+                $claimMessage->setAuthor(null);
             }
         }
 
