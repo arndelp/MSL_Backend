@@ -13,6 +13,10 @@ api.seller.refuse.sellerPayment:
   controller: App\SellerPayments\UI\Controller\SellerActionSellerPaymentController::refuse
   methods: [POST]
 
+
+
+
+
 api.seller.find.sellerPayment.checkToken:
   path: /api/seller/sellerPayment/{id}/checkConfirmationToken
   controller: App\SellerPayments\UI\Controller\SellerPaymentController::checkConfirmationToken
@@ -33,10 +37,23 @@ api.seller.find.sellerPayment.shipped:
   controller: App\SellerPayments\UI\Controller\SellerPaymentController::findSellerPaymentBySellerShipped
   methods: [GET]
 
+
+
 api.buyer.find.sellerPayment.delivered:
   path: /api/buyer/findSellerPaymentDelivered
   controller: App\SellerPayments\UI\Controller\SellerPaymentController::findSellerPaymentByBuyerDelivered
   methods: [GET]
+
+api.buyer.find.sellerPayment.details:
+  path: /api/buyer/findSellerPaymentDetails/{id}
+  controller: App\SellerPayments\UI\Controller\SellerPaymentController::findSellerPaymentDetails
+  methods: [GET]
+
+api.buyer.findById.sellerPayment:
+  path: /api/sellerPayment/{id}
+  controller: App\SellerPayments\UI\Controller\SellerPaymentController::findSellerPaymentDetails
+  
+
 
 sellerPayments.details:
   path: /admin/sellerPayment/{id}

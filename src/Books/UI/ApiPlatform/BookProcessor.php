@@ -7,11 +7,14 @@ use ApiPlatform\State\ProcessorInterface;
 use App\Books\Domain\Entity\Book;
 use App\Books\Application\UseCase\RecordBookByApi;
 use App\Books\Application\DTO\BookDTO;
+use App\Shared\Infrastructure\Service\ImageConverter;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class BookProcessor implements ProcessorInterface
 {
     public function __construct(
-        private RecordBookByApi $useCase
+        private RecordBookByApi $useCase,
+        private ImageConverter $imageConverter,
     ) {}
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Book
@@ -41,22 +44,31 @@ class BookProcessor implements ProcessorInterface
         // categories
         $dto->categories = $request->request->all('categories');
 
-        // cover (Vich)
-        $dto->cover = $request->files->get('cover');
+        // Cover
+        $coverFile = $request->files->get('cover');
+
+        $dto->cover = null;
+
+        if ($coverFile instanceof UploadedFile) {
+            $dto->cover = $this->imageConverter->convertToWebp($coverFile,'covers');
+        }
+
 
         // images
         $files = $request->files->get('images', []);
 
-        if ($files instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
+        if ($files instanceof UploadedFile) {
             $files = [$files];
         }
 
         $filenames = [];
 
         foreach ($files as $file) {
-            $name = uniqid().'.'.$file->guessExtension();
-            $file->move('uploads/images', $name);
-            $filenames[] = $name;
+            if (!$file instanceof UploadedFile) {
+                continue;
+            }
+
+            $filenames[] = $this->imageConverter->convertToWebp($file,'images');
         }
 
         $dto->images = $filenames;

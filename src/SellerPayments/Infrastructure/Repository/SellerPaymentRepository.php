@@ -25,8 +25,7 @@ class SellerPaymentRepository extends  ServiceEntityRepository implements Seller
 
     public function findBySellerAndStatusWSC(User $seller): array
     {
-        return
-       
+        return       
             $this->findBy(
                 [
                     'seller' => $seller,

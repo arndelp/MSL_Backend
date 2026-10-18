@@ -13,42 +13,74 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\SellerPayments\Infrastructure\Repository\ClaimRepository;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use App\SellerPayments\UI\ApiPlatform\ClaimProcessor;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ClaimRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(
+            processor: ClaimProcessor::class,
+            inputFormats: [
+                'multipart' => ['multipart/form-data']
+            ],
+            deserialize: false
+        )
+    ],
+    normalizationContext: ['groups' => ['claim:read']],
+    denormalizationContext: ['groups' => ['claim:write']]
+)]
 class Claim
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['claim:read'])]
     private ?int $id = null;
     
     #[ORM\ManyToOne(inversedBy: 'claims')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['claim:read'])]
     private ?SellerPayment $sellerPayment = null;   
 
     #[ORM\ManyToOne(inversedBy: 'buyerClaims')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['claim:read'])]
     private ?User $buyer = null;
 
     #[ORM\ManyToOne(inversedBy: 'sellerClaims')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['claim:read'])]
     private ?User $seller = null;
 
-    #[ORM\Column(enumType: ClaimStatus::class)]
+    #[ORM\Column(enumType: ClaimStatus::class)]   
+    #[Groups(['claim:read'])]
     private ?ClaimStatus $status = null;
 
     #[ORM\Column(enumType: ClaimReason::class)]
+    #[Groups(['claim:read', 'claim:write'])]
     private ?ClaimReason $reason = null;
 
     #[ORM\Column]
+    #[Groups(['claim:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
+    #[Groups(['claim:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['claim:read'])]
     private ?\DateTimeImmutable $resolvedAt = null;
+
+    #[ORM\Column(type: 'json', nullable: true)]
+    #[Groups(['claim:read'])]
+    private ?array $images = [];
    
 
     /**
@@ -59,6 +91,7 @@ class Claim
         mappedBy: 'claim',
         cascade:['persist'],    //Pour que l'enregistrement auto du message dans claimMessage puisse se faire lors de l'enregistrement d'un Claim
         orphanRemoval: true)]
+    #[Groups(['claim:read', 'claim:write'])]
     private Collection $claimMessages;
 
     /**
@@ -69,6 +102,7 @@ class Claim
         inversedBy: 'claims',
         cascade:['persist'],
         )]    
+    #[Groups(['claim:read', 'claim:write'])]
     private Collection $orderItems;
 
     
@@ -240,5 +274,37 @@ class Claim
         return $this;
     }
 
+
+    public function getImages(): array { return $this->images ?? [];}
+    public function setImages(?array $images): static { $this->images = $images ?? []; return $this;}
+
+    public function addImage(string $image): static
+    {
+        if (!in_array($image, $this->images ?? [])) {
+        $this->images[] = $image;
+        }
+        return $this;
+    }
+
+    public function removeImage(string $image): static
+    {
+        $this->images = array_values(array_filter(
+            $this->images ?? [],
+            fn($img) => $img !== $image
+        ));
+
+        return $this;
+    }
+
+    #[Groups(['claim:read'])]
+    public function getImageUrls(): array
+    {
+        // si aucune image n'est définie, on retourne un tableau vide, sinon on retourne un tableau d'url complètes en préfixant le chemin d'accès aux images
+        $urls = [];
+        foreach ($this->images ?? [] as $image) { 
+            $urls[] = 'http://localhost:8000/uploads/images/claims/' . $image;
+        }
+        return $urls;
+    }
   
 }

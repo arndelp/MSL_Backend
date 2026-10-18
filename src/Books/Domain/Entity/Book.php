@@ -15,20 +15,19 @@ use App\Users\Domain\Entity\User;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use ApiPlatform\Metadata\Post;
 use App\Books\UI\ApiPlatform\BookProcessor;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
-use Symfony\Component\HttpFoundation\File\File;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use App\Enum\BookFormat;
 
 
-
-
-
 #[ORM\Entity(repositoryClass: BookRepository::class)]
 #[ApiResource(
     operations: [
-        new Get(),
+        new Get(
+            normalizationContext: [
+                'groups' => ['seller_payment:read'],
+            ],
+        ),
         new GetCollection(),
         new Post(
             processor: BookProcessor::class,
@@ -42,17 +41,16 @@ use App\Enum\BookFormat;
     denormalizationContext: ['groups' => ['book:write', 'authorNames:write']]    
 )]
 #[ORM\HasLifecycleCallbacks]
-#[Vich\Uploadable]
 class Book
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['book:read'])]
+    #[Groups(['book:read', 'seller_payment:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 150)]
-    #[Groups(['book:read','book:write'])]
+    #[Groups(['book:read','book:write', 'seller_payment:read'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 100, nullable: true)]
@@ -157,15 +155,14 @@ class Book
     private ?bool $isVerified = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['book:read'])]
+    #[Groups(['book:read', 'seller_payment:read'])]
     private ?string $cover = null;
 
     #[ORM\Column(type: 'json', nullable: true)]
     #[Groups(['book:read'])]
     private ?array $images = [];
 
-    #[Vich\UploadableField(mapping: 'book_cover', fileNameProperty: 'cover')]
-    private ?File $coverFile = null;
+   
 
     /**
      * @var Collection<int, OrderItem>
@@ -262,19 +259,7 @@ class Book
     public function setIsVerified(?bool $isVerified): static { $this->isVerified = $isVerified; return $this; }
     
     public function getCover(): ?string { return $this->cover; }
-    public function setCover(?string $cover): static { $this->cover = $cover; return $this; } 
-
-    public function getCoverFile(): ?File { return $this->coverFile; }
-    public function setCoverFile(?File $coverFile ): static 
-        { 
-            $this->coverFile = $coverFile;
-
-            //if ($coverFile) {
-             //   $this->updatedAt = new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris'));
-            //}
-
-            return $this;
-        }
+    public function setCover(?string $cover): static { $this->cover = $cover; return $this; }    
 
     public function getImages(): array { return $this->images ?? [];}
     public function setImages(?array $images): static { $this->images = $images ?? []; return $this;}

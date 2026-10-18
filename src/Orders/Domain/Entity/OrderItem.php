@@ -2,7 +2,7 @@
 
 namespace App\Orders\Domain\Entity;
 
-
+use ApiPlatform\Metadata\ApiResource;
 use App\Books\Domain\Entity\Book;
 use App\Orders\Infrastructure\Repository\OrderItemRepository;
 use App\Users\Domain\Entity\User;
@@ -14,14 +14,28 @@ use App\SellerPayments\Domain\Entity\SellerPayment;
 use App\Orders\Domain\Entity\Order;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 
 
 #[ORM\Entity(repositoryClass: OrderItemRepository::class)]
+#[ApiResource(
+    operations: [
+        new Get(
+            normalizationContext: [
+                'groups' => ['seller_payment:read'],
+            ],
+        ),
+        new GetCollection()
+    ]
+)]
 class OrderItem
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['seller_payment:read'])]
     private ?int $id = null;       
    
     #[ORM\ManyToOne(inversedBy: 'orderItems')]
@@ -30,13 +44,14 @@ class OrderItem
 
     #[ORM\ManyToOne(inversedBy: 'orderItems')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['seller_payment:read'])]
     private ?Book $book = null;    
 
     #[ORM\ManyToOne(inversedBy: 'orderItems')]
     #[ORM\JoinColumn(nullable: true)]                      //Attention nullable: true pour le DEBUG
     private ?SellerPayment $sellerPayment = null;  
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]    
     private ?string $book_title = null;
 
     #[ORM\Column]

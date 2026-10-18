@@ -21,36 +21,21 @@ final class FindSPByBuyerAndStatusDelivered
         $data = array_map(fn($item) => [
             'id' => $item->getId(),
             //pour envoyer une collection
-            'books' => $item->getOrder()->getOrderItems()
-                ->filter(
-                    fn($orderItem) => $orderItem->getOrder()->getUserId()?->getId() === $buyer->getId()
-                )
+            'books' => $item->getOrderItems()
                 ->map(fn($orderItem) => [
-                    'title' => $orderItem->getBook()->getTitle(),
+                    'orderItemId' => $orderItem->getId(),
+                    'title' => $orderItem->getBookTitle()
+                        ?? $orderItem->getBook()?->getTitle(),
                     'quantity' => $orderItem->getQuantity(),
-                    'format' => $orderItem->getBook()->getFormat()?->value,
-                    'coverUrl' => $orderItem->getBook()->getCoverUrl(),
+                    'format' => $orderItem->getBook()?->getFormat()?->value,
+                    'coverUrl' => $orderItem->getBook()?->getCoverUrl(),
                 ])
-                ->toArray(),
-            'shippingFirstname' => $item->getOrder()->getShippingFirstname(),
-            'shippingLastname' => $item->getOrder()->getShippingLastname(),
-            'shippingAddressLine1' => $item->getOrder()->getShippingAddressLine1(),
-            'shippingAddressLine2' => $item->getOrder()?->getShippingAddressLine2(),
-            'shippingPostalCode' => $item->getOrder()->getShippingPostalCode(),
-            'shippingCity' => $item->getOrder()->getShippingCity(),
-            'shippingCountry' => $item->getOrder()->getShippingCountry(),
-            'createdAt' => $item->getCreatedAt()?->format('d-m-Y'),
-            'confirmationToken' => $item->getConfirmationToken(),
-            'paymentNumber' => $item->getPaymentNumber(),
-            'shippingMethod' => $item->getShippingMethod(),
+                ->toArray(),            
+            'createdAt' => $item->getCreatedAt()?->format('d-m-Y'),            
+            'paymentNumber' => $item->getPaymentNumber(),            
             'deliveredAt' => $item->getDeliveredAt()?->format('d-m-Y'),
             'coolingOffPeriod' => $item->getEndCoolingOffPeriodAt()?->format('Y-m-d') //ATTENTION: format Y m D
-
-            
-
-        ], $items);
-
-        
+        ], $items);        
 
         return $data;
     }

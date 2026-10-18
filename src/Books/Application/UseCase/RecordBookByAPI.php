@@ -21,16 +21,13 @@ final class RecordBookByApi
 
     public function execute(BookDTO $dto): Book
         {
-
-
             $user = $this->security->getUser();
             
                 if (!$user) {
                         throw new \Exception('Utilisateur non authentifié');
                     }  
-
         
-        // D'abord mapper le DTO
+            // D'abord mapper le DTO
             $book = $this->bookMapper->toEntity($dto);
 
             // Ensuite définir l'auteur
@@ -53,11 +50,7 @@ final class RecordBookByApi
             }
         }
 
-            $book->setCoverFile($dto->cover);
-
-            if ($dto->cover) {
-                $book->setCoverFile($dto->cover);
-            }
+            $book->setCover($dto->cover);
 
             $book->setImages($dto->images ?? []);
 

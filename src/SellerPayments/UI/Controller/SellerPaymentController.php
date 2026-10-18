@@ -14,6 +14,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\SellerPayments\Application\UseCase\GetSellerPayment;
+use App\SellerPayments\Application\UseCase\FindSPById;
+
 
 final class SellerPaymentController extends AbstractController
 {
@@ -23,7 +25,8 @@ final class SellerPaymentController extends AbstractController
         private FindSPBySellerAndStatusConfirmed $findSPByStatusandSellerConfirmed,
         private FindSPBySellerAndStatusWaitingConfirmation $findSPByStatusandSellerWaitingConfirmation,
         private GetSellerPayment $getSellerPayment,
-        private FindSPByBuyerAndStatusDelivered $findSPByBuyerAndStatusDelivered
+        private FindSPByBuyerAndStatusDelivered $findSPByBuyerAndStatusDelivered,
+        private FindSPById $findSPById
     ) {}
 
     public function findSellerPaymentBySellerWaitingConfirmation(): JsonResponse
@@ -93,16 +96,17 @@ final class SellerPaymentController extends AbstractController
         ]);
     }    
 
-    public function details(GetSellerPayment $getSellerPayment, int $id): Response
+    public function findSellerPaymentDetails( int $id, SellerPaymentRepositoryInterface $sellerPayment): JsonResponse
     {
-        $sellerPayment = $getSellerPayment->execute($id);
+        $buyer = $this->security->getUser();
 
-        if(!$sellerPayment) {
-            $this->addFlash(type: 'error', message: 'Aucun paiement vendeur trouvé');
-            return $this->redirectToRoute('orders.list.alls');
+        if (!$buyer instanceof User) {
+            return new JsonResponse(['error' => 'Utilisateur non authertifié'], 401);
         }
 
-        return $this->render('@SellerPayments/details.html.twig', ['sellerPayment' => $sellerPayment]);
+        $data = $this->findSPById->execute($id);
+
+        return $this->json($data);
     }
 
     public function findSellerPaymentByBuyerDelivered(): JsonResponse
@@ -121,5 +125,38 @@ final class SellerPaymentController extends AbstractController
 
         return $this->json($data);
     }
+
+
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public function details(GetSellerPayment $getSellerPayment, int $id): Response
+    {
+        $sellerPayment = $getSellerPayment->execute($id);
+
+        if(!$sellerPayment) {
+            $this->addFlash(type: 'error', message: 'Aucun paiement vendeur trouvé');
+            return $this->redirectToRoute('orders.list.alls');
+        }
+
+        return $this->render('@SellerPayments/details.html.twig', ['sellerPayment' => $sellerPayment]);
+    }
+
+    
     
 }

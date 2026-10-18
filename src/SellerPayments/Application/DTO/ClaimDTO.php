@@ -22,5 +22,7 @@ final class ClaimDTO
         new Assert\Type(type: 'integer'),
         new Assert\Positive(message: 'Identifiant de livre invalide.'),
     ])]
-    public array $orderItemIds = [];
+    public ?array $orderItemIds = [];
+
+    public ?array $images = []; 
 }

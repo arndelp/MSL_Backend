@@ -2,7 +2,7 @@
 
 namespace App\SellerPayments\Domain\Entity;
 
-
+use ApiPlatform\Metadata\ApiResource;
 use App\SellerPayments\Domain\Entity\Claim;
 use App\Orders\Domain\Entity\Order;
 use App\Users\Domain\Entity\User;
@@ -16,14 +16,28 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Enum\CancellationReason;
 use App\Enum\PayoutStatus;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 
 #[ORM\Entity]
+#[ApiResource(
+    operations: [
+        new Get(
+            normalizationContext: [
+                'groups' => ['seller_payment:read'],
+            ],
+        ),
+        new GetCollection()
+    ]
+)]
 #[ORM\Table(name: 'seller_payments')]
 class SellerPayment
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
+    #[Groups(['seller_payment:read'])]
     private ?int $id = null;
 
     /*
@@ -49,6 +63,7 @@ class SellerPayment
         cascade:['persist'], 
         orphanRemoval: true
     )]
+    #[Groups(['seller_payment:read'])]
     private Collection $orderItems;
 
     

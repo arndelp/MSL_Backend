@@ -7,11 +7,14 @@ use ApiPlatform\State\ProcessorInterface;
 use App\SellerPayments\Domain\Entity\Claim;
 use App\SellerPayments\Application\UseCase\RecordClaimByApi;
 use App\SellerPayments\Application\DTO\ClaimDTO;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use App\Shared\Infrastructure\Service\ImageConverter;
 
 class ClaimProcessor implements ProcessorInterface
 {
     public function __construct (
-        private RecordClaimByApi $useCase
+        private RecordClaimByApi $useCase,
+        private ImageConverter $imageConverter,
     ) {}
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Claim
@@ -28,7 +31,30 @@ class ClaimProcessor implements ProcessorInterface
         $dto->reason = $request->request->get('reason');
         $dto->message = $request->request->get('message');
 
-        $dto->orderItems = $request->request->all('orderItems');
+        $dto->orderItemIds = array_map( //convertir les identifiants recçu en entier
+            'intval',
+            $request->request->all('orderItemIds')
+        );
+
+
+        // images
+        $files = $request->files->get('images', []);
+
+        if ($files instanceof UploadedFile) {
+            $files = [$files];
+        }
+
+        $filenames = [];
+
+        foreach ($files as $file) {
+            if (!$file instanceof UploadedFile) {
+                continue;
+            }
+
+            $filenames[] = $this->imageConverter->convertToWebp($file,'images');
+        }
+
+        $dto->images = $filenames;
 
         return $this->useCase->execute($dto);
     }
