@@ -127,24 +127,6 @@ final class SellerPaymentController extends AbstractController
     }
 
 
-
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public function details(GetSellerPayment $getSellerPayment, int $id): Response
     {
         $sellerPayment = $getSellerPayment->execute($id);

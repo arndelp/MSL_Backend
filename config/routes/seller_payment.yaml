@@ -37,6 +37,17 @@ api.seller.find.sellerPayment.shipped:
   controller: App\SellerPayments\UI\Controller\SellerPaymentController::findSellerPaymentBySellerShipped
   methods: [GET]
 
+api.claim.sellerPayment:
+  path: /api/claim/{sellerPaymentId}
+  controller: App\SellerPayments\UI\Controller\ClaimController::findClaimBySellerPayment
+  methods: [GET]
+
+api.message.claim:
+  path: /api/claimMessage/{claimId}
+  controller: App\SellerPayments\UI\Controller\ClaimController::findMessageByClaim
+  methods: [GET]
+
+
 
 
 api.buyer.find.sellerPayment.delivered:
@@ -52,7 +63,7 @@ api.buyer.find.sellerPayment.details:
 api.buyer.findById.sellerPayment:
   path: /api/sellerPayment/{id}
   controller: App\SellerPayments\UI\Controller\SellerPaymentController::findSellerPaymentDetails
-  
+  methods: [GET]
 
 
 sellerPayments.details:

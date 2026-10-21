@@ -13,8 +13,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\SellerPayments\Infrastructure\Repository\ClaimRepository;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use App\SellerPayments\UI\ApiPlatform\ClaimProcessor;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -22,8 +20,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: ClaimRepository::class)]
 #[ApiResource(
     operations: [
-        new Get(),
-        new GetCollection(),
         new Post(
             processor: ClaimProcessor::class,
             inputFormats: [

@@ -12,7 +12,7 @@ interface SellerPaymentRepositoryInterface
 
     public function findBySellerAndStatusConfirmed(User $seller): array;
 
-    public function findBySellerAndStatusShipped(User $seller): array;
+    public function findSPBySellerAndStatusShipped(User $seller): array;
 
     public function findById(int $id): ?SellerPayment;
 

@@ -66,18 +66,21 @@ security:
         - { path: ^/api/authors, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api/stripe/connect/return, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api/catwithbookcount, roles: PUBLIC_ACCESS, methods: [GET]}
+       
 
 
         # Accès restreint (frontend)
         - { path: ^/api/me, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/orders, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/books, roles: IS_AUTHENTICATED_FULLY, methods: [POST, PUT] }
+
        
         - { path: ^/api/userBooks, roles: IS_AUTHENTICATED_FULLY, methods: [GET]}
         - { path: ^/api/seller/findSellerPaymentPendingConfirmation, roles: IS_AUTHENTICATED_FULLY, methods: [GET] }
         - { path: ^/api/seller/findSellerPaymentConfirmed, roles: IS_AUTHENTICATED_FULLY, methods: [GET] }
         - { path: ^/api/seller/findSellerPaymentShipped, roles: IS_AUTHENTICATED_FULLY, methods: [GET] }
         - { path: ^/api/authorNamesByUser, roles: IS_AUTHENTICATED_FULLY, methods: [GET] }
+        - { path: ^/api/claimMessages/\d+$, roles: IS_AUTHENTICATED_FULLY, methods: [GET]}
 
         - { path: ^/api/deleteBook/\d+$, roles: IS_AUTHENTICATED_FULLY, methods: [DELETE]}
 

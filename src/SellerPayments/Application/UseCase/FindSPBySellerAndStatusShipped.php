@@ -13,7 +13,7 @@ final class FindSPBySellerAndStatusShipped
 
     public function execute($seller):  array
     {
-        $items = $this->repository->findBySellerAndStatusShipped($seller);
+        $items = $this->repository->findSPBySellerAndStatusShipped($seller);
 
         $data = array_map(fn($item) => [
             'id' => $item->getId(),
@@ -36,10 +36,12 @@ final class FindSPBySellerAndStatusShipped
             'shippingPostalCode' => $item->getOrder()->getShippingPostalCode(),
             'shippingCity' => $item->getOrder()->getShippingCity(),
             'shippingCountry' => $item->getOrder()->getShippingCountry(),
-            'createdAt' => $item->getCreatedAt()?->format('d-m-Y'),
-            'confirmationToken' => $item->getConfirmationToken(),
+            'createdAt' => $item->getCreatedAt()?->format('d-m-Y'),           
             'paymentNumber' => $item->getPaymentNumber(),
             'shippingMethod' => $item->getShippingMethod(),
+            
+           
+          
             
 
         ], $items);

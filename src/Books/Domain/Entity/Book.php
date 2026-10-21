@@ -15,20 +15,12 @@ use App\Users\Domain\Entity\User;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use ApiPlatform\Metadata\Post;
 use App\Books\UI\ApiPlatform\BookProcessor;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
 use App\Enum\BookFormat;
 
 
 #[ORM\Entity(repositoryClass: BookRepository::class)]
 #[ApiResource(
-    operations: [
-        new Get(
-            normalizationContext: [
-                'groups' => ['seller_payment:read'],
-            ],
-        ),
-        new GetCollection(),
+    operations: [           
         new Post(
             processor: BookProcessor::class,
             inputFormats: [

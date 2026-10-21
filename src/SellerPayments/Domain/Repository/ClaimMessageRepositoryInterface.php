@@ -2,9 +2,9 @@
 
 namespace App\SellerPayments\Domain\Repository;
 
-use App\SellerPayments\Domain\Entity\ClaimMessage;
+
 
 interface ClaimMessageRepositoryInterface 
 {
-    
+   public function findMessageByClaim(int $claimId): array;
 }
