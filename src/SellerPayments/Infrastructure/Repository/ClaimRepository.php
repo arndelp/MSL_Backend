@@ -39,4 +39,17 @@ class ClaimRepository extends ServiceEntityRepository implements ClaimRepository
             return $this->find($claimId);
         }
 
+    public function findClaimByUser(int $userId): array
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.seller', 's')
+            ->join('c.buyer', 'b')
+            ->where('s.id = :userId')
+            ->orWhere('b.id = :userId')
+            ->setParameter('userId', $userId)
+            ->orderBy('c.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
 }

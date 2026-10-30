@@ -14,6 +14,8 @@ interface SellerPaymentRepositoryInterface
 
     public function findSPBySellerAndStatusShipped(User $seller): array;
 
+    public function findSPBySellerAndStatusDelivered(User $seller): array;
+
     public function findById(int $id): ?SellerPayment;
 
     public function findConfirmationTokenById(int $id, string $confirmationToken): ?SellerPayment;

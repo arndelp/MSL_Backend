@@ -11,6 +11,10 @@ use Symfony\Bundle\SecurityBundle\Security;
 use App\SellerPayments\Domain\Repository\SellerPaymentRepositoryInterface;
 use App\SellerPayments\Application\UseCase\FindClaimBySellerPayment;
 use App\SellerPayments\Application\UseCase\FindMessageByClaim;
+use App\SellerPayments\Application\UseCase\FindClaimByUser;
+use App\SellerPayments\Domain\Repository\ClaimRepositoryInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 
 
@@ -23,6 +27,8 @@ final class ClaimController extends AbstractController
         private SellerPaymentRepositoryInterface $sellerPaymentRepository,
         private FindClaimBySellerPayment $findClaimBySellerPayment,
         private FindMessageByClaim $findMessageByClaim,
+        private FindClaimByUser $findClaimByUser,
+        private ClaimRepositoryInterface $claimRepository,
     ){}
 
     
@@ -59,7 +65,7 @@ final class ClaimController extends AbstractController
 
     }
 
-    public function findMessageByClaim(int $claimId): JsonResponse
+    public function findMessageByClaim(int $id): JsonResponse
     {
         //sécutisation
         $user = $this->security->getUser();
@@ -68,26 +74,48 @@ final class ClaimController extends AbstractController
             return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
         }
 
-        $claim = $this->claimRepository->findById($claimId);
+        $claim = $this->claimRepository->findById($id);
 
         if (!$claim) {
             throw new NotFoundHttpException(
-                    'réclamation introuvable.'
+                    'Pas de message pour cette demande.'
                 );
         }
 
-        $isBuyer = $claim->getSellerPayment()->getOrder()->getUserId()->getId() === $user->getId();
-        $isSeller = $claim->getSellerPayment()->getOrder()->getUserId()->getId() === $user->getId();
-   
-   
-       if (!$isBuyer && !$isSeller) {
+       $sellerPayment = $claim->getSellerPayment();
+
+        $isBuyer = $sellerPayment->getOrder()->getUserId()->getId() === $user->getId();
+
+        $isSeller = $sellerPayment->getSeller()->getId() === $user->getId();
+
+        if (!$isBuyer && !$isSeller) {
             throw new AccessDeniedHttpException(
                 'Vous ne pouvez pas consulter ces messages.'
             );
         }
-        $data = $this->findMessageByClaim->execute($claimId);
+        $data = $this->findMessageByClaim->execute($id);
 
         return $this->json($data);
     }
 
+    public function findClaimByUser(): JsonResponse
+    {
+        
+        $user = $this->security->getUser();
+
+        if (!$user instanceof User) {
+            return new JsonResponse(
+                ['error' => 'Utilisateur non authentifié'],
+                401
+            );
+        }
+
+        $userId = $user->getId();
+
+        $data = $this->findClaimByUser->execute($userId);
+
+       
+
+        return $this->json($data);        
+    }
 }

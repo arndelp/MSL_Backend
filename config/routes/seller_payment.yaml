@@ -13,6 +13,11 @@ api.seller.refuse.sellerPayment:
   controller: App\SellerPayments\UI\Controller\SellerActionSellerPaymentController::refuse
   methods: [POST]
 
+api.claimMessage.post:
+  path: /api/claimMessage
+  controller: App\SellerPayments\UI\Controller\ClaimMessageController::record
+  methods: [POST]
+
 
 
 
@@ -37,14 +42,24 @@ api.seller.find.sellerPayment.shipped:
   controller: App\SellerPayments\UI\Controller\SellerPaymentController::findSellerPaymentBySellerShipped
   methods: [GET]
 
+api.seller.find.sellerPayment.delivered:
+  path: /api/seller/findSellerPaymentDelivered
+  controller: App\SellerPayments\UI\Controller\SellerPaymentController::findSellerPaymentBySellerDelivered
+  methods: [GET]
+
 api.claim.sellerPayment:
   path: /api/claim/{sellerPaymentId}
   controller: App\SellerPayments\UI\Controller\ClaimController::findClaimBySellerPayment
   methods: [GET]
 
 api.message.claim:
-  path: /api/claimMessage/{claimId}
+  path: /api/claimMessages/{id}
   controller: App\SellerPayments\UI\Controller\ClaimController::findMessageByClaim
+  methods: [GET]
+
+api.claim.user:
+  path: /api/allClaims
+  controller: App\SellerPayments\UI\Controller\ClaimController::findClaimByUser
   methods: [GET]
 
 

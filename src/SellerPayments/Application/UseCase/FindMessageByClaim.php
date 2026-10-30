@@ -10,17 +10,18 @@ final class FindMessageByClaim
         private ClaimMessageRepositoryInterface $repository,
     ){}
 
-    public function execute($claimId): array
+    public function execute($id): array
     {
-        $messages = $this->repository->findMessageByClaim($claimId);
+        $messages = $this->repository->findMessageByClaim($id);
 
         $data = array_map(fn($message) => [
 
            'id' => $message->getId(),
            'createdAt' => $message->getCreatedAt(),
            'message' => $message->getMessage(),
-            'author' => $message->getAuthor->getId(),
-            'isRead' => $message->getIsRead()
+            'author' => $message->getAuthor()->getId(),
+            'isRead' => $message->getIsRead(),
+            'paymentNumber' => $message->getClaim()->getSellerPayment()->getPaymentNumber(),
         ], $messages);
 
         return $data;

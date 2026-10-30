@@ -87,7 +87,7 @@ class ClaimMessage
         return $this;
     }
 
-    public function isRead(): ?bool
+    public function getIsRead(): ?bool
     {
         return $this->isRead;
     }

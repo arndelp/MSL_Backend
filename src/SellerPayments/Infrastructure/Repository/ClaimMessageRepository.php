@@ -17,16 +17,25 @@ class ClaimMessageRepository extends ServiceEntityRepository implements ClaimMes
         parent::__construct($registry, ClaimMessage::class);
     }
 
-    public function findMessageByClaim(int $claimId): array
+    public function findMessageByClaim(int $id): array
     {
         return $this->createQueryBuilder('cm')
             ->join('cm.claim', 'c')
-            ->where('c.id = :claimId')
-            ->setParameter('claimId', $claimId)
-            ->orderBy('cm.createdAt', 'DESC')
+            ->where('c.id = :id')
+            ->setParameter('id', $id)
+            ->orderBy('cm.createdAt', 'ASC')
             ->getQuery()
             ->getResult();
     }
+
+    public function save(ClaimMessage $claimMessage): void
+    {
+        $em = $this->getEntityManager();
+        $em->persist($claimMessage);
+        $em->flush();
+
+    }
+
 
     // public function findMessageBySellerPayment(int $sellerPaymentId): array
     // {

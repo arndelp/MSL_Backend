@@ -65,13 +65,28 @@ class SellerPaymentRepository extends  ServiceEntityRepository implements Seller
             );
     }
 
-    public function findSPBySellerAndStatusShipped(User $seller): array
+    public function findSPBySellerAndStatusDelivered(User $seller): array
     {
         return
             $this->findBy(
                 [
                     'seller' => $seller,
                     'status' => SellerPaymentStatus::DELIVERED
+                ],
+                [
+                    'updated_at' => 'DESC'
+                ]
+            );
+    }
+
+
+    public function findSPBySellerAndStatusShipped(User $seller): array
+    {
+        return
+            $this->findBy(
+                [
+                    'seller' => $seller,
+                    'status' => SellerPaymentStatus::SHIPPED
                 ],
                 [
                     'updated_at' => 'DESC'

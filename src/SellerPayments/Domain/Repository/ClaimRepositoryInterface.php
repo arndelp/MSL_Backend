@@ -11,4 +11,6 @@ interface ClaimRepositoryInterface
     public function findClaimBySP(int $sellerPaymentId): array;
 
     public function findById(int $claimId): ?Claim;
+
+    public function findClaimByUser(int $userId): array;
 }

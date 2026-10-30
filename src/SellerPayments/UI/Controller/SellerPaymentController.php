@@ -3,6 +3,7 @@
 namespace App\SellerPayments\UI\Controller;
 
 use App\SellerPayments\Application\UseCase\FindSPBySellerAndStatusShipped;
+use App\SellerPayments\Application\UseCase\FindSPBySellerAndStatusDelivered;
 use App\SellerPayments\Application\UseCase\FindSPBySellerAndStatusConfirmed;
 use App\SellerPayments\Application\UseCase\FindSPBySellerAndStatusWaitingConfirmation;
 use App\SellerPayments\Application\UseCase\FindSPByBuyerAndStatusDelivered;
@@ -21,6 +22,7 @@ final class SellerPaymentController extends AbstractController
 {
     public function __construct(
         private Security $security,
+        private FindSPBySellerAndStatusDelivered $findSPByStatusandSellerDelivered,
         private FindSPBySellerAndStatusShipped $findSPByStatusandSellerShipped,
         private FindSPBySellerAndStatusConfirmed $findSPByStatusandSellerConfirmed,
         private FindSPBySellerAndStatusWaitingConfirmation $findSPByStatusandSellerWaitingConfirmation,
@@ -64,6 +66,19 @@ final class SellerPaymentController extends AbstractController
         }
 
         $data = $this->findSPByStatusandSellerShipped->execute($seller);
+
+        return $this->json($data);
+    }
+
+    public function findSellerPaymentBySellerDelivered(): JsonResponse
+    {
+        $seller = $this->security->getUser();
+
+        if (!$seller instanceof User) {
+            return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
+        }
+
+        $data = $this->findSPByStatusandSellerDelivered->execute($seller);
 
         return $this->json($data);
     }
