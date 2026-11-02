@@ -10,7 +10,7 @@ final class FindClaimByUser
         private ClaimRepositoryInterface $repository,
     ){}
 
-    public function execute($userId): array
+    public function execute(int $userId): array
     {
        
         $claims = $this->repository->findClaimByUser($userId);

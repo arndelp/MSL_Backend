@@ -20,12 +20,12 @@ class ClaimMessageRepository extends ServiceEntityRepository implements ClaimMes
     public function findMessageByClaim(int $id): array
     {
         return $this->createQueryBuilder('cm')
-            ->join('cm.claim', 'c')
+            ->join('cm.claim', 'c')            
             ->where('c.id = :id')
             ->setParameter('id', $id)
             ->orderBy('cm.createdAt', 'ASC')
             ->getQuery()
-            ->getResult();
+            ->getResult(); //Pour avoir un tableau de valeur (message)
     }
 
     public function save(ClaimMessage $claimMessage): void
@@ -33,6 +33,52 @@ class ClaimMessageRepository extends ServiceEntityRepository implements ClaimMes
         $em = $this->getEntityManager();
         $em->persist($claimMessage);
         $em->flush();
+
+    }
+
+    public function hasMessageNotReadByUser(int $userId): bool
+    {
+        return (bool) $this->createQueryBuilder('cm')
+            ->join('cm.claim', 'c')            
+            ->join('cm.author', 'a')
+            ->where('(c.buyer = :id OR c.seller = :id)')
+            ->andWhere('a.id != :id')
+            ->andWhere('cm.isRead = false')
+            ->setParameter('id', $userId)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult(); // pour avoir un retour booléen
+    }
+
+    public function hasMessageNotReadByUserAndClaim(int $userId, int $claimId): bool
+    {
+        return (bool) $this->createQueryBuilder('cm')
+            ->join('cm.claim', 'c')            
+            ->join('cm.author', 'a')
+            ->where('(c.buyer = :userId OR c.seller = :userId)')
+            ->andWhere('a.id != :userId')
+            ->andWhere('cm.isRead = false')
+            ->andWhere('c.id = :claimId')
+            ->setParameter('userId', $userId)
+            ->setParameter('claimId', $claimId)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findMessageByClaimAndNotUser(int $userId, int $claimId): array
+    {
+        return $this->createQueryBuilder('cm')
+            ->join('cm.claim', 'c')
+            ->join('cm.author', 'a')
+            ->where('(c.buyer = :userId OR c.seller = :userId)')
+            ->andWhere('a.id != :userId')
+            ->andWhere('cm.isRead = false')
+            ->andWhere('c.id = :claimId')
+            ->setParameter('userId', $userId)
+            ->setParameter('claimId', $claimId)
+            ->getQuery()
+            ->getResult();
 
     }
 

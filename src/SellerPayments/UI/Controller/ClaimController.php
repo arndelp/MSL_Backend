@@ -11,10 +11,13 @@ use Symfony\Bundle\SecurityBundle\Security;
 use App\SellerPayments\Domain\Repository\SellerPaymentRepositoryInterface;
 use App\SellerPayments\Application\UseCase\FindClaimBySellerPayment;
 use App\SellerPayments\Application\UseCase\FindMessageByClaim;
+use App\SellerPayments\Application\UseCase\FindUnreadMessageByUserAndClaim;
 use App\SellerPayments\Application\UseCase\FindClaimByUser;
 use App\SellerPayments\Domain\Repository\ClaimRepositoryInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use App\SellerPayments\Application\UseCase\FindImagesByClaim;
+
 
 
 
@@ -29,9 +32,9 @@ final class ClaimController extends AbstractController
         private FindMessageByClaim $findMessageByClaim,
         private FindClaimByUser $findClaimByUser,
         private ClaimRepositoryInterface $claimRepository,
-    ){}
-
-    
+        private FindUnreadMessageByUserAndClaim $findUnreadMessageByUserAndClaim,
+        private FindImagesByClaim $findImagesByClaimId
+    ){}    
 
     public function findClaimBySellerPayment(int $sellerPaymentId): JsonResponse
     {
@@ -62,7 +65,6 @@ final class ClaimController extends AbstractController
         $data = $this->findClaimBySellerPayment->execute($sellerPaymentId);
 
         return $this->json($data);
-
     }
 
     public function findMessageByClaim(int $id): JsonResponse
@@ -93,14 +95,14 @@ final class ClaimController extends AbstractController
                 'Vous ne pouvez pas consulter ces messages.'
             );
         }
-        $data = $this->findMessageByClaim->execute($id);
+        $data = $this->findMessageByClaim->execute($id);        
 
         return $this->json($data);
     }
 
+
     public function findClaimByUser(): JsonResponse
-    {
-        
+    {        
         $user = $this->security->getUser();
 
         if (!$user instanceof User) {
@@ -114,8 +116,32 @@ final class ClaimController extends AbstractController
 
         $data = $this->findClaimByUser->execute($userId);
 
-       
+        foreach ($data as &$claim) { // "&" permet de modifier directement le tableau d'origine (içi: ajouter hasUnreadMessages pour chaque $claim)
+            $claim['hasUnreadMessages'] =
+                $this->findUnreadMessageByUserAndClaim->execute(
+                    $userId,
+                    $claim['id']
+                );
+        }
 
+        unset($claim); //unset() évite de conserver accidentellement une référence vers son dernier élément après la boucle.
+        
         return $this->json($data);        
+    }
+
+    public function findImagesByClaim(int $id): JsonResponse
+    {
+        $user = $this->security->getUser();
+
+        if (!$user instanceof User) {
+            return new JsonResponse(
+                ['error' => 'Utilisateur non authentifié'],
+                401
+            );
+        }
+
+        $data = $this->findImagesByClaimId->execute($id);
+
+        return $this->json($data);
     }
 }

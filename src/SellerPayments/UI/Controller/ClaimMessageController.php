@@ -13,6 +13,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Psr\Log\LoggerInterface;
 use App\SellerPayments\Application\UseCase\FindClaimById;
+use App\SellerPayments\Application\UseCase\FindUnreadMessageByUser;
+use App\SellerPayments\Application\UseCase\SetAllClaimMessageAsRead;
 
 
 
@@ -22,97 +24,147 @@ final class ClaimMessageController extends AbstractController
         private Security $security,   
         private ValidatorInterface $validator,
         private RecordMessageByApi $recordMessageByApi,
-        private FindClaimById $findClaimById
+        private FindClaimById $findClaimById,
+        private FindUnreadMessageByUser $findUnreadMessageByUser,
+        private SetAllClaimMessageAsRead $setAllClaimMessageAsRead
     ) {}
 
     public function record(Request $request,LoggerInterface $logger): Response 
     {
 
-    //sécutisation
-    $user = $this->security->getUser();
+        //sécutisation
+        $user = $this->security->getUser();
 
-    if (!$user instanceof User) {
-        return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
-    }
+        if (!$user instanceof User) {
+            return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
+        }
+
+        
+
+        // Récupération des données JSON à partir de la requête
+        $data = json_decode($request->getContent(), true);  
+
+        if (empty($data)) {
+            return new JsonResponse(['error' => 'Données reçues vides'], 400);
+        }
+
+        // Création du DTO à partir des données reçues
+        $dto = new ClaimMessageDTO();
+        $dto->message = $data['message'] ?? null;
+        $dto->claimId = (int) ($data['claimId'] ?? 0);
+
+        $claim = $this->findClaimById->execute($dto->claimId);
 
     
 
-    // Récupération des données JSON à partir de la requête
-    $data = json_decode($request->getContent(), true);  
+        if (!$claim) {
+                throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException(
+                    'Réclamation introuvable.'
+                );
+            }
 
-    if (empty($data)) {
-        return new JsonResponse(['error' => 'Données reçues vides'], 400);
-    }
+        $isBuyer = $claim['buyerId'] === $user->getId(); //$claim['buyerId'] car le useCase envoie un tableau
+        $isSeller = $claim['sellerId'] === $user->getId();
 
-    // Création du DTO à partir des données reçues
-    $dto = new ClaimMessageDTO();
-    $dto->message = $data['message'] ?? null;
-    $dto->claimId = (int) ($data['claimId'] ?? 0);
-
-    $claim = $this->findClaimById->execute($dto->claimId);
-
-  
-
-    if (!$claim) {
-            throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException(
-                'Réclamation introuvable.'
+        if (!$isBuyer && !$isSeller) {
+            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException(
+                'Vous ne pouvez pas envoyer de message dans cette conversation.'
             );
         }
 
-    $isBuyer = $claim['buyerId'] === $user->getId(); //$claim['buyerId'] car le useCase envoie un tableau
-    $isSeller = $claim['sellerId'] === $user->getId();
-
-    if (!$isBuyer && !$isSeller) {
-        throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException(
-            'Vous ne pouvez pas envoyer de message dans cette conversation.'
-        );
-    }
 
 
-
-    // Validation
-    $errors = $this->validator->validate($dto);
-    if (count($errors) > 0) {
-        return new JsonResponse(['errors' => (string) $errors], 400);
-    }
-
-    try {
-        //UseCase
-        $claimMessage = $this->recordMessageByApi->execute($dto, $user);
-
-        if (!$claimMessage) {
-            throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException(
-                'Réclamation introuvable.'
-            );
+        // Validation
+        $errors = $this->validator->validate($dto);
+        if (count($errors) > 0) {
+            return new JsonResponse(['errors' => (string) $errors], 400);
         }
 
-        //email
-        // $sendMail->execute(
-        //     from: 'Monsalondulivre.fr <automated@monsalondulivre.fr>',   
-        //     to: 'arndelp80@gmail.com',
-        //     subject: $contactMessage->getSubject(),
-        //     content: $contactMessage->getContent()
-        // );
-    } catch (\InvalidArgumentException $e) {
-            // Erreurs métier (ex: message de contact déjà enregistré)
-            return new JsonResponse(['error' => $e->getMessage()], 400);
+        try {
+            //UseCase
+            $claimMessage = $this->recordMessageByApi->execute($dto, $user);
 
-        } catch (\Throwable $e)  {
-            //Erreurs serveur
-            $logger->error('Erreur en recevant le nouveau message de contact : ' . $e->getMessage(), [
-                'exception' => $e,
-                'trace' => $e->getTraceAsString()
-            ]);
-            return new JsonResponse(['error' => 'Erreur interne serveur.'], 500);
-        }     
+            if (!$claimMessage) {
+                throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException(
+                    'Réclamation introuvable.'
+                );
+            }
 
-    return new JsonResponse([
-        'success' => true,
-        'message' => 'Message envoyé.',
-        'id' => $claimMessage->getId(),
-    ], 201);
+            //email
+            // $sendMail->execute(
+            //     from: 'Monsalondulivre.fr <automated@monsalondulivre.fr>',   
+            //     to: 'arndelp80@gmail.com',
+            //     subject: $contactMessage->getSubject(),
+            //     content: $contactMessage->getContent()
+            // );
+        } catch (\InvalidArgumentException $e) {
+                // Erreurs métier (ex: message de contact déjà enregistré)
+                return new JsonResponse(['error' => $e->getMessage()], 400);
+
+            } catch (\Throwable $e)  {
+                //Erreurs serveur
+                $logger->error('Erreur en recevant le nouveau message de contact : ' . $e->getMessage(), [
+                    'exception' => $e,
+                    'trace' => $e->getTraceAsString()
+                ]);
+                return new JsonResponse(['error' => 'Erreur interne serveur.'], 500);
+            }     
+
+        return new JsonResponse([
+            'success' => true,
+            'message' => 'Message envoyé.',
+            'id' => $claimMessage->getId(),
+        ], 201);
     }
+
+
+
     
+    public function hasUnreadMessagesByUser(): JsonResponse
+    {
+        $user = $this->security->getUser();
 
+        if (!$user instanceof User) {
+            return new JsonResponse(['error' => 'Non authentifié'], 401);
+        }
+
+        $hasUnreadMessages = $this->findUnreadMessageByUser
+            ->execute($user->getId());
+
+        return new JsonResponse([
+            'hasUnreadMessages' => $hasUnreadMessages
+        ]);
+    } 
+
+    public function setAllClaimMessageByClaimNotUserAsRead(int $id): JsonResponse
+    {
+        $user = $this->security->getUser();
+
+        if (!$user instanceof User) {
+            return new JsonResponse(['error' => 'Non authentifié'], 401);
+        }
+
+        $userId = $user->getId();
+
+        try {
+            $this->setAllClaimMessageAsRead->execute($userId, $id);
+
+            return new JsonResponse([
+                'success' => 'Message à jour avec succès'
+            ], 200);
+        } catch (\InvalidArgumentException $e) {
+            return new JsonResponse([
+                'error' => $e->getMessage()
+            ], 404);
+
+        } catch (\Throwable $e) {
+            return new JsonResponse([
+                'error' => 'Mise à jour du message impossible, veuillez nous contacter',
+            ], 500);
+        }
+    }
+
+
+    
        
 }

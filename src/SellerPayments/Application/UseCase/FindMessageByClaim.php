@@ -22,6 +22,7 @@ final class FindMessageByClaim
             'author' => $message->getAuthor()->getId(),
             'isRead' => $message->getIsRead(),
             'paymentNumber' => $message->getClaim()->getSellerPayment()->getPaymentNumber(),
+            'claimId' => $message->getClaim()->getId(),
         ], $messages);
 
         return $data;

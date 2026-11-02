@@ -3,6 +3,13 @@ api.seller.sellerPayment.toBeShipped:
   controller: App\SellerPayments\UI\Controller\SellerActionSellerPaymentController::itemShipped
   methods: [PATCH]
 
+api.setClaimMessageAsRead:
+  path: /api/setAsRead/{id}
+  controller: App\SellerPayments\UI\Controller\ClaimMessageController::setAllClaimMessageByClaimNotUserAsRead
+  methods : [PATCH]
+
+
+
 api.seller.accept.sellerPayment:
   path: /api/seller/sellerPayment/{id}/accept
   controller: App\SellerPayments\UI\Controller\SellerActionSellerPaymentController::accept
@@ -62,6 +69,19 @@ api.claim.user:
   controller: App\SellerPayments\UI\Controller\ClaimController::findClaimByUser
   methods: [GET]
 
+api.unreadMessage.user:
+  path: /api/unreadMessage
+  controller: App\SellerPayments\UI\Controller\ClaimMessageController::hasUnreadMessagesByUser
+  methods: [GET]
+
+api.unreadMessage.user.claim:
+  path: /api/unreadMessageByClaim
+  controller: App\SellerPayments\UI\Controller\ClaimMessageController::hasUnreadMessagesByUserAndClaim
+  methods: [GET]
+
+api.images.claim:
+  path: /api/imagesByClaim/{id}
+  controller: App\SellerPayments\UI\Controller\ClaimController::findImagesByClaim
 
 
 

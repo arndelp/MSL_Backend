@@ -298,7 +298,7 @@ class Claim
         // si aucune image n'est définie, on retourne un tableau vide, sinon on retourne un tableau d'url complètes en préfixant le chemin d'accès aux images
         $urls = [];
         foreach ($this->images ?? [] as $image) { 
-            $urls[] = 'http://localhost:8000/uploads/images/claims/' . $image;
+            $urls[] = 'http://localhost:8000/uploads/images/' . $image;
         }
         return $urls;
     }
