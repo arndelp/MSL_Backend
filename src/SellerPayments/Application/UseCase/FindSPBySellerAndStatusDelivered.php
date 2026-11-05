@@ -27,6 +27,8 @@ final class FindSPBySellerAndStatusDelivered
                     'quantity' => $orderItem->getQuantity(),
                     'format' => $orderItem->getBook()->getFormat()?->value,
                     'coverUrl' => $orderItem->getBook()->getCoverUrl(),
+                    'price' => $orderItem->getBook()->getPrice(),
+                    'quantity' => $orderItem->getQuantity(),
                 ])
                 ->toArray(),
             'shippingFirstname' => $item->getOrder()->getShippingFirstname(),

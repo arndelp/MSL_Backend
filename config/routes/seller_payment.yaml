@@ -54,8 +54,13 @@ api.seller.find.sellerPayment.delivered:
   controller: App\SellerPayments\UI\Controller\SellerPaymentController::findSellerPaymentBySellerDelivered
   methods: [GET]
 
+api.seller.find.sellerPayment.refund:
+  path: /api/seller/findSellerPayment/{sellerPaymentId}
+  controller: App\SellerPayments\UI\Controller\SellerPaymentController::findSellerPaymentByIdForRefund
+  methods: [GET]
+
 api.claim.sellerPayment:
-  path: /api/claim/{sellerPaymentId}
+  path: /api/claim/
   controller: App\SellerPayments\UI\Controller\ClaimController::findClaimBySellerPayment
   methods: [GET]
 

@@ -154,6 +154,21 @@ final class SellerPaymentController extends AbstractController
         return $this->render('@SellerPayments/details.html.twig', ['sellerPayment' => $sellerPayment]);
     }
 
+    public function findSellerPaymentByIdForRefund(string $sellerPaymentId): JsonResponse
+    {
+        
+        $seller = $this->security->getUser();
+
+        if (!$seller instanceof User) {
+            return new JsonResponse(['error' => 'Utilisateur non authentifié'], 401);
+        }
+
+        $sellerPaymentId= (int) $sellerPaymentId;
+
+        $data = $this->findSPById->execute($sellerPaymentId);
+
+        return $this->json($data);
+    }   
     
     
 }

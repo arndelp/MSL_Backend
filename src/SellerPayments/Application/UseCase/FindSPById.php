@@ -15,6 +15,7 @@ final class FindSPById
 
     public function execute($id): ?array
     {
+      
         $SP = $this->repository->findById($id);
 
         $data = [

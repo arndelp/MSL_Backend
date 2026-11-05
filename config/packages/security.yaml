@@ -83,6 +83,7 @@ security:
         - { path: ^/api/authorNamesByUser, roles: IS_AUTHENTICATED_FULLY, methods: [GET] }
         - { path: ^/api/claimMessages/\d+$, roles: IS_AUTHENTICATED_FULLY, methods: [GET]}
         - { path: ^/api/allClaims, roles: IS_AUTHENTICATED_FULLY, methods: [GET]}
+        - { path: ^/api/seller/findSellerPayment, roles: IS_AUTHENTICATED_FULLY, methods: [GET]}
        
 
         - { path: ^/api/deleteBook/\d+$, roles: IS_AUTHENTICATED_FULLY, methods: [DELETE]}
